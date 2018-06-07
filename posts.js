@@ -4,19 +4,31 @@ var markdown = require( "markdown" ).markdown;
 class Posts {
 
   static index(req, res, bucket, dynamoDb) {
-    const params = {
-      TableName: POSTS_TABLE
-    }
+    const params = { TableName: POSTS_TABLE };
     dynamoDb.scan(params, (error, result) => {
       if (error) {
         console.log(error);
-        res.status(400).json({error: 'Something\'s broken'});
-      }
-      if (result.Items) {
-        res.render('posts/index', {bucket: bucket, req: req, politics: result.Items, features: null});
+        res.json({ error: error });
+      } else {
+        var pols = [];
+        var local = [];
+        var current = [];
+        console.log(result);
+        for (var i = 0; result && i < result.Items.length; i++) {
+          if (result.Items[i].category == 'Politics') {
+            pols.push(result.Items[i]);
+          } else if (result.Items[i].category == 'Local') {
+            local.push(result.Items[i]);
+          } else if (result.Items[i].category == 'Current Events') {
+            current.push(result.Items[i]);
+          }
+        }
+        res.render('posts/index', {bucket: bucket, req: req,
+                                   politics: pols, local: local,
+                                   current: current, features: null});
       }
     });
-  }
+  } 
 
   static read(req, res, bucket, dynamoDb) {
     const params = {
@@ -128,6 +140,32 @@ class Posts {
     } else {
       res.status(400).json({error: 'invalid arguments'});
     }
+  }
+
+  /*
+   * Finds and returns all posts in the specified category.
+   *
+   * Post-conditions: returns null if there was an error or no posts were
+   *                  found.
+   */
+  static find_category(category, dynamoDb) {
+    const params = {
+      TableName: POSTS_TABLE,
+      KeyConditionExpression: "category = :c" ,
+      ExpressionAttributeValues: {
+        ":c": category 
+      }
+    } 
+  
+    dynamoDb.query(params, (error) => {
+      if (error) {
+        console.log(error);
+        return null;
+      } else {
+        console.log(result);
+        return result.Items;
+      }
+    });
   }
 
   static parse(body) {

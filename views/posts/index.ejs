@@ -3,9 +3,9 @@
   <div id="left" class="col-md-3 col-12">
     <h4 class="heading">Politics</h4>
     <div id="gutter-left">
-    <% politics.forEach(function(post) {  %>
-      <%- include('gutter', {post: post}); %>
-    <% }); %>
+    <% for (var i = 0; politics && i < politics.length; i++) { %>
+      <%- include('gutter', {post: politics[i]}); %>
+    <% } %>
     </div>
   </div>
   <div class="col">
@@ -41,12 +41,23 @@
     <% } %> 
     <h4 class="heading">Current Events</h4>
       <% i = 0 %>
-      <%# current.forEach(function(post) { %>
-        <%# if (i == 2) { %>
+      <% for (i = 0; i < current.length; i++) { %>
+        <% post = current[i]; %>
+        <% if (i == 2) { %>
           <!-- Infinite timeline -->
-        <%# } %>
-        <!-- other posts -->
-      <%# }); %> 
+        <% } %>
+        <article class="article">
+          <div class="row">
+            <div class="col">
+              <h3><a href="/posts/<%= post.postId %>"><%= post.title %></a></h3>
+              <img src="" />
+              <h6>by <%= post.author %></h6>
+              <%# render partial: "shared/blurb", locals: {post: post} %>
+            </div>
+          </div>
+        </article>
+        <hr />  
+      <% } %> 
   </div>
   <div id="right" class="col-md-3 col-12">
     <div class="greyed">
@@ -56,15 +67,14 @@
     </div>
     <h4 class="heading mt-4">Local</h4>
     <div id="gutter-right">
-      <% i = 0 %>
-      <%# local.forEach(function(post) { %>
+      <% for (i = 0; local && i < local.length; i++) { %>
         <% if (i == 5) { %>
           <div id="carousel-2" class="carousel slide" data-ride="carousel" data-interval="10000">
             <ol class="carousel-indicators"></ol>
             <div class="carousel-inner" role="listbox">
-              <% var j = 0 %>
+              <% var k = 0; %>
               <%# short.forEach(function(sh) { %>
-                <% if (j == 0) { %>
+                <% if (k == 0) { %>
                   <div class="carousel-item align-items-center active">
                 <% } else { %>
                   <div class="carousel-item align-items-center">
@@ -72,14 +82,14 @@
                 <a href="#carousel-2" role="button" data-slide="next">
                   <p><%= sh.title %></p>
                 </a>
-                <% j++ %>
+                <% k++; %>
                 </div>
               <%# } %>
             </div>
           </div>
         <% } %>
-        <!-- local posts -->
-      <%# } %>
+        <%- include('gutter', {post: local[i]}); -%> 
+      <% } %>
     </div>
   </div>
 </div>
