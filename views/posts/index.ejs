@@ -52,7 +52,7 @@
               <h3><a href="/posts/<%= post.postId %>"><%= post.title %></a></h3>
               <img src="" />
               <h6>by <%= post.author %></h6>
-              <%# render partial: "shared/blurb", locals: {post: post} %>
+              <%- post.content.substr(0, 200) + "..."; -%> 
             </div>
           </div>
         </article>

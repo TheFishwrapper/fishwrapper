@@ -22,6 +22,7 @@ class Posts {
           } else if (result.Items[i].category == 'Current Events') {
             current.push(result.Items[i]);
           }
+          result.Items[i].content = markdown.toHTML(result.Items[i].content);
         }
         res.render('posts/index', {bucket: bucket, req: req,
                                    politics: pols, local: local,
