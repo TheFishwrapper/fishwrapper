@@ -1,5 +1,5 @@
 const POSTS_TABLE = process.env.POSTS_TABLE;
-var markdown = require( "markdown" ).markdown;
+var markdown = require("markdown").markdown;
 
 class Posts {
 
