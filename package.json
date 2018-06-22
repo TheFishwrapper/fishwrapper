@@ -15,6 +15,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "markdown": "^0.5.0",
+    "request": "^2.87.0",
     "serverless-http": "^1.5.5"
   },
   "devDependencies": {

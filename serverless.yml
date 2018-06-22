@@ -48,8 +48,17 @@ functions:
   app:
     handler: index.handler
     events:
-      - http: ANY /
+      - http:
+            path: /
+            method: any
+            cors: true
+            authorizer:
+              name: auth
+              identitySource: method.request.querystring.code
+              type: request 
       - http: 'ANY {proxy+}'
+  auth:
+    handler: auth.handler
 
 resources:
   Resources:
