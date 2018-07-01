@@ -12,6 +12,8 @@ custom:
         sources:
           - table: posts-table-dev
             sources: [./posts.json]
+          - table: users-table-dev
+            sources: [./users.json]
   customDomain:
     domainName: fish.capitalistlepton.com 
     basePath: ''
@@ -40,25 +42,20 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["PostsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["FeaturesDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
     FEATS_TABLE: 'features-table-${self:provider.stage}' 
+    USERS_TABLE: 'users-table-${self:provider.stage}'
+    COOKIE_SECRET: ${ssm:cookieSecret}
+    S3_BUCKET: ${ssm:s3Bucket}
 
 functions:
   app:
     handler: index.handler
     events:
-      - http:
-            path: /
-            method: any
-            cors: true
-            authorizer:
-              name: auth
-              identitySource: method.request.querystring.code
-              type: request 
+      - http: 'ANY /'
       - http: 'ANY {proxy+}'
-  auth:
-    handler: auth.handler
 
 resources:
   Resources:
@@ -93,3 +90,20 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'features-table-${self:provider.stage}' 
+
+    UsersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: user
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: user
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'users-table-${self:provider.stage}'
+

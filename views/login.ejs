@@ -1,0 +1,10 @@
+<%- include('header') -%>
+  <form action="/login" accept-charset="UTF-8" method="POST">
+    <input name="utf8" type="hidden" value="✓" />
+    <label for="username">Username:</label>
+    <input name="username" type="text" /><br />
+    <label for="password">Password:</label>
+    <input name="password" type="password" /><br />
+    <input type="submit" value="Submit" class="btn btn-outline-secondary" />
+  </form>
+<%- include('footer') -%>

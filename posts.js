@@ -13,7 +13,6 @@ class Posts {
         var pols = [];
         var local = [];
         var current = [];
-        console.log(result);
         for (var i = 0; result && i < result.Items.length; i++) {
           if (result.Items[i].category == 'Politics') {
             pols.push(result.Items[i]);

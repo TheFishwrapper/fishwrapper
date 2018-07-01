@@ -1,9 +1,11 @@
 const serverless = require('serverless-http');
 const bodyParser = require('body-parser');
-const express = require('express')
-const app = express()
+const express = require('express');
+const cookie = require('cookie-parser');
+const app = express();
 const AWS = require('aws-sdk');
 const Posts = require('./posts');
+const Login = require('./login');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 
@@ -22,11 +24,22 @@ app.use(bodyParser.json({ strict: false }));
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
+app.use(cookie(process.env.COOKIE_SECRET));
 app.set('view engine', 'ejs');
-let bucket = "https://s3.amazonaws.com/fishwrapper-assets-dev/";
+let bucket = process.env.S3_BUCKET; 
 
 app.get('/', function (req, res) {
   Posts.index(req, res, bucket, dynamoDb);
+  console.log('Signed cookies: ');
+  console.log(req.signedCookies);
+});
+
+app.get('/login', function (req, res) {
+  Login.show(req, res, bucket, dynamoDb);
+});
+
+app.post('/login', function (req, res) {
+  Login.attempt(req, res, bucket, dynamoDb);
 });
 
 app.get('/posts', function (req, res) {
@@ -51,10 +64,6 @@ app.post('/posts', function(req, res) {
   } else if (req.body._method == 'POST') {
     Posts.create(req, res, dynamoDb);
   }
-});
-
-app.put('/posts/:postId', function(req, res) {
-  res.json(req.params);
 });
 
 module.exports.handler = serverless(app);
