@@ -30,8 +30,6 @@ let bucket = process.env.S3_BUCKET;
 
 app.get('/', function (req, res) {
   Posts.index(req, res, bucket, dynamoDb);
-  console.log('Signed cookies: ');
-  console.log(req.signedCookies);
 });
 
 app.get('/login', function (req, res) {
