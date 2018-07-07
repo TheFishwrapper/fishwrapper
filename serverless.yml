@@ -6,14 +6,6 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-      seed: true
-    seed:
-      dev:
-        sources:
-          - table: posts-table-dev
-            sources: [./posts.json]
-          - table: users-table-dev
-            sources: [./users.json]
   customDomain:
     domainName: fish.capitalistlepton.com 
     basePath: ''

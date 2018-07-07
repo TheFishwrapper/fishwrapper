@@ -1,0 +1,51 @@
+{{> header}}
+<div class="row">
+  <div id="left" class="col-md-3 col-12">
+    <h4 class="heading">Politics</h4>
+    <div id="gutter-left">
+    {{#each politics}}
+      {{> posts_gutter}}
+    {{/each}}
+    </div>
+  </div>
+  <div class="col">
+    {{#if features}}
+      <div id="my-carousel" class="carousel slide" data-ride="carousel" data-interval="10000">
+        <ol class="carousel-indicators"></ol>
+        {{#caro features}}
+            <a href="/posts/{{postId}}"><img src="" /></a>
+            <div class="carousel-caption d-none d-md-block">
+              <h3><a href="/posts/{{postId}}">{{title}}</a></h3>
+            </div>
+          </div>
+        {{/caro}}
+        <a class="carousel-control-prev" href="#my-carousel" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#my-carousel" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+    {{/if}}
+    <h4 class="heading">Current Events</h4>
+      {{#each current}}
+        {{> posts_gutter}}
+      {{/each}}
+  </div>
+  <div id="right" class="col-md-3 col-12">
+    <div class="greyed">
+      <div id="quiz" class="bord">
+        <h4 class="center"><a href="/quizzes" class="darker">First quiz here</a></h4>
+      </div>
+    </div>
+    <h4 class="heading mt-4">Local</h4>
+    <div id="gutter-right">
+      {{#each local}}
+        {{> posts_gutter}}
+      {{/each}}
+    </div>
+  </div>
+</div>
+{{> footer}}

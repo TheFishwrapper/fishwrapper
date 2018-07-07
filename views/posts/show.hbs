@@ -1,9 +1,9 @@
-<%- include('../header') -%>
+{{> header}}
 <div class="row">
   <div class="col text-center">
-    <h2><%= post.title %></h2>
-    <h6>by <%= post.author %></h6>
-    <h6>Published: <%= post.published_on %></h6>
+    <h2>{{post.title}}</h2>
+    <h6>by {{post.author}}</h6>
+    <h6>Published: {{post.published_on}}</h6>
   </div>
 </div>
 <div class="row">
@@ -41,7 +41,7 @@
 </div>
 <div class="row mt-3">
   <div class="col post">
-    <%- post.content %>
+    {{{post.content}}}
   </div>
 </div>
-<%- include('../footer') -%>
+{{> footer}}

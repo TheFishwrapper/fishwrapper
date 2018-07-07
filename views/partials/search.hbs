@@ -1,5 +1,7 @@
 <form id="search-form" action="/posts" accept-charset="UTF-8" method="GET">
   <input name="utf8" type="hidden" value="✓" />
   <input id="search-bar" type="text" name="search" placeholder="Search" />
-  <input type="hidden" name="category" value="<%= req.query.category %>" /> 
+  {{#if req.query.category}}
+    <input type="hidden" name="category" value="{{req.query.category}}" /> 
+  {{/if}}
 </form>
