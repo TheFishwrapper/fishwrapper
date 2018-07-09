@@ -26,7 +26,7 @@ class Login {
             console.log(err);
           }
           if (correct) {
-            res.cookie('id_token', 12, { signed: true, httpOnly: true, sameSite: 'strict' });
+            res.cookie('id_token', result.Item.user, { signed: true, httpOnly: true, sameSite: 'strict' });
             res.redirect(302, '/');
           } else {
             res.status(400).json({ error: 'Incorrect password or username' });
@@ -36,6 +36,11 @@ class Login {
         res.status(404).json({ error: 'user not found' });
       }
     });
+  }
+
+  static logout(req, res, bucket, dynamoDb) {
+    res.cookie('id_token', '', { expires: new Date() });
+    res.redirect(302, '/');
   }
 }
 

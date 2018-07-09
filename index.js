@@ -47,7 +47,6 @@ app.set('view engine', 'hbs');
 let bucket = process.env.S3_BUCKET; 
 
 app.get('/', function (req, res) {
-//  res.render('index', {bucket: bucket, id_token: req.signedCookies.id_token});
   Posts.index(req, res, bucket, dynamoDb);
 });
 
@@ -57,6 +56,10 @@ app.get('/login', function (req, res) {
 
 app.post('/login', function (req, res) {
   Login.attempt(req, res, bucket, dynamoDb);
+});
+
+app.get('/logout', function (req, res) {
+  Login.logout(req, res, bucket, dynmaoDb);
 });
 
 app.get('/posts', function (req, res) {
