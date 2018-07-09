@@ -47,40 +47,40 @@ app.set('view engine', 'hbs');
 let bucket = process.env.S3_BUCKET; 
 
 app.get('/', function (req, res) {
-  Posts.index(req, res, bucket, dynamoDb);
+  Posts.index(req, res, dynamoDb);
 });
 
 app.get('/login', function (req, res) {
-  Login.show(req, res, bucket, dynamoDb);
+  Login.show(req, res, dynamoDb);
 });
 
 app.post('/login', function (req, res) {
-  Login.attempt(req, res, bucket, dynamoDb);
+  Login.attempt(req, res, dynamoDb);
 });
 
 app.get('/logout', function (req, res) {
-  Login.logout(req, res, bucket, dynmaoDb);
+  Login.logout(req, res, dynmaoDb);
 });
 
 app.get('/posts', function (req, res) {
-  Posts.index(req, res, bucket, dynamoDb);
+  Posts.index(req, res, dynamoDb);
 });
 
 app.get('/posts/new', function(req, res) {
-  Posts.new_post(req, res, bucket, dynamoDb);
+  Posts.new_post(req, res, dynamoDb);
 });
 
 app.get('/posts/:postId', function(req, res) {
-  Posts.read(req, res, bucket, dynamoDb); 
+  Posts.read(req, res, dynamoDb); 
 });
 
 app.get('/posts/:postId/edit', function(req, res) {
-  Posts.edit(req, res, bucket, dynamoDb);
+  Posts.edit(req, res, dynamoDb);
 });
 
 app.post('/posts', function(req, res) {
   if (req.body._method == 'PUT') {
-    Posts.update(req, res, bucket, dynamoDb);
+    Posts.update(req, res, dynamoDb);
   } else if (req.body._method == 'POST') {
     Posts.create(req, res, dynamoDb);
   }

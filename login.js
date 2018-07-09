@@ -1,14 +1,15 @@
 const USERS_TABLE = process.env.USERS_TABLE;
+const bucket = process.env.S3_BUCKET;
 const bcrypt = require('bcryptjs');
 
 class Login {
 
-  static show(req, res, bucket, dynamoDb) {
+  static show(req, res, dynamoDb) {
     console.log(res);
     res.render('login', {bucket: bucket, req: req});
   }
 
-  static attempt(req, res, bucket, dynamoDb) {
+  static attempt(req, res, dynamoDb) {
     const params = {
       TableName: USERS_TABLE,
        Key: {
@@ -38,7 +39,7 @@ class Login {
     });
   }
 
-  static logout(req, res, bucket, dynamoDb) {
+  static logout(req, res, dynamoDb) {
     res.cookie('id_token', '', { expires: new Date() });
     res.redirect(302, '/');
   }

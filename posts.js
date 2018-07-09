@@ -1,9 +1,10 @@
 const POSTS_TABLE = process.env.POSTS_TABLE;
+const bucket = process.env.S3_BUCKET;
 var markdown = require("markdown").markdown;
 
 class Posts {
 
-  static index(req, res, bucket, dynamoDb) {
+  static index(req, res, dynamoDb) {
     const params = { TableName: POSTS_TABLE };
     dynamoDb.scan(params, (error, result) => {
       if (error) {
@@ -30,7 +31,7 @@ class Posts {
     });
   } 
 
-  static read(req, res, bucket, dynamoDb) {
+  static read(req, res, dynamoDb) {
     const params = {
       TableName: POSTS_TABLE,
       Key: {
@@ -86,7 +87,7 @@ class Posts {
     }
   }
   
-  static edit(req, res, bucket, dynamoDb) {
+  static edit(req, res, dynamoDb) {
     if (Posts.authenticate(req, res)) {
       const params = {
         TableName: POSTS_TABLE,
@@ -109,7 +110,7 @@ class Posts {
     }
   } 
 
-  static new_post(req, res, bucket, dynamoDb) {
+  static new_post(req, res, dynamoDb) {
     if (Posts.authenticate(req, res)) {
       const post = {
         staging: true,
@@ -119,7 +120,7 @@ class Posts {
     }
   }
 
-  static update(req, res, bucket, dynamoDb) {
+  static update(req, res, dynamoDb) {
     if (Posts.authenticate(req, res)) {
       const post = Posts.parse(req.body);
       if (post) {
@@ -178,6 +179,10 @@ class Posts {
     });
   }
 
+  /*
+   * Parses the body of the posts form and returns an object with all
+   * of the fields of the form.
+   */
   static parse(body) {
     var post = new Object();
     post.postId = body.postId;
@@ -202,6 +207,9 @@ class Posts {
     return post;
   }
 
+  /*
+   * Validates the type of a given variable.
+   */
   static validate(param, type) {
     if (typeof param !== type) {
       return `"${param}" must be a ${type}\n`;
@@ -224,4 +232,5 @@ class Posts {
     }
   }
 }
+
 module.exports = Posts;
