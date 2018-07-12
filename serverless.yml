@@ -72,11 +72,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: id 
+            AttributeName: index 
             AttributeType: N
         KeySchema:
           -
-            AttributeName: id 
+            AttributeName: index 
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

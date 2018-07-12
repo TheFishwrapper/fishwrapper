@@ -7,6 +7,7 @@ const app = express();
 const AWS = require('aws-sdk');
 const Posts = require('./posts');
 const Login = require('./login');
+const Features = require('./features');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 
@@ -84,6 +85,10 @@ app.post('/posts', function(req, res) {
   } else if (req.body._method == 'POST') {
     Posts.create(req, res, dynamoDb);
   }
+});
+
+app.get('/features', function(req, res) {
+  Features.index(req, res, dynamoDb);
 });
 
 module.exports.handler = serverless(app);
