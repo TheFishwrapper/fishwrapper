@@ -5,6 +5,8 @@ const cookie = require('cookie-parser');
 const hbs = require('hbs');
 const app = express();
 const AWS = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
 const Posts = require('./posts');
 const Login = require('./login');
 const Features = require('./features');
@@ -21,6 +23,36 @@ if (IS_OFFLINE === 'true') {
 } else {
   dynamoDb = new AWS.DynamoDB.DocumentClient();
 }
+
+let s3 = new AWS.S3();
+
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '/tmp/my-uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname)
+  }
+});
+
+let mulS3 = multerS3({
+  s3: s3,
+  bucket: 'fishwrapper-pictures-dev',
+  acl: 'public-read',
+  contentType: function (req, file, cb) {
+    cb(null, file.mimetype);
+  }, 
+  metadata: function (req, file, cb) {
+    cb(null, {
+      fieldName: file.fieldname
+    });
+  },
+  key: function (req, file, cb) {
+    cb(null, Date.now().toString() + '-' + file.originalname)
+  }
+});
+
+let upload = multer({ storage: mulS3 });
 
 hbs.registerHelper('blurb', function(content) { return content.substr(0, 230) + '...' });
 hbs.registerHelper('caro', function(items, options) {
@@ -70,7 +102,6 @@ app.get('/posts', function (req, res) {
 app.get('/posts/new', function(req, res) {
   Posts.new_post(req, res, dynamoDb);
 });
-
 app.get('/posts/:postId', function(req, res) {
   Posts.read(req, res, dynamoDb); 
 });
@@ -79,7 +110,8 @@ app.get('/posts/:postId/edit', function(req, res) {
   Posts.edit(req, res, dynamoDb);
 });
 
-app.post('/posts', function(req, res) {
+app.post('/posts', upload.single('thumbnail'), function(req, res) {
+  console.log(req.file);
   if (req.body._method == 'PUT') {
     Posts.update(req, res, dynamoDb);
   } else if (req.body._method == 'POST') {

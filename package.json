@@ -18,10 +18,13 @@
     "express": "^4.16.3",
     "hbs": "^4.0.1",
     "markdown": "^0.5.0",
+    "multer": "^1.3.1",
+    "multer-s3": "^2.7.0",
     "request": "^2.87.0",
     "serverless-http": "^1.5.5"
   },
   "devDependencies": {
+    "serverless-apigw-binary": "^0.4.4",
     "serverless-domain-manager": "^2.4.0",
     "serverless-dynamodb-local": "^0.2.30",
     "serverless-offline": "^3.23.0"

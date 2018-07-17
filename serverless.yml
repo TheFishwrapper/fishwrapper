@@ -11,11 +11,14 @@ custom:
     basePath: ''
     stage: ${self:provider.stage}
     createRoute53Record: true
-
+  apigwBinary:
+    types:
+      - '*/*'
 plugins:
   - serverless-domain-manager
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-apigw-binary
 
 provider:
   name: aws
@@ -31,16 +34,20 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - s3:PutObject
+        - s3:PutObjectAcl
       Resource:
         - { "Fn::GetAtt": ["PostsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["FeaturesDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
+        - "arn:aws:s3:::fishwrapper-pictures-dev/*"
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
     FEATS_TABLE: 'features-table-${self:provider.stage}' 
     USERS_TABLE: 'users-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
+    PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
 
 functions:
   app:
