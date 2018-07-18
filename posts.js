@@ -59,7 +59,7 @@ class Posts {
     if (Posts.authenticate(req, res)) {
       const post = Posts.parse(req.body);
       post.postId = post.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-');
-      if (post) {
+      if (post && req.file) {
         const params = {
           TableName: POSTS_TABLE,
           Item: {
@@ -69,7 +69,9 @@ class Posts {
             author: post.author,
             published_on: post.published_on,
             content: post.content,
-            staging: post.staging 
+            staging: post.staging,
+            thumbnail: post.thumbnail,
+            thumbnail_credit: post.thumbnail_credit 
           },
         };
 
@@ -123,22 +125,44 @@ class Posts {
   static update(req, res, dynamoDb) {
     if (Posts.authenticate(req, res)) {
       const post = Posts.parse(req.body);
+      let params;
       if (post) {
-        const params = {
-          TableName: POSTS_TABLE,
-          Key: {
-            postId: post.postId
-          },
-          UpdateExpression: 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging',
-          ExpressionAttributeValues: {
-            ':title': post.title,
-            ':author': post.author,
-            ':category': post.category,
-            ':published_on': post.published_on,
-            ':content': post.content,
-            ':staging': post.staging
-          },
-        } 
+        if (req.file) {
+          params = {
+            TableName: POSTS_TABLE,
+            Key: {
+              postId: post.postId
+            },
+            UpdateExpression: 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging, thumbnail = :thumbnail, thumbnail_credit = :thumbnail_credit',
+            ExpressionAttributeValues: {
+              ':title': post.title,
+              ':author': post.author,
+              ':category': post.category,
+              ':published_on': post.published_on,
+              ':content': post.content,
+              ':staging': post.staging,
+              ':thumbnail': req.file.location,
+              ':thumbnail_credit': post.thumbnail_credit
+            },
+          }
+        } else {
+          params = {
+            TableName: POSTS_TABLE,
+            Key: {
+              postId: post.postId
+            },
+            UpdateExpression: 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging, thumbnail_credit = :thumbnail_credit',
+            ExpressionAttributeValues: {
+              ':title': post.title,
+              ':author': post.author,
+              ':category': post.category,
+              ':published_on': post.published_on,
+              ':content': post.content,
+              ':staging': post.staging,
+              ':thumbnail_credit': post.thumbnail_credit
+            },
+          }
+        }
         dynamoDb.update(params, (error) => {
           if (error) {
             console.log(error);
@@ -192,6 +216,7 @@ class Posts {
     post.content = body.content;
     post.category = body.category;
     post.staging = new Boolean(body.staging).valueOf();
+    post.thumbnail_credit = body.thumbnail_credit;
     var error = '';
     error += Posts.validate(post.postId, 'string');
     error += Posts.validate(post.title, 'string');
@@ -199,6 +224,7 @@ class Posts {
     error += Posts.validate(post.published_on, 'string');
     error += Posts.validate(post.content, 'string');
     error += Posts.validate(post.category, 'string');
+    error += Posts.validate(post.thumbnail_credit, 'string');
     if (error) {
       console.log();
       console.log(error);

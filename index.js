@@ -111,7 +111,6 @@ app.get('/posts/:postId/edit', function(req, res) {
 });
 
 app.post('/posts', upload.single('thumbnail'), function(req, res) {
-  console.log(req.file);
   if (req.body._method == 'PUT') {
     Posts.update(req, res, dynamoDb);
   } else if (req.body._method == 'POST') {

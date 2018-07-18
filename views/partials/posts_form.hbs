@@ -9,7 +9,8 @@
   <input type="text" name="published_on" value="{{post.published_on}}" /><br />
   <label for="content">Content:</label><br />
   <textarea name="content" cols="80" rows="12">{{post.content}}</textarea><br />
-  <input type="file" name="thumbnail" />
+  <input type="file" name="thumbnail" /><br />
+  <input type="text" name="thumbnail_credit" value="{{post.thumbnail_credit}}" /><br />
   <input type="hidden" name="staging" value="{{post.staging}}" />
   <input type="hidden" name="postId" value="{{post.postId}}" id="postId" />
   <input type="hidden" name="_method" value="{{method}}" />
