@@ -70,7 +70,7 @@ class Posts {
             published_on: post.published_on,
             content: post.content,
             staging: post.staging,
-            thumbnail: post.thumbnail,
+            thumbnail: req.file.location,
             thumbnail_credit: post.thumbnail_credit 
           },
         };
@@ -175,6 +175,23 @@ class Posts {
         res.status(400).json({error: 'invalid arguments'});
       }
     }
+  }
+
+  static destroy(req, res, dynamoDb) {
+    const params = {
+      TableName: POSTS_TABLE,
+      Key: {
+        postId: req.params.postId
+      }
+    };
+    dynamoDb.delete(params, function (err, data) {
+      if (err) {
+        console.log(err);
+        res.status(400).json({ error: 'Could not find post' });
+      } else {
+        res.redirect(302, '/');
+      }
+    });
   }
 
   /*

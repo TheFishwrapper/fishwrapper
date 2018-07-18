@@ -8,7 +8,7 @@
 <a href="/about" class="p-2">About</a>
 <a href="/contact" class="p-2">Contact Us</a>
 <a href="/infinite_timelines" class="p-2">Infinite Timeline</a>
-{{#if id_token }}
+{{#if req.signedCookies.id_token }}
   <a href="/staging" class="p-2">Staging</a>
   <a href="/logout" class="p-2">Logout</a>
   <a href="/features" class="p-2">Featured</a>

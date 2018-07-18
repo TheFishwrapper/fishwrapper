@@ -92,7 +92,7 @@ app.post('/login', function (req, res) {
 });
 
 app.get('/logout', function (req, res) {
-  Login.logout(req, res, dynmaoDb);
+  Login.logout(req, res, dynamoDb);
 });
 
 app.get('/posts', function (req, res) {
@@ -102,12 +102,17 @@ app.get('/posts', function (req, res) {
 app.get('/posts/new', function(req, res) {
   Posts.new_post(req, res, dynamoDb);
 });
+
 app.get('/posts/:postId', function(req, res) {
   Posts.read(req, res, dynamoDb); 
 });
 
 app.get('/posts/:postId/edit', function(req, res) {
   Posts.edit(req, res, dynamoDb);
+});
+
+app.get('/posts/:postId/delete', function(req, res) {
+  Posts.destroy(req, res, dynamoDb);
 });
 
 app.post('/posts', upload.single('thumbnail'), function(req, res) {

@@ -40,9 +40,9 @@
   }(document, "script", "twitter-wjs"));</script>
   <script id="tumblr-js" async src="https://assets.tumblr.com/share-button.js"></script>
   <div class="col" id="social-networks">
-    <div class="fb-share-button" data-href="http://www.thefishwrapper.news/posts/<%= post.postId %>" data-layout="button" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.thefishwrapper.news%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
-    <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Check%20out%20this%20article&url=http://www.thefishwrapper.news/posts/<%= post.postId %>">Tweet</a>
-    <a class="tumblr-share-button" href="https://www.tumblr.com/share" data-href="http://www.thefishwrapper.news/posts/<%= post.postId %>"></a>
+    <div class="fb-share-button" data-href="http://www.thefishwrapper.news/posts/{{post.postId}}" data-layout="button" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fwww.thefishwrapper.news%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share</a></div>
+    <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Check%20out%20this%20article&url=http://www.thefishwrapper.news/posts/{{post.postId}}">Tweet</a>
+    <a class="tumblr-share-button" href="https://www.tumblr.com/share" data-href="http://www.thefishwrapper.news/posts/{{post.postId}}>"></a>
   </div>
 </div>
 <div class="row mt-3">
@@ -50,4 +50,10 @@
     {{{post.content}}}
   </div>
 </div>
+{{#if req.signedCookies.id_token}}
+  <div class="row">
+    <p class="mr-2"><a class="btn btn-outline-secondary" href="/posts/{{post.postId}}/edit">Edit</a></p>
+    <p class="mr-2"><a class="btn btn-outline-secondary" href="/posts/{{post.postId}}/delete">Delete</a></p> 
+  </div>
+{{/if}} 
 {{> footer}}
