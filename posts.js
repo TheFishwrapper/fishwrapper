@@ -1,5 +1,6 @@
 const POSTS_TABLE = process.env.POSTS_TABLE;
 const bucket = process.env.S3_BUCKET;
+const Login = require('./login');
 var markdown = require("markdown").markdown;
 
 class Posts {
@@ -56,7 +57,7 @@ class Posts {
   }
 
   static create(req, res, dynamoDb) {
-    if (Posts.authenticate(req, res)) {
+    if (Login.authenticate(req, res)) {
       const post = Posts.parse(req.body);
       post.postId = post.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-');
       if (post && req.file) {
@@ -90,13 +91,13 @@ class Posts {
   }
   
   static edit(req, res, dynamoDb) {
-    if (Posts.authenticate(req, res)) {
+    if (Login.authenticate(req, res)) {
       const params = {
         TableName: POSTS_TABLE,
         Key: {
           postId: req.params.postId
         }
-      }
+      };
 
       dynamoDb.get(params, (error, result) => {
         if (error) {
@@ -113,7 +114,7 @@ class Posts {
   } 
 
   static new_post(req, res, dynamoDb) {
-    if (Posts.authenticate(req, res)) {
+    if (Login.authenticate(req, res)) {
       const post = {
         staging: true,
         postId: 10 
@@ -123,7 +124,7 @@ class Posts {
   }
 
   static update(req, res, dynamoDb) {
-    if (Posts.authenticate(req, res)) {
+    if (Login.authenticate(req, res)) {
       const post = Posts.parse(req.body);
       let params;
       if (post) {
@@ -260,18 +261,6 @@ class Posts {
       return `"${param}" is an empty string\n`; 
     } else {
       return '';
-    }
-  }
-
-  /*
-   * Verifies that the user is logged in.
-   */
-  static authenticate(req, res) {
-    if (!req.signedCookies['id_token']) {
-      res.redirect(302, '/login');
-      return false;
-    } else {
-      return true;
     }
   }
 }
