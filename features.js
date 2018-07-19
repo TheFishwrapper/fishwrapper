@@ -107,20 +107,22 @@ class Features {
   }
 
   static destroy(req, res, dynamoDb) {
-    const params = {
-      TableName: FEATS_TABLE,
-      Key: {
-        index: parseInt(req.params.index, 10)
-      }
-    };
-    dynamoDb.delete(params, function (err, data) {
-      if (err) {
-        console.log(err);
-        res.status(400).json({ error: 'Could not find feature' });
-      } else {
-        res.redirect('/features');
-      }
-    });
+    if (Login.authenticate(req, res)) {
+      const params = {
+        TableName: FEATS_TABLE,
+        Key: {
+          index: parseInt(req.params.index, 10)
+        }
+      };
+      dynamoDb.delete(params, function (err, data) {
+        if (err) {
+          console.log(err);
+          res.status(400).json({ error: 'Could not find feature' });
+        } else {
+          res.redirect('/features');
+        }
+      });
+    }
   }
 }
 
