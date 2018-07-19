@@ -103,19 +103,19 @@ app.get('/posts/new', function(req, res) {
   Posts.new_post(req, res, dynamoDb);
 });
 
-app.get('/posts/:postId', function(req, res) {
+app.get('/posts/:postId', function (req, res) {
   Posts.read(req, res, dynamoDb); 
 });
 
-app.get('/posts/:postId/edit', function(req, res) {
+app.get('/posts/:postId/edit', function (req, res) {
   Posts.edit(req, res, dynamoDb);
 });
 
-app.get('/posts/:postId/delete', function(req, res) {
+app.get('/posts/:postId/delete', function (req, res) {
   Posts.destroy(req, res, dynamoDb);
 });
 
-app.post('/posts', upload.single('thumbnail'), function(req, res) {
+app.post('/posts', upload.single('thumbnail'), function (req, res) {
   if (req.body._method == 'PUT') {
     Posts.update(req, res, dynamoDb);
   } else if (req.body._method == 'POST') {
@@ -123,8 +123,32 @@ app.post('/posts', upload.single('thumbnail'), function(req, res) {
   }
 });
 
-app.get('/features', function(req, res) {
+app.get('/features', function (req, res) {
   Features.index(req, res, dynamoDb);
+});
+
+app.get('/features/new', function (req, res) {
+  Features.new_feat(req, res, dynamoDb);
+});
+
+app.get('/features/:index', function (req, res) {
+  Features.show(req, res, dynamoDb);
+});
+
+app.get('/features/:index/edit', function (req, res) {
+  Features.edit(req, res, dynamoDb);
+});
+
+app.get('/features/:index/delete', function (req, res) {
+  Features.destroy(req, res, dynamoDb);
+});
+
+app.post('/features', function (req, res) {
+  if (req.body._method == 'PUT') {
+    Features.update(req, res, dynamoDb);
+  } else if (req.body._method == 'POST') {
+    Features.create(req, res, dynamoDb);
+  }
 });
 
 module.exports.handler = serverless(app);

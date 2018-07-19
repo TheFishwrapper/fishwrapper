@@ -43,6 +43,18 @@ class Login {
     res.cookie('id_token', '', { expires: new Date() });
     res.redirect(302, '/');
   }
+
+  /*
+   * Verifies that the user is logged in.
+   */
+  static authenticate(req, res) {
+    if (!req.signedCookies['id_token']) {
+      res.redirect(302, '/login');
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
 
 module.exports = Login;

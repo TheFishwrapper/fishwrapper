@@ -1,0 +1,13 @@
+{{> header}}
+<h1>Featured Articles</h1>
+<p><a href="/features/new" class="btn btn-outline-secondary">New featured article</a></p>
+<div class="row">
+  {{#each feats}}
+    <div class="col-4">
+      <h3><a href="/features/{{index}}">{{post}}</a></h3>
+      <p><a href="/features/{{index}}/edit" class="btn btn-outline-secondary">Edit</a></p>
+      <p><a href="/features/{{index}}/delete" class="btn btn-outline-secondary">Delete</a></p>
+    </div>
+  {{/each}}
+</div>
+{{> footer}}

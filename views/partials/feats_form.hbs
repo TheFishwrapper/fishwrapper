@@ -1,0 +1,14 @@
+<form action="/features" method="POST">
+  <label for="index">Index:</label>
+  <input type="text" name="index" value="{{feat.index}}" /><br />
+  <label for="post">Post:</label>
+  <select name="post">
+    {{#each posts}}
+      <option value="{{postId}}">{{title}}</option>
+    {{/each}}
+  </select>
+  <input type="hidden" name="_method" value="{{method}}" />
+
+  <input type="submit" value="Submit" class="btn btn-outline-secondary" />
+</form>
+
