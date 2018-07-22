@@ -1,0 +1,14 @@
+{{> header}}
+<h4 class="heading">{{heading}}</h4>
+<div class="row">
+  <div class="col-md-3 col-12">
+    {{#each left}}
+      {{> posts_center}}
+    {{/each}}
+  </div>
+  <div id="center" class="col">
+    {{#each center}}
+      {{> posts_center}}
+    {{/each}}
+  </div>
+{{> footer}}

@@ -69,6 +69,7 @@ hbs.registerHelper('caro', function(items, options) {
   out += '</div>';
   return out;
 });
+hbs.registerHelper('checkedIf', function(test) { return (test) ? "checked" : ""; });
 hbs.registerPartials(__dirname + '/views/partials');
 
 app.use(bodyParser.json({ strict: false }));
@@ -121,6 +122,10 @@ app.post('/posts', upload.single('thumbnail'), function (req, res) {
   } else if (req.body._method == 'POST') {
     Posts.create(req, res, dynamoDb);
   }
+});
+
+app.get('/staging', function (req, res) {
+  Posts.staging(req, res, dynamoDb);
 });
 
 app.get('/features', function (req, res) {

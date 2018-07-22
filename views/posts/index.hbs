@@ -13,9 +13,9 @@
       <div id="my-carousel" class="carousel slide" data-ride="carousel" data-interval="10000">
         <ol class="carousel-indicators"></ol>
         {{#caro features}}
-            <a href="/posts/{{postId}}"><img src="" /></a>
+            <a href="/posts/{{post}}"><img src="{{thumbnail}}" /></a>
             <div class="carousel-caption d-none d-md-block">
-              <h3><a href="/posts/{{postId}}">{{title}}</a></h3>
+              <h3><a href="/posts/{{post}}">{{title}}</a></h3>
             </div>
           </div>
         {{/caro}}
@@ -31,17 +31,7 @@
     {{/if}}
     <h4 class="heading">Current Events</h4>
       {{#each current}}
-        <article class="article">
-          <div class="row">
-            <div class="col">
-              <h3><a href="/posts/{{postId}}">{{title}}</a></h3>
-              <img alt="Article Thumbnail" class="img-fluid" src="{{thumbnail}}">
-              <h6>by {{author}}</h6>
-              {{{blurb content}}}
-            </div>
-          </div>
-        </article>
-        <hr />
+        {{> posts_center}}
       {{/each}}
   </div>
   <div id="right" class="col-md-3 col-12">

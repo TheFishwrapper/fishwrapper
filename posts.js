@@ -12,22 +12,33 @@ class Posts {
         console.log(error);
         res.json({ error: error });
       } else {
-        var pols = [];
-        var local = [];
-        var current = [];
-        for (var i = 0; result && i < result.Items.length; i++) {
-          if (result.Items[i].category == 'Politics') {
-            pols.push(result.Items[i]);
-          } else if (result.Items[i].category == 'Local') {
-            local.push(result.Items[i]);
-          } else if (result.Items[i].category == 'Current Events') {
-            current.push(result.Items[i]);
+        dynamoDb.scan({ TableName: process.env.FEATS_TABLE }, (err, resul) => {
+          var posts = result.Items.filter(p => !p.staging);
+          posts.sort((a, b) => new Date(b.published_on) - new Date(a.published_on));
+          var pols = [];
+          var local = [];
+          var current = [];
+          var feats = resul.Items.sort((a, b) => a.index - b.index);
+          for (var i = 0; result && i < posts.length; i++) {
+            if (posts[i].category == 'Politics') {
+              pols.push(posts[i]);
+            } else if (posts[i].category == 'Local') {
+              local.push(posts[i]);
+            } else if (posts[i].category == 'Current Events') {
+              current.push(posts[i]);
+            }
+            posts[i].content = markdown.toHTML(posts[i].content);
+            for (var j = 0; j < feats.length; j++) {
+               if (posts[i].postId == feats[j].post) {
+                 feats[j].title = posts[i].title;
+                 feats[j].thumbnail = posts[i].thumbnail;
+              }
+            }
           }
-          result.Items[i].content = markdown.toHTML(result.Items[i].content);
-        }
-        res.render('posts/index', {bucket: bucket, req: req,
-                                   politics: pols, local: local,
-                                   current: current, features: null});
+          res.render('posts/index', {bucket: bucket, req: req,
+                                     politics: pols, local: local,
+                                     current: current, features: feats});
+      });
       }
     });
   } 
@@ -44,8 +55,7 @@ class Posts {
       if (error) {
         console.log(error);
         res.status(400).json({ error: 'Could not get post' });
-      }
-      if (result.Item) {
+      } else if (result && result.Item) {
         if (result.Item.content) {
           result.Item.content = markdown.toHTML(result.Item.content);
         }
@@ -197,6 +207,29 @@ class Posts {
     }
   }
 
+  static staging(req, res, dynamoDb) {
+    if (Login.authenticate(req, res)) {
+      const params = {
+        TableName: POSTS_TABLE,
+        FilterExpression: 'staging = :val',
+        ExpressionAttributeValues: {
+          ':val': true
+        } 
+      };
+      dynamoDb.scan(params, function (err, data) {
+        if (err) {
+          console.log(err);
+          res.status(400).json({ error: err });
+        } else {
+          data.Items.map(p => p.content = markdown.toHTML(p.content));
+          var left = data.Items.slice(0, data.Count / 2);
+          var center = data.Items.slice(data.Count / 2);
+          res.render('posts/subindex', {bucket: bucket, heading: 'Staging', left: left, center: center});
+        }
+      });
+    }
+  }
+
   /*
    * Finds and returns all posts in the specified category.
    *
@@ -235,7 +268,7 @@ class Posts {
     post.published_on = body.published_on;
     post.content = body.content;
     post.category = body.category;
-    post.staging = new Boolean(body.staging).valueOf();
+    post.staging = (body.staging) ? true : false;
     post.thumbnail_credit = body.thumbnail_credit;
     var error = '';
     error += Posts.validate(post.postId, 'string');
@@ -264,6 +297,39 @@ class Posts {
     } else {
       return '';
     }
+  }
+
+  /*
+   * Joins the features and posts tables so that each feature has the full
+   * contents of the respective posts.
+   */
+  static joinFeats(dynamoDb, cb) {
+    dynamoDb.scan({TableName: process.env.FEATS_TABLE}, (err, res) => {
+      if (err) {
+        console.log(err);
+        cb(null);
+      } else {
+        var feats = [];
+        for (var i = 0; i < res.Items.length; i++) {
+          const params = { 
+            TableName: POSTS_TABLE, 
+            Key: {
+              postId: res.Items[i].post
+            }
+          };
+          dynamoDb.get(params, (e, r) => {
+            if (e) {
+              console.log(e);
+              cb(null);
+            } else {
+              feats.push(r);
+            }
+          });
+        }
+        console.log(feats);
+        cb(feats);
+      }
+    });
   }
 }
 
