@@ -230,28 +230,23 @@ class Posts {
     }
   }
 
-  /*
-   * Finds and returns all posts in the specified category.
-   *
-   * Post-conditions: returns null if there was an error or no posts were
-   *                  found.
-   */
-  static find_category(category, dynamoDb) {
+  static category(req, res, dynamoDb) {
     const params = {
       TableName: POSTS_TABLE,
-      KeyConditionExpression: "category = :c" ,
+      FilterExpression: 'category = :val',
       ExpressionAttributeValues: {
-        ":c": category 
+        ':val': req.query.category
       }
-    } 
-  
-    dynamoDb.query(params, (error) => {
-      if (error) {
-        console.log(error);
-        return null;
+    };
+    dynamoDb.scan(params, function (err, data) {
+      if (err) {
+        console.log(err);
+        res.status(400).json({ error: err });
       } else {
-        console.log(result);
-        return result.Items;
+        data.Items.map(p => p.content = markdown.toHTML(p.content));
+        var left = data.Items.slice(0, data.Count / 2);
+        var center = data.Items.slice(data.Count / 2);
+        res.render('posts/subindex', {bucket: bucket, heading: req.query.category, left: left, center: center});
       }
     });
   }

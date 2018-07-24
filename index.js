@@ -97,7 +97,11 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/posts', function (req, res) {
-  Posts.index(req, res, dynamoDb);
+  if (req.query.category) {
+    Posts.category(req, res, dynamoDb);
+  } else {
+    Posts.index(req, res, dynamoDb);
+  }
 });
 
 app.get('/posts/new', function(req, res) {
