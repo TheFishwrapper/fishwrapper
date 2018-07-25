@@ -160,4 +160,12 @@ app.post('/features', function (req, res) {
   }
 });
 
+app.get('/about', function (req, res) {
+  res.render('about', {bucket: bucket});
+});
+
+app.get('/contact', function (req, res) {
+  res.render('contact', {bucket: bucket});
+});
+
 module.exports.handler = serverless(app);
