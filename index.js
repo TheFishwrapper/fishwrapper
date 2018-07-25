@@ -168,4 +168,8 @@ app.get('/contact', function (req, res) {
   res.render('contact', {bucket: bucket});
 });
 
+app.get('*', function (req, res) {
+  res.render('missing', {bucket: bucket});
+});
+
 module.exports.handler = serverless(app);
