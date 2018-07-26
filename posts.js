@@ -199,7 +199,7 @@ class Posts {
       dynamoDb.delete(params, function (err, data) {
         if (err) {
           console.log(err);
-          res.status(400).json({ error: 'Could not find post' });
+          res.status(404).json({ error: 'Could not find post' });
         } else {
           res.redirect(302, '/');
         }

@@ -10,6 +10,7 @@ const multerS3 = require('multer-s3');
 const Posts = require('./posts');
 const Login = require('./login');
 const Features = require('./features');
+const Subscribers = require('./subscribers');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 
@@ -166,6 +167,22 @@ app.get('/about', function (req, res) {
 
 app.get('/contact', function (req, res) {
   res.render('contact', {bucket: bucket});
+});
+
+app.get('/subscribers/new', function (req, res) {
+  Subscribers.new_subscriber(req, res, dynamoDb);
+});
+
+app.get('/subscribers/delete', function (req, res) {
+  Subscribers.delete(req, res, dynamoDb);
+});
+
+app.post('/subscribers', function(req, res) {
+  if (req.body._method == 'POST') {
+    Subscribers.create(req, res, dynamoDb);
+  } else if (req.body._method == 'DELETE') {
+    Subscribers.destroy(req, res, dynamoDb);
+  }
 });
 
 app.get('*', function (req, res) {
