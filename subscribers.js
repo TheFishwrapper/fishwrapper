@@ -9,13 +9,15 @@ class Subscribers {
   }
 
   static create(req, res, dynamoDb) {
-    const params = {
+    let params = {
       TableName: SUB_TABLE, 
       Item: {
         email: req.body.email,
-        phone: req.body.phone
       }
     };
+    if (req.body.phone) {
+      params.Item.phone = req.body.phone;
+    }
     dynamoDb.put(params, function (error) {
       if (error) {
         console.log(error);
@@ -40,7 +42,7 @@ class Subscribers {
     dynamoDb.delete(params, function (err, data) {
       if (err) {
         console.log(err);
-        Lib.error(res, 'Could not find subscriber to delete.');
+        Lib.error(res, 'Could not remove subscriber. Make sure a proper email is supplied.');
       } else { 
         res.redirect('/');
       }
