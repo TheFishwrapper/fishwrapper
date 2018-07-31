@@ -1,6 +1,7 @@
 const USERS_TABLE = process.env.USERS_TABLE;
 const bucket = process.env.S3_BUCKET;
 const bcrypt = require('bcryptjs');
+const Lib = require('./lib');
 
 class Login {
 
@@ -19,22 +20,24 @@ class Login {
     dynamoDb.get(params, function (error, result) {
       if (error) {
         console.log(error);
+        Lib.error(res, error);
       } 
       if (result.Item) {
         const hash = result.Item.password;
         bcrypt.compare(req.body.password, hash, function (err, correct) {
           if (err) {
             console.log(err);
+            Lib.error(res, err);
           }
           if (correct) {
             res.cookie('id_token', result.Item.user, { signed: true, httpOnly: true, sameSite: 'strict' });
             res.redirect(302, '/');
           } else {
-            res.status(400).json({ error: 'Incorrect password or username' });
+            Lib.error(res, 'Incorrect password or username');
           }
         });
       } else {
-        res.status(404).json({ error: 'user not found' });
+        Lib.error(res, 'User not found');
       }
     });
   }
@@ -56,5 +59,4 @@ class Login {
     }
   }
 }
-
 module.exports = Login;

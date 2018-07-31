@@ -1,5 +1,6 @@
 const SUB_TABLE = process.env.SUBSCRIBERS_TABLE;
 const bucket = process.env.S3_BUCKET;
+const Lib = require('./lib');
 
 class Subscribers {
 
@@ -18,7 +19,7 @@ class Subscribers {
     dynamoDb.put(params, function (error) {
       if (error) {
         console.log(error);
-        res.status(400).json({ error: 'Could not create subscriber' });
+        Lib.error(res, 'Could not create subscriber. Make sure a proper email is supplied.');
       } else {
         res.redirect('/');
       }
@@ -39,7 +40,7 @@ class Subscribers {
     dynamoDb.delete(params, function (err, data) {
       if (err) {
         console.log(err);
-        res.status(404).json({ error: 'Could not find subscriber' });
+        Lib.error(res, 'Could not find subscriber to delete.');
       } else { 
         res.redirect('/');
       }

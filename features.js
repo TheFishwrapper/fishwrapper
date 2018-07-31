@@ -2,6 +2,7 @@ const FEATS_TABLE = process.env.FEATS_TABLE;
 const POSTS_TABLE = process.env.POSTS_TABLE;
 const bucket = process.env.S3_BUCKET;
 const Login = require('./login');
+const Lib = require('./lib');
 
 class Features {
 
@@ -11,7 +12,7 @@ class Features {
       dynamoDb.scan(params, (error, result) => {
         if (error) {
           console.log(error);
-          res.json({ error: error });
+          Lib.error(res, error);
         } else {
           res.render('features/index', {bucket: bucket, req: req, feats: result.Items});
         }
@@ -25,7 +26,7 @@ class Features {
       dynamoDb.scan(params, (error, result) => {
         if (error) {
           console.log(error);
-          res.status(400).json({ error: error });
+          Lib.error(res, error);
         } else {
           res.render('features/new', {bucket: bucket, req: req, posts: result.Items});
         }
@@ -46,7 +47,7 @@ class Features {
       dynamoDb.put(params, (error) => {
         if (error) {
           console.log(error);
-          res.status(400).json({ error: 'Could not create featured article' });
+          Lib.error(res, 'Could not create featured article');
         } else {
           res.redirect('/features');
         }
@@ -71,13 +72,13 @@ class Features {
           dynamoDb.scan({TableName: POSTS_TABLE}, (err, resul) => {
             if (err) {
               console.log(err);
-              res.status(400).json({ error: err });
+              Lib.error(res, err);
             } else {
               res.render('features/edit', {bucket: bucket, req: req, posts: resul.Items, feat: result.Item});
             }
           });
         } else {
-          res.status(404).json({ error: 'Feature not found' });
+          Lib.error(res, 'Featured article not found');
         }
       });
     }
@@ -98,7 +99,7 @@ class Features {
       dynamoDb.update(params, (error) => {
         if (error) {
           console.log(error);
-          res.status(400).json({ error: 'Could not update feature' });
+          Lib.erro(res, 'Could not update featured article');
         } else {
           res.redirect('/features');
         }
@@ -117,7 +118,7 @@ class Features {
       dynamoDb.delete(params, function (err, data) {
         if (err) {
           console.log(err);
-          res.status(400).json({ error: 'Could not find feature' });
+          Lib.error(res, 'Could not find featured article');
         } else {
           res.redirect('/features');
         }
@@ -125,5 +126,4 @@ class Features {
     }
   }
 }
-
 module.exports = Features;

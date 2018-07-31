@@ -1,6 +1,7 @@
 const POSTS_TABLE = process.env.POSTS_TABLE;
 const bucket = process.env.S3_BUCKET;
 const Login = require('./login');
+const Lib = require('./lib');
 var markdown = require("markdown").markdown;
 
 class Posts {
@@ -10,7 +11,7 @@ class Posts {
     dynamoDb.scan(params, (error, result) => {
       if (error) {
         console.log(error);
-        res.json({ error: error });
+        Lib.error(res, error);
       } else {
         dynamoDb.scan({ TableName: process.env.FEATS_TABLE }, (err, resul) => {
           var posts = result.Items.filter(p => !p.staging);
@@ -53,15 +54,15 @@ class Posts {
 
     dynamoDb.get(params, (error, result) => {
       if (error) {
-        console.log(error);
-        res.status(400).json({ error: 'Could not get post' });
+         console.log(error);
+         Lib.error(res, error);
       } else if (result && result.Item) {
         if (result.Item.content) {
           result.Item.content = markdown.toHTML(result.Item.content);
         }
         res.render('posts/show', {bucket: bucket, req: req, post: result.Item});
       } else {
-        res.status(404).json({ error: "Post not found" });
+        Lib.error(res, 'Post not found');
       }
     }); 
   }
@@ -89,13 +90,13 @@ class Posts {
         dynamoDb.put(params, (error) => {
           if (error) {
             console.log(error);
-            res.status(400).json({ error: 'Could not create post' });
+            Lib.error(res, 'Could not create post');
           } else {
             res.redirect('/posts/' + post.postId);
           }
         });
       } else {
-        res.status(400).json({error: 'Invalid post arguments'});
+        Lib.error(res, 'Invalid post arguments');
       }
     }
   }
@@ -112,12 +113,12 @@ class Posts {
       dynamoDb.get(params, (error, result) => {
         if (error) {
           console.log(error);
-          res.status(400).json({ error: 'Could not get post' });
+          Lib.error(res, 'Could not get post');
         }
         if (result.Item) {
           res.render('posts/edit', {bucket: bucket, req: req, post: result.Item});
         } else {
-          res.status(404).json({ error: "Post not found" });
+          Lib.error(res, 'Post not found');
         }
       });
     }
@@ -177,13 +178,13 @@ class Posts {
         dynamoDb.update(params, (error) => {
           if (error) {
             console.log(error);
-            res.status(400).json({ error: 'Could not update post' });
+            Lib.error(res, 'Could not update post');
           } else {
             res.redirect('/posts/' + post.postId);
           }
         });
       } else {
-        res.status(400).json({error: 'invalid arguments'});
+        Lib.error(res, 'Invalid arguments');
       }
     }
   }
@@ -199,9 +200,9 @@ class Posts {
       dynamoDb.delete(params, function (err, data) {
         if (err) {
           console.log(err);
-          res.status(404).json({ error: 'Could not find post' });
+          Lib.error(res, 'Could not find post');
         } else {
-          res.redirect(302, '/');
+          res.redirect('/');
         }
       });
     }
@@ -219,7 +220,7 @@ class Posts {
       dynamoDb.scan(params, function (err, data) {
         if (err) {
           console.log(err);
-          res.status(400).json({ error: err });
+          Lib.error(res, err);
         } else {
           data.Items.map(p => p.content = markdown.toHTML(p.content));
           var left = data.Items.slice(0, data.Count / 2);
@@ -241,7 +242,7 @@ class Posts {
     dynamoDb.scan(params, function (err, data) {
       if (err) {
         console.log(err);
-        res.status(400).json({ error: err });
+        Lib.error(res, err);
       } else {
         data.Items.map(p => p.content = markdown.toHTML(p.content));
         var left = data.Items.slice(0, data.Count / 2);
@@ -293,39 +294,5 @@ class Posts {
       return '';
     }
   }
-
-  /*
-   * Joins the features and posts tables so that each feature has the full
-   * contents of the respective posts.
-   */
-  static joinFeats(dynamoDb, cb) {
-    dynamoDb.scan({TableName: process.env.FEATS_TABLE}, (err, res) => {
-      if (err) {
-        console.log(err);
-        cb(null);
-      } else {
-        var feats = [];
-        for (var i = 0; i < res.Items.length; i++) {
-          const params = { 
-            TableName: POSTS_TABLE, 
-            Key: {
-              postId: res.Items[i].post
-            }
-          };
-          dynamoDb.get(params, (e, r) => {
-            if (e) {
-              console.log(e);
-              cb(null);
-            } else {
-              feats.push(r);
-            }
-          });
-        }
-        console.log(feats);
-        cb(feats);
-      }
-    });
-  }
 }
-
 module.exports = Posts;
