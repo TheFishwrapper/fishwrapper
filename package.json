@@ -20,8 +20,8 @@
     "markdown": "^0.5.0",
     "multer": "^1.3.1",
     "multer-s3": "^2.7.0",
-    "request": "^2.87.0",
-    "serverless-http": "^1.5.5"
+    "serverless-http": "^1.5.5",
+    "solr-node": "^1.0.14"
   },
   "devDependencies": {
     "serverless-apigw-binary": "^0.4.4",

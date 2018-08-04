@@ -20,24 +20,24 @@ class Login {
     dynamoDb.get(params, function (error, result) {
       if (error) {
         console.log(error);
-        Lib.error(res, error);
+        Lib.error(res, req, error);
       } 
       if (result.Item) {
         const hash = result.Item.password;
         bcrypt.compare(req.body.password, hash, function (err, correct) {
           if (err) {
             console.log(err);
-            Lib.error(res, err);
+            Lib.error(res, req, err);
           }
           if (correct) {
             res.cookie('id_token', result.Item.user, { signed: true, httpOnly: true, sameSite: 'strict' });
             res.redirect(302, '/');
           } else {
-            Lib.error(res, 'Incorrect password or username');
+            Lib.error(res, req, 'Incorrect password or username');
           }
         });
       } else {
-        Lib.error(res, 'User not found');
+        Lib.error(res, req, 'User not found');
       }
     });
   }

@@ -2,7 +2,14 @@ const POSTS_TABLE = process.env.POSTS_TABLE;
 const bucket = process.env.S3_BUCKET;
 const Login = require('./login');
 const Lib = require('./lib');
-var markdown = require("markdown").markdown;
+const markdown = require('markdown').markdown;
+const SolrNode = require('solr-node');
+const solr = new SolrNode({
+  host: process.env.SOLR_SITE,
+  port: process.env.SOLR_PORT,
+  core: process.env.SOLR_CORE,
+  protocol: 'http'
+});
 
 class Posts {
 
@@ -11,7 +18,7 @@ class Posts {
     dynamoDb.scan(params, (error, result) => {
       if (error) {
         console.log(error);
-        Lib.error(res, error);
+        Lib.error(res, req, error);
       } else {
         dynamoDb.scan({ TableName: process.env.FEATS_TABLE }, (err, resul) => {
           var posts = result.Items.filter(p => !p.staging);
@@ -36,7 +43,7 @@ class Posts {
               }
             }
           }
-          res.render('posts/index', {bucket: bucket, req: req,
+          Lib.render(res, req, 'posts/index', {req: req,
                                      politics: pols, local: local,
                                      current: current, features: feats});
       });
@@ -55,14 +62,14 @@ class Posts {
     dynamoDb.get(params, (error, result) => {
       if (error) {
          console.log(error);
-         Lib.error(res, error);
+         Lib.error(res, req, error);
       } else if (result && result.Item) {
         if (result.Item.content) {
           result.Item.content = markdown.toHTML(result.Item.content);
         }
-        res.render('posts/show', {bucket: bucket, req: req, post: result.Item});
+        Lib.render(res, req, 'posts/show', {req: req, post: result.Item});
       } else {
-        Lib.error(res, 'Post not found');
+        Lib.error(res, req, 'Post not found');
       }
     }); 
   }
@@ -90,13 +97,14 @@ class Posts {
         dynamoDb.put(params, (error) => {
           if (error) {
             console.log(error);
-            Lib.error(res, 'Could not create post');
+            Lib.error(res, req, 'Could not create post');
           } else {
             res.redirect('/posts/' + post.postId);
           }
         });
+        Posts.solrPost(post);
       } else {
-        Lib.error(res, 'Invalid post arguments');
+        Lib.error(res, req, 'Invalid post arguments');
       }
     }
   }
@@ -113,12 +121,12 @@ class Posts {
       dynamoDb.get(params, (error, result) => {
         if (error) {
           console.log(error);
-          Lib.error(res, 'Could not get post');
+          Lib.error(res, req, 'Could not get post');
         }
         if (result.Item) {
-          res.render('posts/edit', {bucket: bucket, req: req, post: result.Item});
+          Lib.render(res, req, 'posts/edit', {req: req, post: result.Item});
         } else {
-          Lib.error(res, 'Post not found');
+          Lib.error(res, req, 'Post not found');
         }
       });
     }
@@ -130,7 +138,7 @@ class Posts {
         staging: true,
         postId: 10 
       };
-      res.render('posts/new', {bucket: bucket, req: req, post: post});
+      Lib.render(res, req, 'posts/new', {req: req, post: post});
     }
   }
 
@@ -139,26 +147,7 @@ class Posts {
       const post = Posts.parse(req.body);
       let params;
       if (post) {
-        if (req.file) {
-          params = {
-            TableName: POSTS_TABLE,
-            Key: {
-              postId: post.postId
-            },
-            UpdateExpression: 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging, thumbnail = :thumbnail, thumbnail_credit = :thumbnail_credit',
-            ExpressionAttributeValues: {
-              ':title': post.title,
-              ':author': post.author,
-              ':category': post.category,
-              ':published_on': post.published_on,
-              ':content': post.content,
-              ':staging': post.staging,
-              ':thumbnail': req.file.location,
-              ':thumbnail_credit': post.thumbnail_credit
-            },
-          }
-        } else {
-          params = {
+        params = {
             TableName: POSTS_TABLE,
             Key: {
               postId: post.postId
@@ -173,18 +162,22 @@ class Posts {
               ':staging': post.staging,
               ':thumbnail_credit': post.thumbnail_credit
             },
-          }
+        };
+        if (req.file) {
+          params.UpdateExpression = 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging, thumbnail = :thumbnail, thumbnail_credit = :thumbnail_credit';
+          params.ExpressionAttributeValues[':thumbnail'] = req.file.location;
         }
         dynamoDb.update(params, (error) => {
           if (error) {
             console.log(error);
-            Lib.error(res, 'Could not update post');
+            Lib.error(res, req, 'Could not update post');
           } else {
             res.redirect('/posts/' + post.postId);
           }
         });
+        Posts.solrPost(post);
       } else {
-        Lib.error(res, 'Invalid arguments');
+        Lib.error(res, req, 'Invalid arguments');
       }
     }
   }
@@ -200,9 +193,16 @@ class Posts {
       dynamoDb.delete(params, function (err, data) {
         if (err) {
           console.log(err);
-          Lib.error(res, 'Could not find post');
+          Lib.error(res, req, 'Could not find post');
         } else {
           res.redirect('/');
+        }
+      });
+      solr.delete({id: req.params.postId}, function (err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Solr response:', result.responseHeader);
         }
       });
     }
@@ -220,12 +220,12 @@ class Posts {
       dynamoDb.scan(params, function (err, data) {
         if (err) {
           console.log(err);
-          Lib.error(res, err);
+          Lib.error(res, req, err);
         } else {
           data.Items.map(p => p.content = markdown.toHTML(p.content));
           var left = data.Items.slice(0, data.Count / 2);
           var center = data.Items.slice(data.Count / 2);
-          res.render('posts/subindex', {bucket: bucket, heading: 'Staging', left: left, center: center});
+          Lib.render(res, req, 'posts/subindex', {heading: 'Staging', left: left, center: center});
         }
       });
     }
@@ -242,14 +242,43 @@ class Posts {
     dynamoDb.scan(params, function (err, data) {
       if (err) {
         console.log(err);
-        Lib.error(res, err);
+        Lib.error(res, req, err);
       } else {
         data.Items.map(p => p.content = markdown.toHTML(p.content));
         var left = data.Items.slice(0, data.Count / 2);
         var center = data.Items.slice(data.Count / 2);
-        res.render('posts/subindex', {bucket: bucket, heading: req.query.category, left: left, center: center});
+        Lib.render(res, req, 'posts/subindex', {heading: req.query.category, left: left, center: center});
       }
     });
+  }
+
+  static search(req, res, dynamoDb) {
+    let qstring;
+    if (req.query.category) {
+      qstring = 'category:' + req.query.category + ' AND ' + req.query.search; 
+    } else {
+      qstring = req.query.search;
+    }
+    solr.search('q='+ qstring).then(x => {
+      let posts = x.response.docs.map(a => a.id);
+      let ps = posts.map(p => Posts.idToPost(p, dynamoDb));
+      Promise.all(ps).then(r => {
+        let ar = r.map(a => a.Item).filter(a => !a.staging);
+        const left = ar.slice(0, ar.length / 2);
+        const center = ar.slice(ar.length / 2);
+        Lib.render(res, req, 'posts/subindex', {heading: 'Search results', left: left, center: center});
+      }); 
+    }).catch(e => Lib.error(res, req, e)); 
+  }
+
+  static idToPost(id, dynamoDb) {
+    let params = {
+      TableName: POSTS_TABLE,
+      Key: {
+        postId: id 
+      },
+    };
+    return dynamoDb.get(params).promise();
   }
 
   /*
@@ -293,6 +322,23 @@ class Posts {
     } else {
       return '';
     }
+  }
+
+  static solrPost(post) {
+    const data = {
+      id: post.postId,
+      title: post.title,
+      author: post.author.toLowerCase(),
+      category: post.category,
+      content: post.content
+    };
+    solr.update(data,  function (err, resul) {
+      if (err) {
+        console.log('Solr error:', err);
+      } else {
+        console.log('Solr response:', resul.responseHeader);
+      }
+    });
   }
 }
 module.exports = Posts;

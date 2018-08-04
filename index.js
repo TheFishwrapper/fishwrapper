@@ -3,10 +3,12 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const cookie = require('cookie-parser');
 const hbs = require('hbs');
+const SolrNode = require('solr-node');
 const app = express();
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
+const Lib = require('./lib');
 const Posts = require('./posts');
 const Login = require('./login');
 const Features = require('./features');
@@ -26,15 +28,6 @@ if (IS_OFFLINE === 'true') {
 }
 
 let s3 = new AWS.S3();
-
-let storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '/tmp/my-uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
-  }
-});
 
 let mulS3 = multerS3({
   s3: s3,
@@ -98,7 +91,9 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/posts', function (req, res) {
-  if (req.query.category) {
+  if (req.query.search) {
+    Posts.search(req, res, dynamoDb);
+  } else if (req.query.category) {
     Posts.category(req, res, dynamoDb);
   } else {
     Posts.index(req, res, dynamoDb);
@@ -162,11 +157,11 @@ app.post('/features', function (req, res) {
 });
 
 app.get('/about', function (req, res) {
-  res.render('about', {bucket: bucket});
+  Lib.render(res, req, 'about', {bucket: bucket});
 });
 
 app.get('/contact', function (req, res) {
-  res.render('contact', {bucket: bucket});
+  Lib.render(res, req, 'contact', {bucket: bucket});
 });
 
 app.get('/subscribers/new', function (req, res) {
@@ -185,8 +180,27 @@ app.post('/subscribers', function(req, res) {
   }
 });
 
+app.get('/reindex', function(req, res) {
+ if (Login.authenticate(req, res)) {
+    const solr = new SolrNode({
+      host: process.env.SOLR_SITE,
+      port: process.env.SOLR_PORT,
+      core: process.env.SOLR_CORE,
+      protocol: 'http'
+    });
+    dynamoDb.scan({TableName: process.env.POSTS_TABLE}, (error, result) => {
+      if (error) {
+        console.log(error);
+      } else {
+        result.Items.map(x => Posts.solrPost(x));
+      }
+    });
+    res.redirect('/');
+  }
+});
+
 app.get('*', function (req, res) {
-  res.render('missing', {bucket: bucket});
+  Lib.render(res, req, 'missing', {bucket: bucket});
 });
 
 module.exports.handler = serverless(app);

@@ -5,7 +5,7 @@ const Lib = require('./lib');
 class Subscribers {
 
   static new_subscriber(req, res, dynamoDb) {
-    res.render('subscribers/new', {bucket: bucket});
+    Lib.render(res, req, 'subscribers/new');
   }
 
   static create(req, res, dynamoDb) {
@@ -21,7 +21,7 @@ class Subscribers {
     dynamoDb.put(params, function (error) {
       if (error) {
         console.log(error);
-        Lib.error(res, 'Could not create subscriber. Make sure a proper email is supplied.');
+        Lib.error(res, req, 'Could not create subscriber. Make sure a proper email is supplied.');
       } else {
         res.redirect('/');
       }
@@ -29,7 +29,7 @@ class Subscribers {
   }
 
   static delete(req, res, dynamoDb) {
-    res.render('subscribers/delete', {bucket: bucket});
+    Lib.render(res, req, 'subscribers/delete');
   }
 
   static destroy(req, res, dynamoDb) {
@@ -42,7 +42,7 @@ class Subscribers {
     dynamoDb.delete(params, function (err, data) {
       if (err) {
         console.log(err);
-        Lib.error(res, 'Could not remove subscriber. Make sure a proper email is supplied.');
+        Lib.error(res, req, 'Could not remove subscriber. Make sure a proper email is supplied.');
       } else { 
         res.redirect('/');
       }

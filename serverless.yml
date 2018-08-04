@@ -50,6 +50,9 @@ provider:
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
+    SOLR_SITE: ${ssm:solrSite}
+    SOLR_PORT: ${ssm:solrPort}
+    SOLR_CORE: '${ssm:solrCore}-${self:provider.stage}'
 
 functions:
   app:
