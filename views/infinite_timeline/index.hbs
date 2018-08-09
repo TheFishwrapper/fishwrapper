@@ -5,4 +5,9 @@
     <p>{{content}}</p>
   {{/each}}
   <p class="btn btn-outline-secondary mt-3"><a href="/infinite_timeline/new">Contribute to the magic</a><p>
+  {{#if req.signedCookies.id_token}}
+    <p class="btn btn-outline-secondary"><a href="/infinite_timeline/edit">Choose best submission</a><p>
+    <p class="btn btn-outline-secondary"><a href="/infinite_timeline/week">Change week</a><p>
+    <p class="btn btn-outline-secondary"><a href="/infinite_timeline/clean">Clean out submissions</a><p>
+  {{/if}} 
 {{> footer}}

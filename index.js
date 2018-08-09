@@ -228,6 +228,10 @@ app.post('/infinite_timeline/week', function (req, res) {
   InfiniteTimeline.setWeek(req, res, dynamoDb);
 });
 
+app.get('/infinite_timeline/clean', function (req, res) {
+  InfiniteTimeline.clean(req, res, dynamoDb);
+});
+
 app.get('*', function (req, res) {
   Lib.render(res, req, 'missing', {bucket: bucket});
 });

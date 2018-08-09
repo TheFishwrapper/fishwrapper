@@ -1,4 +1,8 @@
 {{> header}}
+  <form action="/infinite_timeline/edit" method="GET">
+    <label for"week-select">Choose Week:</label>
+    <input type="text" size="2" id="week-select" name="week"><br />
+  </form>
   <h1>Timeline submissions for week {{week}}</h1>
   <form action="/infinite_timeline" method="POST">
     {{#each story}}

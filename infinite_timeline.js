@@ -141,5 +141,23 @@ class InfiniteTimeline {
       });
     }
   }
+
+  static clean(req, res, dynamoDb) {
+    if (Login.authenticate(req, res)) {
+      dynamoDb.scan({TableName: TIME_TABLE}, function (err, data) {
+        let stories = data.Items.filter(x => !x.selected);
+        stories = stories.map(x => {
+          const params = {
+            TableName: TIME_TABLE,
+            Key: {
+              id: x.id
+            }
+          };
+          return dynamoDb.delete(params).promise();
+        });
+        Promise.all(stories).then(x => res.redirect('/infinite_timeline')).catch(e => Lib.error(res, req, e));
+      });
+    }
+  }
 }
 module.exports = InfiniteTimeline;
