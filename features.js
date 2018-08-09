@@ -74,7 +74,12 @@ class Features {
               console.log(err);
               Lib.error(res, req, err);
             } else {
-              Lib.render(res, req, 'features/edit', {bucket: bucket, req: req, posts: resul.Items, feat: result.Item});
+              let posts = resul.Items.map(x => {
+                x.sel = x.postId == result.Item.post;
+                return x;
+              });
+              console.log(posts);
+              Lib.render(res, req, 'features/edit', {bucket: bucket, req: req, posts: posts, feat: result.Item});
             }
           });
         } else {

@@ -4,7 +4,7 @@
   <label for="post">Post:</label>
   <select name="post">
     {{#each posts}}
-      <option value="{{postId}}">{{title}}</option>
+      <option value="{{postId}}" {{selected sel}}>{{title}}</option>
     {{/each}}
   </select>
   <input type="hidden" name="_method" value="{{method}}" />

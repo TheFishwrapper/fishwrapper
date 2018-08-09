@@ -64,7 +64,8 @@ hbs.registerHelper('caro', function(items, options) {
   out += '</div>';
   return out;
 });
-hbs.registerHelper('checkedIf', function(test) { return (test) ? "checked" : ""; });
+hbs.registerHelper('checkedIf', function(test) { return (test) ? 'checked' : ''; });
+hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
 hbs.registerPartials(__dirname + '/views/partials');
 
 app.use(bodyParser.json({ strict: false }));
