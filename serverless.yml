@@ -40,13 +40,17 @@ provider:
         - { "Fn::GetAtt": ["PostsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["FeaturesDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
-        - { "Fn::GetAtt": ["SubscribersDynamoDBtable", "Arn" ] }
+        - { "Fn::GetAtt": ["SubscribersDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] } 
+        - { "Fn::GetAtt": ["GlobalDynamoDBTable", "Arn" ] }
         - "arn:aws:s3:::fishwrapper-pictures-dev/*"
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
     FEATS_TABLE: 'features-table-${self:provider.stage}' 
     USERS_TABLE: 'users-table-${self:provider.stage}'
     SUBSCRIBERS_TABLE: 'subscribers-table-${self:provider.stage}'
+    TIME_TABLE: 'infinite-table-${self:provider.stage}'
+    GLOBAL_TABLE: 'global-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
@@ -111,13 +115,13 @@ resources:
           WriteCapacityUnits: 1
         TableName: 'users-table-${self:provider.stage}'
 
-    SubscribersDynamoDBtable:
+    SubscribersDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
         AttributeDefinitions:
           -
-             AttributeName: email 
-             AttributeType: S
+            AttributeName: email 
+            AttributeType: S
         KeySchema:
           -
             AttributeName: email 
@@ -127,3 +131,34 @@ resources:
           WriteCapacityUnits: 1
         TableName: 'subscribers-table-${self:provider.stage}'
 
+    InfiniteTimelineDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id 
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: id 
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'infinite-table-${self:provider.stage}'
+
+    GlobalDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: key 
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: key 
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'global-table-${self:provider.stage}'

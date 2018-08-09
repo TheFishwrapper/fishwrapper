@@ -1,0 +1,17 @@
+{{> header}}
+  <h1>Timeline submissions for week {{week}}</h1>
+  <form action="/infinite_timeline" method="POST">
+    {{#each story}}
+      <label for="{{id}}">{{content}}</label>
+      {{#if selected}}
+        <input type="radio" id="{{id}}" name="story" value="{{id}}" checked />
+      {{else}}
+        <input type="radio" id="{{id}}" name="story" value="{{id}}" />
+      {{/if}}
+      <br />
+    {{/each}}
+    <input type="hidden" name="week" value="{{week}}" />
+    <input type="hidden" name="_method" value="PUT" />
+    <input type="submit" value="Submit" class="btn btn-outline-secondary" />
+  </form>
+{{> footer}}

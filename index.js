@@ -13,6 +13,7 @@ const Posts = require('./posts');
 const Login = require('./login');
 const Features = require('./features');
 const Subscribers = require('./subscribers');
+const InfiniteTimeline = require('./infinite_timeline');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 
@@ -180,7 +181,7 @@ app.post('/subscribers', function(req, res) {
   }
 });
 
-app.get('/reindex', function(req, res) {
+app.get('/reindex', function (req, res) {
  if (Login.authenticate(req, res)) {
     const solr = new SolrNode({
       host: process.env.SOLR_SITE,
@@ -197,6 +198,34 @@ app.get('/reindex', function(req, res) {
     });
     res.redirect('/');
   }
+});
+
+app.get('/infinite_timeline', function (req, res) {
+  InfiniteTimeline.index(req, res, dynamoDb);
+});
+
+app.get('/infinite_timeline/new', function (req, res) {
+  InfiniteTimeline.new_story(req, res, dynamoDb);
+});
+
+app.get('/infinite_timeline/edit', function (req, res) {
+  InfiniteTimeline.edit(req, res, dynamoDb);
+});
+
+app.post('/infinite_timeline', function (req, res) {
+  if (req.body._method == 'POST') {
+    InfiniteTimeline.create(req, res, dynamoDb);
+  } else if (req.body._method == 'PUT') {
+    InfiniteTimeline.update(req, res, dynamoDb);
+  }
+});
+
+app.get('/infinite_timeline/week', function (req, res) {
+  InfiniteTimeline.changeWeek(req, res, dynamoDb);
+});
+
+app.post('/infinite_timeline/week', function (req, res) {
+  InfiniteTimeline.setWeek(req, res, dynamoDb);
 });
 
 app.get('*', function (req, res) {
