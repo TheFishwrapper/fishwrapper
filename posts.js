@@ -244,7 +244,7 @@ class Posts {
         console.log(err);
         Lib.error(res, req, err);
       } else {
-        data.Items.map(p => p.content = markdown.toHTML(p.content));
+        data.Items.map(p => p.content = markdown.toHTML(p.content)); // TODO
         var left = data.Items.slice(0, data.Count / 2);
         var center = data.Items.slice(data.Count / 2);
         Lib.render(res, req, 'posts/subindex', {heading: req.query.category, left: left, center: center});

@@ -1,0 +1,18 @@
+{{> header}}
+  <h4 class="heading">Quizzes</h4>
+  {{#if req.signedCookies.id_token}}
+    <a href="/quizzes/new" class="btn btn-outline-secondary">New</a>
+  {{/if}}
+  <div class="row">
+    <div class="col-md-3 col-12">
+      {{#each left}}
+        {{> quiz_index}}
+      {{/each}}
+    </div>
+    <div id="center" class="col">
+      {{#each center}}
+        {{> quiz_index}}
+      {{/each}}
+    </div>
+  </div> 
+{{> footer}}

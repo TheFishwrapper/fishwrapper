@@ -1,0 +1,19 @@
+{{> header}}
+  <div class="row">
+    <div class="col-12 text-center">
+      <h2>{{quiz.title}}</h2>
+      <h6>by {{quiz.author}}</h6>
+    </div>
+    <div class="col-12">
+      <p>{{{quiz.blurb}}}</p>
+      <div class="image-container text-center" id="quiz-image">
+        <img alt="Quiz thumbnail" class="img-fluid" src="{{quiz.thumbnail}}" />
+        <h6>{{quiz.thumbnail_credit}}</h6>
+      </div>
+      {{#if req.signedCookies.id_token}}
+        <a href="/quizzes/{{quizId}}/edit" class="btn btn-outline-secondary">Edit</a>
+        <a href="/quizzes/{{quizId}}/delete" class="btn btn-outline-secondary">Delete</a>
+      {{/if}}
+    </div>
+  </div>
+{{> footer}}

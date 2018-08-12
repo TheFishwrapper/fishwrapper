@@ -43,6 +43,7 @@ provider:
         - { "Fn::GetAtt": ["SubscribersDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] } 
         - { "Fn::GetAtt": ["GlobalDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["QuizzesDynamoDBTable", "Arn" ] }
         - "arn:aws:s3:::fishwrapper-pictures-dev/*"
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
@@ -51,6 +52,7 @@ provider:
     SUBSCRIBERS_TABLE: 'subscribers-table-${self:provider.stage}'
     TIME_TABLE: 'infinite-table-${self:provider.stage}'
     GLOBAL_TABLE: 'global-table-${self:provider.stage}'
+    QUIZZES_TABLE: 'quizzes-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
@@ -162,3 +164,19 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'global-table-${self:provider.stage}'
+
+    QuizzesDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: quizId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: quizId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'quizzes-table-${self:provider.stage}'

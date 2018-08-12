@@ -14,6 +14,7 @@ const Login = require('./login');
 const Features = require('./features');
 const Subscribers = require('./subscribers');
 const InfiniteTimeline = require('./infinite_timeline');
+const Quizzes = require('./quizzes');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 
@@ -231,6 +232,34 @@ app.post('/infinite_timeline/week', function (req, res) {
 
 app.get('/infinite_timeline/clean', function (req, res) {
   InfiniteTimeline.clean(req, res, dynamoDb);
+});
+
+app.get('/quizzes', function (req, res) {
+  Quizzes.index(req, res, dynamoDb);
+});
+
+app.get('/quizzes/:quizId', function (req, res) {
+  Quizzes.show(req, res, dynamoDb);
+});
+
+app.get('/quizzes/:quizId/edit', function (req, res) {
+  Quizzes.edit(req, res, dynamoDb);
+});
+
+app.get('/quizzes/:quizId/delete', function (req, res) {
+  Quizzes.destroy(req, res, dynamoDb);
+});
+
+app.get('/quizzes/new', function (req, res) {
+  Quizzes.new(req, res, dynamoDb);
+});
+
+app.post('/quizzes', upload.single('thumbnail'), function (req, res) {
+   if (req.body._method == 'POST') {
+     Quizzes.create(req, res, dynamoDb);
+   } else if (req.body._method == 'PUT') {
+     Quizzes.update(req, res, dynamoDb);
+   }
 });
 
 app.get('*', function (req, res) {
