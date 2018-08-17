@@ -10,9 +10,22 @@
         <img alt="Quiz thumbnail" class="img-fluid" src="{{quiz.thumbnail}}" />
         <h6>{{quiz.thumbnail_credit}}</h6>
       </div>
+      <form action="/quizzes/{{quiz.quizId}}" method="POST">
+        {{#each quiz.questions}}
+          <h3>{{qContent}}</h3>
+          <div class="none">
+          {{#each answers}}
+            <input type="radio" id="{{aId}}" name="{{../qId}}" value="{{aResult}}" />
+            <label for="{{aId}}">{{aContent}}</label><br />
+          {{/each}}
+          </div>
+        {{/each}}
+        <input type="submit" class="btn btn-outline-secondary" value="Submit" />
+      </form>
+
       {{#if req.signedCookies.id_token}}
-        <a href="/quizzes/{{quizId}}/edit" class="btn btn-outline-secondary">Edit</a>
-        <a href="/quizzes/{{quizId}}/delete" class="btn btn-outline-secondary">Delete</a>
+        <a href="/quizzes/{{quiz.quizId}}/edit" class="btn btn-outline-secondary">Edit</a>
+        <a href="/quizzes/{{quiz.quizId}}/delete" class="btn btn-outline-secondary">Delete</a>
       {{/if}}
     </div>
   </div>

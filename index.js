@@ -67,6 +67,7 @@ hbs.registerHelper('caro', function(items, options) {
 });
 hbs.registerHelper('checkedIf', function(test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
+hbs.registerHelper('equal', function (a, b) { return (a == b) ? 'selected' : ''; });
 hbs.registerPartials(__dirname + '/views/partials');
 
 app.use(bodyParser.json({ strict: false }));
@@ -238,6 +239,10 @@ app.get('/quizzes', function (req, res) {
   Quizzes.index(req, res, dynamoDb);
 });
 
+app.get('/quizzes/new', function (req, res) {
+  Quizzes.new(req, res, dynamoDb);
+});
+
 app.get('/quizzes/:quizId', function (req, res) {
   Quizzes.show(req, res, dynamoDb);
 });
@@ -250,20 +255,20 @@ app.get('/quizzes/:quizId/delete', function (req, res) {
   Quizzes.destroy(req, res, dynamoDb);
 });
 
-app.get('/quizzes/new', function (req, res) {
-  Quizzes.new(req, res, dynamoDb);
+app.post('/quizzes', upload.single('thumbnail'), function (req, res) {
+  if (req.body._method == 'POST') {
+    Quizzes.create(req, res, dynamoDb);
+  } else if (req.body._method == 'PUT') {
+    Quizzes.update(req, res, dynamoDb);
+  }
 });
 
-app.post('/quizzes', upload.single('thumbnail'), function (req, res) {
-   if (req.body._method == 'POST') {
-     Quizzes.create(req, res, dynamoDb);
-   } else if (req.body._method == 'PUT') {
-     Quizzes.update(req, res, dynamoDb);
-   }
+app.post('/quizzes/:quizId', function (req, res) {
+  Quizzes.grade(req, res, dynamoDb);
 });
 
 app.get('*', function (req, res) {
-  Lib.render(res, req, 'missing', {bucket: bucket});
+  Lib.render(res, req, 'missing');
 });
 
 module.exports.handler = serverless(app);

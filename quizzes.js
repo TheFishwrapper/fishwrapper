@@ -31,7 +31,9 @@ class Quizzes {
           author: req.body.author,
           blurb: req.body.blurb,
           thumbnail: req.file.location,
-          thumbnail_credit: req.body.thumbnail_credit
+          thumbnail_credit: req.body.thumbnail_credit,
+          questions: Quizzes.parseQuestions(req.body),
+          results: Quizzes.parseResults(req.body)
         }
       };
       dynamoDb.put(params, function (err, data) {
@@ -90,12 +92,14 @@ class Quizzes {
         Key: {
           quizId: req.body.quizId
         },
-        UpdateExpression: 'SET title = :title, author = :author, blurb = :blurb, thumbnail_credit = :thumbnail_credit',
+        UpdateExpression: 'SET title = :title, author = :author, blurb = :blurb, thumbnail_credit = :thumbnail_credit, questions = :questions, results = :results',
         ExpressionAttributeValues: {
           ':title': req.body.title,
           ':author': req.body.author,
           ':blurb': req.body.blurb,
-          ':thumbnail_credit': req.body.thumbnail_credit
+          ':thumbnail_credit': req.body.thumbnail_credit,
+          ':questions': Quizzes.parseQuestions(req.body),
+          ':results': Quizzes.parseResults(req.body)
         }
       };
       if (req.file) {
@@ -131,5 +135,90 @@ class Quizzes {
       });
     }
   }
+
+  static parseQuestions(body) {
+    let qids = Object.keys(body).filter(x => x.startsWith('qContent-q')).map(x => x.substring(9));
+    let qs = [];
+    for (var i = 0; i < qids.length; i++) {
+      if (qids[i] && body['qContent-' + qids[i]]) {
+      let q = { qId: qids[i], qContent: body['qContent-' + qids[i]] };
+      let ans = Object.keys(body).filter(x => x.endsWith(qids[i]) && x.startsWith('aContent-a'));
+      q.answers = ans.map(x => {
+        let aId = x.substring(9);
+        let aContent = body[x];
+        let a = null;
+        if (aId && aContent) {
+          a = { aId: aId, aContent: aContent, aResult: body[`aResult-${aId}`] };
+        }
+        return a; 
+      });
+      q.answers = q.answers.filter(x => x);
+      qs.push(q);
+      }
+    }
+    return qs;
+  }
+
+  static parseResults(body) {
+    let res = Object.keys(body).filter(x => x.startsWith('rContent-r')).map(x => x.substring(9));
+    let rs = [];
+    for (var i = 0; i < res.length; i++) {
+      if (res[i] && body['rContent-' + res[i]]) {
+        let r = { rId: res[i], rContent: body['rContent-' + res[i]] };
+        rs.push(r);
+      }
+    }
+    console.log(rs);
+    return rs;
+  }
+
+  static grade(req, res, dynamoDb) {
+     const params = {
+      TableName: QUIZZES_TABLE,
+      Key: {
+        quizId: req.params.quizId
+      }
+    };
+    dynamoDb.get(params, function (err, data) {
+      let quiz = data.Item;
+      let ques = Object.keys(req.body);
+      let resul = [];
+      for (let i = 0; i < ques.length; i++) {
+        let q;
+        for (let j = 0; j < quiz.questions.length; j++) {
+          if (quiz.questions[j].qId == ques[i]) {
+            q = quiz.questions[j];
+          }
+        }
+        let res;
+        for (let j = 0; j < quiz.results.length; j++) {
+          if (req.body[ques[i]] == quiz.results[j].rId) {
+            res = quiz.results[j];
+          }
+        }
+        resul.push({ q: q, r: res });
+      }
+      let result = new Map();
+      for (let i = 0; i < resul.length; i++) {
+        if (!result.has(resul[i].r)) {
+          result.set(resul[i].r, 1);
+        } else {
+          result.set(resul[i].r, result.get(resul[i].r) + 1); 
+        }
+      }
+      Lib.render(res, req, 'quizzes/grade', {quiz: quiz, result: Quizzes.maxOfMap(result)});
+    });
+  }
+
+  static maxOfMap(map) {
+    let max = { k: null, v: -1 };
+    for (let [key, value] of  map) {
+      if (value > max.v) {
+        max = { k: key, v: value };
+      }
+    }
+    return max.k;
+  } 
+      
 }
 module.exports = Quizzes;

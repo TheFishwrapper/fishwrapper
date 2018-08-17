@@ -1,16 +1,97 @@
+<script type="text/javascript">
+  function addQuestion() {
+    let ques = document.getElementById('questions');
+    let q = document.createElement('li');
+    let qId = 'q' + Date.now();
+    let con = document.createElement('input');
+    con.type = 'text';
+    con.name = `qContent-${qId}`;
+    let ans = document.createElement('ul');
+    ans.id = qId;
+    let but = document.createElement('button');
+    but.type = 'button';
+    but.classList.add('btn');
+    but.classList.add('btn-outline-secondary');
+    but.addEventListener('click', () => addAnswer(qId));
+    but.innerHTML = 'Add Answer';
+    q.appendChild(con);
+    q.appendChild(ans);
+    q.appendChild(but);
+    ques.appendChild(q);
+  }
+  function addAnswer(id) {
+    let ans = document.getElementById(id);
+    let a = document.createElement('li');
+    let aId = `a${Date.now()}-${id}`; 
+    let con = document.createElement('input');
+    con.type = 'text';
+    con.name = `aContent-${aId}`;
+    let sel = document.createElement('select');
+    sel.name = `aResult-${aId}`;
+    a.appendChild(con);
+    a.appendChild(sel); 
+    ans.appendChild(a);
+  }
+  function addResult() {
+    let res = document.getElementById('results');
+    let r = document.createElement('li');
+    let rId = 'r' + Date.now();
+    let con = document.createElement('input');
+    con.type = 'text';
+    con.name = `rContent-${rId}`;
+    r.appendChild(con);
+    res.appendChild(r);
+  }
+  function updateResults() {
+    let sels = document.getElementsByTagName('select');
+    let res = document.getElementById('results');
+    // TODO
+  }
+</script>
 <form action="/quizzes" method="POST" enctype="multipart/form-data">
   <label for="title">Title:</label>
   <input type="text" id="title" name="title" value="{{quiz.title}}" /><br />
   <label for="author">Author:</label>
   <input type="text" id="author" name="author" value="{{quiz.author}}" /><br />
-  <label for="blurb">Blurb:</label><br />
-  <textarea id="blurb" name="blurb" cols="80" rows="6">{{quiz.blurb}}</textarea><br />
+  <label>Blurb:</label><br />
+  <textarea name="blurb" cols="80" rows="6">{{{quiz.blurb}}}</textarea><br />
   <label for="thumbnail">Thumbnail Image:</label>
   <input type="file" id="thumbnail" name="thumbnail" /><br />
   <label for="thumbnail_credit">Image credit:</label>
   <input type="text" id="thumbnail_credit" name="thumbnail_credit" value="{{quiz.thumbnail_credit}}" /><br />
   <input type="hidden" name="_method" value="{{method}}" />
   <input type="hidden" name="quizId" value="{{quiz.quizId}}" />
+  <h2>Questions:</h2>
+  <ol id="questions">
+  {{#each quiz.questions}}
+    <li>
+    <input type="text" name="qContent-{{qId}}" value="{{qContent}}" />
+    <ul id="{{qId}}">
+    {{#each answers}}
+      <li>
+        <input type="text" name="aContent-{{aId}}" value="{{aContent}}" /><br />
+        <select name="aResult-{{aId}}">
+          {{#each ../../quiz.results}}
+            <option value="{{rId}}" {{equal ../aResult rId}}>{{rContent}}</option>
+          {{/each}}
+        </select>
+      </li>
+    {{/each}}
+    </ul>
+    <button type="button" onclick="addAnswer('{{qId}}')" class="btn btn-outline-secondary">Add answer</button>
+    </li>
+  {{/each}}
+  </ol>
+  <button type="button" class="btn btn-outline-secondary" onclick="addQuestion()">Add Question</button>
+  <h2>Results:</h2>
+  <ul id="results">
+  {{#each quiz.results}}
+    <li><input type="text" name="rContent-{{rId}}" value="{{rContent}}" /></li>
+  {{/each}}
+  </ul>
+  <button type="button" class="btn btn-outline-secondary" onclick="addResult()">Add Result</button><br />
 
   <input type="submit" value="Submit" class="btn btn-outline-secondary" />
 </form>
+
+
