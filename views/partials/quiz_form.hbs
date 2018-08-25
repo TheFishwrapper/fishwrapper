@@ -39,7 +39,16 @@
     let con = document.createElement('input');
     con.type = 'text';
     con.name = `rContent-${rId}`;
+    let br = document.createElement('br');
+    let lab = document.createElement('label');
+    lab.innerHTML = 'Thumbnail credit:';
+    let credit = document.createElement('input');
+    credit.type = 'text';
+    credit.name = `rThumbnailCredit-${rId}`;
     r.appendChild(con);
+    r.appendChild(br);
+    r.appendChild(lab);
+    r.appendChild(credit);
     res.appendChild(r);
   }
   function updateResults() {
@@ -86,7 +95,11 @@
   <h2>Results:</h2>
   <ul id="results">
   {{#each quiz.results}}
-    <li><input type="text" name="rContent-{{rId}}" value="{{rContent}}" /></li>
+    <li>
+      <input type="text" name="rContent-{{rId}}" value="{{rContent}}" /><br />
+      <label>Thumbnail credit:</label>
+      <input type="text" name="rThumbnailCredit-{{rId}}" value="{{thumbnail_credit}}" />
+    </li>
   {{/each}}
   </ul>
   <button type="button" class="btn btn-outline-secondary" onclick="addResult()">Add Result</button><br />

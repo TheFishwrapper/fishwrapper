@@ -1,10 +1,8 @@
 {{> header}}
   <div class="row">
-    <div class="col-12 text-center">
-      <h2>{{quiz.title}}</h2>
-      <h6>by {{quiz.author}}</h6>
-    </div>
-    <div class="col-12">
+    <div class="col">
+      <h1 id="quiz-title">{{quiz.title}}</h1>
+      <h6 class="mb-3">by {{quiz.author}}</h6>
       <p>{{{quiz.blurb}}}</p>
       <div class="image-container text-center" id="quiz-image">
         <img alt="Quiz thumbnail" class="img-fluid" src="{{quiz.thumbnail}}" />
@@ -20,12 +18,12 @@
           {{/each}}
           </div>
         {{/each}}
-        <input type="submit" class="btn btn-outline-secondary" value="Submit" />
+        <input type="submit" class="btn btn-warning submit" value="Submit" />
       </form>
 
       {{#if req.signedCookies.id_token}}
-        <a href="/quizzes/{{quiz.quizId}}/edit" class="btn btn-outline-secondary">Edit</a>
-        <a href="/quizzes/{{quiz.quizId}}/delete" class="btn btn-outline-secondary">Delete</a>
+        <a href="/quizzes/{{quiz.quizId}}/edit" class="btn btn-outline-secondary mt-3">Edit</a>
+        <a href="/quizzes/{{quiz.quizId}}/delete" class="btn btn-outline-secondary mt-3">Delete</a>
       {{/if}}
     </div>
   </div>

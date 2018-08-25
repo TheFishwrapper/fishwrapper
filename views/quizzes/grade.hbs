@@ -1,13 +1,19 @@
 {{> header}}
   <div class="row">
-    <div class="col-12 text-center">
-      <h2>{{quiz.title}}</h2>
-      <h6>by {{quiz.author}}</h6>
-    </div>
-    <div class="col-12">
-     <p>{{result.rContent}}</p>
-     <p><a href="/quizzes/{{quiz.quizId}}" class="btn btn-secondary-outline">Back</a></p> 
+    <div class="col">
+      <h1 id="quiz-title">{{quiz.title}}</h1>
+      <h6 class="mb-3">by {{quiz.author}}</h6>
+      <p>{{quiz.blurb}}</p> 
     </div>
   </div>
- 
+  <div class="row mt-5">
+    <div class="col">
+     <h3>{{result.rContent}}</h3>
+     <div class="image-container text-center">
+       <img alt="Result thumbnail" class="img-fluid" src="{{result.thumbnail}}" />
+       <h6>{{result.thumbnail_credit}}</h6>
+     </div>
+     <a href="/quizzes/{{quiz.quizId}}" class="btn btn-outline-secondary mt-3">Back</a> 
+    </div>
+  </div>
 {{> footer}}

@@ -87,19 +87,19 @@ class Quizzes {
 
   static update(req, res, dynamoDb) {
     if (Login.authenticate(req, res)) {
+      Quizzes.updateResults(req.body, dynamoDb);
       let params = {
         TableName: QUIZZES_TABLE,
         Key: {
           quizId: req.body.quizId
         },
-        UpdateExpression: 'SET title = :title, author = :author, blurb = :blurb, thumbnail_credit = :thumbnail_credit, questions = :questions, results = :results',
+        UpdateExpression: 'SET title = :title, author = :author, blurb = :blurb, thumbnail_credit = :thumbnail_credit, questions = :questions',
         ExpressionAttributeValues: {
           ':title': req.body.title,
           ':author': req.body.author,
           ':blurb': req.body.blurb,
           ':thumbnail_credit': req.body.thumbnail_credit,
           ':questions': Quizzes.parseQuestions(req.body),
-          ':results': Quizzes.parseResults(req.body)
         }
       };
       if (req.file) {
@@ -165,11 +165,64 @@ class Quizzes {
     for (var i = 0; i < res.length; i++) {
       if (res[i] && body['rContent-' + res[i]]) {
         let r = { rId: res[i], rContent: body['rContent-' + res[i]] };
+        if (body['rThumbnailCredit-' + res[i]]) {
+          r.thumbnail_credit = body['rThumbnailCredit-' + res[i]];
+        }
         rs.push(r);
       }
     }
-    console.log(rs);
     return rs;
+  }
+
+  static updateResults(body, dynamoDb) {
+    const params = {
+      TableName: QUIZZES_TABLE,
+      Key: {
+        quizId: body.quizId
+      }
+    };
+    dynamoDb.get(params, function (err, data) {
+      if (err) { 
+        console.log(err);
+      } else {
+        let results = data.Item.results;
+        let res = Quizzes.parseResults(body);
+        let final = res.map(rNew => { 
+          for (let rOld of results) { 
+            if (rNew.rId == rOld.rId) {
+              return Quizzes.updateResult(rNew, rOld);
+            }
+          }
+          return rNew;
+        });
+        const par = {
+          TableName: QUIZZES_TABLE,
+          Key: {
+            quizId: body.quizId
+          },
+          UpdateExpression: 'SET results = :results', 
+          ExpressionAttributeValues: {
+            ':results': final 
+          }
+        };
+        dynamoDb.update(par, function (err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+      }
+    });
+  }
+
+  static updateResult(rNew, rOld) {
+    let r = rOld; 
+    if (rNew.rContent != rOld.rContent) {
+      r.rContent = rNew.rContent;
+    }
+    if (rNew.thumbnail_credit && rNew.thumbnail_credit != rOld.thumbnail_credit) {
+      r.thumbnail_credit = rNew.thumbnail_credit;
+    } 
+    return r;
   }
 
   static grade(req, res, dynamoDb) {
