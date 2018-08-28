@@ -65,9 +65,10 @@ hbs.registerHelper('caro', function(items, options) {
   out += '</div>';
   return out;
 });
-hbs.registerHelper('checkedIf', function(test) { return (test) ? 'checked' : ''; });
+hbs.registerHelper('checkedIf', function (test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
 hbs.registerHelper('equal', function (a, b) { return (a == b) ? 'selected' : ''; });
+hbs.registerHelper('image', function (image) { return (image) ? image : 'https://via.placeholder.com/350?text=Image not found'; });
 hbs.registerPartials(__dirname + '/views/partials');
 
 app.use(bodyParser.json({ strict: false }));

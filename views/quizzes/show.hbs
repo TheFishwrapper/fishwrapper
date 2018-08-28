@@ -5,7 +5,7 @@
       <h6 class="mb-3">by {{quiz.author}}</h6>
       <p>{{{quiz.blurb}}}</p>
       <div class="image-container text-center" id="quiz-image">
-        <img alt="Quiz thumbnail" class="img-fluid" src="{{quiz.thumbnail}}" />
+        <img alt="Quiz thumbnail" class="img-fluid" src="{{image quiz.thumbnail}}" />
         <h6>{{quiz.thumbnail_credit}}</h6>
       </div>
       <form action="/quizzes/{{quiz.quizId}}" method="POST">
