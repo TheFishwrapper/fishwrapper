@@ -44,6 +44,7 @@ provider:
         - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] } 
         - { "Fn::GetAtt": ["GlobalDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["QuizzesDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["InstaShortsDynamoDBTable", "Arn" ] }
         - "arn:aws:s3:::fishwrapper-pictures-dev/*"
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
@@ -53,6 +54,7 @@ provider:
     TIME_TABLE: 'infinite-table-${self:provider.stage}'
     GLOBAL_TABLE: 'global-table-${self:provider.stage}'
     QUIZZES_TABLE: 'quizzes-table-${self:provider.stage}'
+    INSTA_TABLE: 'insta-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
@@ -180,3 +182,19 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'quizzes-table-${self:provider.stage}'
+
+    InstaShortsDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: instaId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: instaId 
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'insta-table-${self:provider.stage}'

@@ -1,0 +1,13 @@
+{{> header}}
+  <h1>Insta Shorts</h1>
+  <a href="/insta_shorts/new" class="btn btn-outline-secondary">New Insta Short</a>
+  <div class="row">
+    {{#each shorts}}
+      <div class="col-4">
+        <p>{{content}}</p>
+        <a href="/insta_shorts/{{instaId}}/edit" class="btn btn-outline-secondary">Edit</a>
+        <a href="/insta_shorts/{{instaId}}/delete" class="btn btn-outline-secondary">Delete</a>
+      </div>
+    {{/each}}
+  </div>
+{{> footer}}

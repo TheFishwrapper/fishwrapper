@@ -15,7 +15,7 @@ const Features = require('./features');
 const Subscribers = require('./subscribers');
 const InfiniteTimeline = require('./infinite_timeline');
 const Quizzes = require('./quizzes');
-
+const InstaShorts = require('./insta_shorts');
 const IS_OFFLINE = process.env.IS_OFFLINE;
 
 let dynamoDb;
@@ -266,6 +266,30 @@ app.post('/quizzes', upload.single('thumbnail'), function (req, res) {
 
 app.post('/quizzes/:quizId', function (req, res) {
   Quizzes.grade(req, res, dynamoDb);
+});
+
+app.get('/insta_shorts', function (req, res) {
+  InstaShorts.index(req, res, dynamoDb);
+});
+
+app.get('/insta_shorts/new', function (req, res) {
+  InstaShorts.new_short(req, res, dynamoDb);
+});
+
+app.get('/insta_shorts/:instaId/edit', function (req, res) {
+  InstaShorts.edit(req, res, dynamoDb);
+});
+
+app.get('/insta_shorts/:instaId/delete', function (req, res) {
+  InstaShorts.destroy(req, res, dynamoDb);
+});
+
+app.post('/insta_shorts', function (req, res) {
+  if (req.body._method == 'POST') {
+    InstaShorts.create(req, res, dynamoDb);
+  } else if (req.body._method == 'PUT') {
+    InstaShorts.update(req, res, dynamoDb);
+  }
 });
 
 app.get('*', function (req, res) {

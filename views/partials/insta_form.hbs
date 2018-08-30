@@ -1,0 +1,8 @@
+<form action="/insta_shorts" method="POST">
+  <label>Content:</label>
+  <input type="text" name="content" size="100" value="{{short.content}}" /><br />
+  <input type="hidden" name="instaId" value="{{short.instaId}}" />
+  <input type="hidden" name="_method" value="{{method}}" />
+
+  <input type="submit" value="Submit" class="btn btn-outline-secondary" />
+</form>
