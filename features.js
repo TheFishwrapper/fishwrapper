@@ -14,7 +14,7 @@ class Features {
           console.log(error);
           Lib.error(res, req, error);
         } else {
-          Lib.render(res, req, 'features/index', {bucket: bucket, req: req, feats: result.Items});
+          Lib.render(res, req, 'features/index', {feats: result.Items});
         }
       });
     }
@@ -28,7 +28,7 @@ class Features {
           console.log(error);
           Lib.error(res, req, error);
         } else {
-          Lib.render(res, req, 'features/new', {bucket: bucket, req: req, posts: result.Items});
+          Lib.render(res, req, 'features/new', {posts: result.Items});
         }
       });
     }
@@ -79,7 +79,7 @@ class Features {
                 return x;
               });
               console.log(posts);
-              Lib.render(res, req, 'features/edit', {bucket: bucket, req: req, posts: posts, feat: result.Item});
+              Lib.render(res, req, 'features/edit', {posts: posts, feat: result.Item});
             }
           });
         } else {
