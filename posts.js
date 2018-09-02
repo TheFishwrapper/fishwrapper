@@ -43,9 +43,23 @@ class Posts {
               }
             }
           }
-          Lib.render(res, req, 'posts/index', {req: req,
-                                     politics: pols, local: local,
-                                     current: current, features: feats});
+          dynamoDb.scan({ TableName: process.env.TIME_TABLE }, (e, d) => {
+            if (e) {
+              console.log(e);
+              Lib.error(res, req, e);
+            } else {
+              const time = d.Items.sort((a, b) => a.week - b.week);
+              dynamoDb.scan({ TableName: process.env.INSTA_TABLE }, (er, da) => {
+                if (er) {
+                  console.log(er);
+                  Lib.error(res, req, er);
+                } else {
+                  Lib.render(res, req, 'posts/index', {req: req, politics: pols, local: local, 
+                    current: current, features: feats, time: time, shorts: da.Items});
+                }
+              });
+            }
+          });
       });
       }
     });

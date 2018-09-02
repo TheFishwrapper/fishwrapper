@@ -17,7 +17,6 @@
             <div class="carousel-caption d-none d-md-block">
               <h3><a href="/posts/{{post}}">{{title}}</a></h3>
             </div>
-          </div>
         {{/caro}}
         <a class="carousel-control-prev" href="#my-carousel" role="button" data-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -30,9 +29,21 @@
       </div>
     {{/if}}
     <h4 class="heading">Current Events</h4>
-      {{#each current}}
-        {{> posts_center}}
-      {{/each}}
+    {{#first current num="2"}}
+      {{> posts_center}}
+    {{/first}}
+    <div class="greyed">
+      <div class="bord">
+        <h4><a class="darker" href="/infinite_timeline">Infinite Timeline</a></h4>
+        <h6 class="mb-3">A collaborative story produced by readers like you.</h6>
+        {{#each time}}
+          <p>{{content}}</p>
+        {{/each}}
+      </div>
+    </div>
+    {{#last current num="2"}}
+      {{> posts_current}}
+    {{/last}}
   </div>
   <div id="right" class="col-md-3 col-12">
     <div class="greyed">
@@ -42,9 +53,22 @@
     </div>
     <h4 class="heading mt-4">Local</h4>
     <div id="gutter-right">
-      {{#each local}}
+      {{#first local num="5"}}
         {{> posts_gutter}}
-      {{/each}}
+      {{/first}}
+      {{#if shorts}}
+        <div id="carousel-2" class="carousel slide" data-ride="carousel" data-interval="10000">
+          <ol class="carousel-indicators"></ol>
+          {{#caro shorts}}
+            <a href="#carousel-2" role="button" data-slide="next">
+              <p>{{content}}</p>
+            </a>
+          {{/caro}}
+        </div>
+      {{/if}}
+      {{#last local num="5"}}
+        {{> posts_gutter}}
+      {{/last}}
     </div>
   </div>
 </div>

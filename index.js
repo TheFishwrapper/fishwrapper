@@ -50,8 +50,8 @@ let mulS3 = multerS3({
 
 let upload = multer({ storage: mulS3 });
 
-hbs.registerHelper('blurb', function(content) { return content.substr(0, 230) + '...' });
-hbs.registerHelper('caro', function(items, options) {
+hbs.registerHelper('blurb', function (content) { return content.substr(0, 230) + '...' });
+hbs.registerHelper('caro', function (items, options) {
   var out = '<div class="carousel-inner" role="listbox">';
   for (var i = 0; i < items.length; i++) {
     out += '<div class="carousel-item';
@@ -61,9 +61,20 @@ hbs.registerHelper('caro', function(items, options) {
       out += '">';
     }
     out += options.fn(items[i]);
+    out += '</div>';
   }
   out += '</div>';
   return out;
+});
+hbs.registerHelper('first', function (context, options) { 
+  for (let i = 0; i < options.hash['num']; i++) {
+    return options.fn(context[i]);
+  }
+});
+hbs.registerHelper('last', function (context, options) {
+  for (let i = options.hash['num']; i < context.length; i++) {
+    return options.fn(context[i]);
+  }
 });
 hbs.registerHelper('checkedIf', function (test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
