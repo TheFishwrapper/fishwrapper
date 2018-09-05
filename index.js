@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const cookie = require('cookie-parser');
 const hbs = require('hbs');
+const gzip = require('compression');
 const SolrNode = require('solr-node');
 const app = express();
 const AWS = require('aws-sdk');
@@ -34,13 +35,14 @@ let s3 = new AWS.S3();
 let mulS3 = multerS3({
   s3: s3,
   bucket: 'fishwrapper-pictures-dev',
+  cacheControl: 'max-age=31536000',
   acl: 'public-read',
   contentType: function (req, file, cb) {
     cb(null, file.mimetype);
   }, 
   metadata: function (req, file, cb) {
     cb(null, {
-      fieldName: file.fieldname
+      fieldName: file.fieldname,
     });
   },
   key: function (req, file, cb) {
@@ -87,6 +89,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
 app.use(cookie(process.env.COOKIE_SECRET));
+app.use(gzip());
 app.set('view engine', 'hbs');
 let bucket = process.env.S3_BUCKET; 
 
