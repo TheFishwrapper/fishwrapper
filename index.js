@@ -306,6 +306,15 @@ app.post('/insta_shorts', function (req, res) {
   }
 });
 
+app.get('/sitemap.xml', function (req, res) {
+  Lib.sitemap(req, res, dynamoDb);
+});
+
+app.get('/robots.txt', function (req, res) {
+  res.type('text/plain');
+  res.send('Sitemap: https://www.thefishwrapper.news/sitemap.xml');
+});
+
 app.get('*', function (req, res) {
   Lib.render(res, req, 'missing');
 });
