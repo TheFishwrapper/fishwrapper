@@ -69,14 +69,22 @@ hbs.registerHelper('caro', function (items, options) {
   return out;
 });
 hbs.registerHelper('first', function (context, options) { 
+  let out = '';
   for (let i = 0; i < options.hash['num']; i++) {
-    return options.fn(context[i]);
+    if (context[i] != undefined) {
+      out += options.fn(context[i]);
+    }
   }
+  return out;
 });
 hbs.registerHelper('last', function (context, options) {
+  let out = '';
   for (let i = options.hash['num']; i < context.length; i++) {
-    return options.fn(context[i]);
+    if (context[i] != undefined) {
+      out += options.fn(context[i]);
+    }
   }
+  return out;
 });
 hbs.registerHelper('checkedIf', function (test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });

@@ -258,7 +258,8 @@ class Posts {
         console.log(err);
         Lib.error(res, req, err);
       } else {
-        data.Items.map(p => p.content = markdown.toHTML(p.content)); // TODO
+        data.Items.map(p => p.content = markdown.toHTML(p.content));
+        data.Items.sort((a, b) => new Date(b.published_on) - new Date(a.published_on));
         var left = data.Items.slice(0, data.Count / 2);
         var center = data.Items.slice(data.Count / 2);
         Lib.render(res, req, 'posts/subindex', {heading: req.query.category, left: left, center: center});
