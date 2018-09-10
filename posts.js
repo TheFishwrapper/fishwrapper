@@ -48,7 +48,8 @@ class Posts {
               console.log(e);
               Lib.error(res, req, e);
             } else {
-              const time = d.Items.sort((a, b) => a.week - b.week);
+              let time = d.Items.filter(x => x.selected);
+              time.sort((a, b) => a.week - b.week);
               dynamoDb.scan({ TableName: process.env.INSTA_TABLE }, (er, da) => {
                 if (er) {
                   console.log(er);
