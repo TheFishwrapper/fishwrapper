@@ -101,6 +101,7 @@ class Posts {
             category: post.category,
             author: post.author,
             published_on: post.published_on,
+            issue: post.issue,
             content: post.content,
             staging: post.staging,
             thumbnail: req.file.location,
@@ -166,19 +167,20 @@ class Posts {
             Key: {
               postId: post.postId
             },
-            UpdateExpression: 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging, thumbnail_credit = :thumbnail_credit',
+            UpdateExpression: 'SET title = :title, author = :author, category = :category, published_on = :published_on, issue = :issue, content = :content, staging = :staging, thumbnail_credit = :thumbnail_credit',
             ExpressionAttributeValues: {
               ':title': post.title,
               ':author': post.author,
               ':category': post.category,
               ':published_on': post.published_on,
+              ':issue': post.issue,
               ':content': post.content,
               ':staging': post.staging,
               ':thumbnail_credit': post.thumbnail_credit
             },
         };
         if (req.file) {
-          params.UpdateExpression = 'SET title = :title, author = :author, category = :category, published_on = :published_on, content = :content, staging = :staging, thumbnail = :thumbnail, thumbnail_credit = :thumbnail_credit';
+          params.UpdateExpression += ',thumbnail = :thumbnail';
           params.ExpressionAttributeValues[':thumbnail'] = req.file.location;
         }
         dynamoDb.update(params, (error) => {
@@ -306,6 +308,7 @@ class Posts {
     post.title = body.title;
     post.author = body.author;
     post.published_on = body.published_on;
+    post.issue = Number(body.issue);
     post.content = body.content;
     post.category = body.category;
     post.staging = (body.staging) ? true : false;
