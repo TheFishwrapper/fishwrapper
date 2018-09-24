@@ -1,10 +1,14 @@
 {
   "name": "fishwrapper",
   "version": "1.0.0",
-  "description": "",
+  "description": "Serverless Web App for The Fishwrapper, a satirical news site.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc --reporter=text --reporter=html mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CapitalistLepton/fishwrapper.git"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +29,11 @@
     "solr-node": "^1.0.14"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "dotenv": "^6.0.0",
+    "faker": "^4.1.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.0.1",
     "serverless-apigw-binary": "^0.4.4",
     "serverless-domain-manager": "^2.4.0",
     "serverless-dynamodb-local": "^0.2.30",

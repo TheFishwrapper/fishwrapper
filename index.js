@@ -101,6 +101,23 @@ app.use(gzip());
 app.set('view engine', 'hbs');
 let bucket = process.env.S3_BUCKET; 
 
+let handlerObj = {
+  req: null,
+  res: null,
+  callback: function (action, page, obj) {
+    switch (action) {
+      case 'render':
+        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET, req: this.req}, obj));
+        break;
+      case 'redirect':
+        this.res.redirect(page);
+        break;
+      default:
+        console.log('Unknown action');
+     }
+   }
+};
+
 app.get('/', function (req, res) {
   Posts.index(req, res, dynamoDb);
 });
@@ -156,30 +173,27 @@ app.get('/staging', function (req, res) {
 });
 
 app.get('/features', function (req, res) {
-  Features.index(req, res, dynamoDb);
+  Features.index(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/features/new', function (req, res) {
-  Features.new_feat(req, res, dynamoDb);
-});
-
-app.get('/features/:index', function (req, res) {
-  Features.show(req, res, dynamoDb);
+  Features.new_feat(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/features/:index/edit', function (req, res) {
-  Features.edit(req, res, dynamoDb);
+  Features.edit(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/features/:index/delete', function (req, res) {
-  Features.destroy(req, res, dynamoDb);
+  Features.destroy(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.post('/features', function (req, res) {
+  let cb = handlerObj.callback.bind({req: req, res: res}); 
   if (req.body._method == 'PUT') {
-    Features.update(req, res, dynamoDb);
+    Features.update(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
   } else if (req.body._method == 'POST') {
-    Features.create(req, res, dynamoDb);
+    Features.create(req, dynamoDb, cb);
   }
 });
 

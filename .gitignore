@@ -1,10 +1,13 @@
 # package directories
-node_modules
-jspm_packages
+node_modules/
+jspm_packages/
+
+# Coverage files
+.nyc_output/
+coverage/
 
 # Serverless directories
 .serverless
 
-.sass-cache/
-
+# Mac OS 
 .DS_Store

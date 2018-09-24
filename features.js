@@ -1,64 +1,92 @@
-const FEATS_TABLE = process.env.FEATS_TABLE;
-const POSTS_TABLE = process.env.POSTS_TABLE;
-const bucket = process.env.S3_BUCKET;
 const Login = require('./login');
-const Lib = require('./lib');
+//const Lib = require('./lib');
 
+/*
+ * Controller class for featured articles.
+ */
 class Features {
 
-  static index(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
-      const params = { TableName: FEATS_TABLE };
+  /*
+   * Renders the index page with all the featured articles.
+   * NOTE:
+   *   User must be logged in.
+   */
+  static index(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
+      const params = { TableName: process.env.FEATS_TABLE };
       dynamoDb.scan(params, (error, result) => {
         if (error) {
-          console.log(error);
-          Lib.error(res, req, error);
+          console.error(error);
+          callback('render', 'error', {error: error});
         } else {
-          Lib.render(res, req, 'features/index', {feats: result.Items});
+          callback('render', 'features/index', 
+            {feats: result.Items.sort((a,b) => a.index - b.index)}); 
         }
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static new_feat(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
-      const params = { TableName: POSTS_TABLE };
+  /*
+   * Renders a form to create a new featured article with a list of all the
+   * current posts.
+   * NOTE:
+   *   User must be logged in.
+   */
+  static new_feat(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
+      const params = { TableName: process.env.POSTS_TABLE };
       dynamoDb.scan(params, (error, result) => {
         if (error) {
-          console.log(error);
-          Lib.error(res, req, error);
+          console.error(error);
+          callback('render', 'error', {error: error});
         } else {
-          Lib.render(res, req, 'features/new', {posts: result.Items});
+          callback('render', 'features/new', {posts: result.Items});
         }
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static create(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  /*
+   * Creates a new featured article in the database from the given request and
+   * redirects to the features index page if successful.
+   * NOTE:
+   *   User must be logged in.
+   */
+  static create(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: FEATS_TABLE,
+        TableName: process.env.FEATS_TABLE,
         Item: {
           index: parseInt(req.body.index, 10),
           post: req.body.post
         }
       };
-      console.log(req.body);
       dynamoDb.put(params, (error) => {
         if (error) {
-          console.log(error);
-          Lib.error(res, req, 'Could not create featured article');
+          console.error(error);
+          callback('render', 'error', {error: error});
         } else {
-          res.redirect('/features');
+          callback('redirect', '/features');
         }
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static edit(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  /*
+   * Renders a form to edit the selected featured article.
+   * NOTE:
+   *   User must be logged in.
+   */
+  static edit(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: FEATS_TABLE,
+        TableName: process.env.FEATS_TABLE,
         Key: {
           index: parseInt(req.params.index, 10)
         }
@@ -66,33 +94,43 @@ class Features {
 
       dynamoDb.get(params, (error, result) => {
         if (error) {
-          console.log(error);
-        }
+          console.error(error);
+          callback('render', 'error', {error: error});
+        } else {
         if (result.Item) {
-          dynamoDb.scan({TableName: POSTS_TABLE}, (err, resul) => {
+          dynamoDb.scan({TableName: process.env.POSTS_TABLE}, (err, resul) => {
             if (err) {
-              console.log(err);
-              Lib.error(res, req, err);
+              console.error(err);
+              callback('render', 'error', {error: err});
             } else {
               let posts = resul.Items.map(x => {
                 x.sel = x.postId == result.Item.post;
                 return x;
               });
-              console.log(posts);
-              Lib.render(res, req, 'features/edit', {posts: posts, feat: result.Item});
+              callback('render', 'features/edit', {posts: posts, 
+                feat: result.Item});
             }
-          });
+           });
         } else {
-          Lib.error(res, req, 'Featured article not found');
+          callback('render', 'error', {error: 'Featured article not found'});
+        }
         }
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static update(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  /*
+   * Updates a featured article in the database from the given request and
+   * redirects to the features index page if successful.
+   * NOTE:
+   *   User must be logged in.
+   */
+  static update(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: FEATS_TABLE,
+        TableName: process.env.FEATS_TABLE,
         Key: {
           index: parseInt(req.body.index, 10)
         },
@@ -103,31 +141,41 @@ class Features {
       };
       dynamoDb.update(params, (error) => {
         if (error) {
-          console.log(error);
-          Lib.error(res, req, 'Could not update featured article');
+          console.error(error);
+          callback('render', 'error', {error: 'Could not update featured article'});
         } else {
-          res.redirect('/features');
+          callback('redirect', '/features');
         }
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static destroy(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  /*
+   * Deletes the selected featured article from the database and redirects
+   * to the features index page if successful.
+   * NOTE:
+   *   User must be logged in.
+   */
+  static destroy(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: FEATS_TABLE,
+        TableName: process.env.FEATS_TABLE,
         Key: {
           index: parseInt(req.params.index, 10)
         }
       };
       dynamoDb.delete(params, function (err, data) {
         if (err) {
-          console.log(err);
-          Lib.error(res, req, 'Could not find featured article');
+          console.error(err);
+          callback('render', 'error', {error: 'Could not find featured article'});
         } else {
-          res.redirect('/features');
+          callback('redirect', '/features');
         }
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 }

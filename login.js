@@ -52,7 +52,18 @@ class Login {
    */
   static authenticate(req, res) {
     if (!req.signedCookies['id_token']) {
-      res.redirect(302, '/login');
+      res.redirect('/login');
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  /*
+   * Verifies that the user is logged in.
+   */
+  static authenticate(req) {
+    if (!req.signedCookies['id_token']) {
       return false;
     } else {
       return true;
