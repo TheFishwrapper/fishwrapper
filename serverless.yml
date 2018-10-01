@@ -8,7 +8,7 @@ custom:
       migrate: true
   domain:
     dev: fish.capitalistlepton.com
-    production: thefishwrapper.capitalistlepton.com
+    production: thefishwrapper.news
   bucket:
     dev: arn:aws:s3:::fishwrapper-pictures-dev/*
     production: arn:aws:s3:::fishwrapper-pictures-production/*
