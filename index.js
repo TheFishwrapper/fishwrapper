@@ -337,6 +337,24 @@ app.get('/robots.txt', function (req, res) {
   res.send('Sitemap: https://www.thefishwrapper.news/sitemap.xml');
 });
 
+app.get('/googled33b7223d079ee62.html', function (req, res) { // Google search console verification
+  const re = /https:\/\/s3.amazonaws.com\//
+  let bucket = process.env.S3_BUCKET.replace(re, ''); // Get basename of the bucket
+  bucket = bucket.substring(0, bucket.length - 1); // Remove trailing '/'
+  const params = {
+    Bucket: bucket,
+    Key: 'googled33b7223d079ee62.html'
+  };
+  s3.getObject(params, (err, data) => {
+    if (err) {
+      console.error(err);
+      res.render('error', {bucket: process.env.S3_BUCKET, req: req, error: err});
+    } else {
+      res.send(data.Body);
+    }
+  });
+});
+
 app.get('*', function (req, res) {
   Lib.render(res, req, 'missing');
 });
