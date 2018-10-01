@@ -34,7 +34,7 @@ let s3 = new AWS.S3();
 
 let mulS3 = multerS3({
   s3: s3,
-  bucket: 'fishwrapper-pictures-dev',
+  bucket: process.env.PICS_BUCKET,
   cacheControl: 'max-age=31536000',
   acl: 'public-read',
   contentType: function (req, file, cb) {

@@ -9,6 +9,9 @@ custom:
   domain:
     dev: fish.capitalistlepton.com
     production: thefishwrapper.capitalistlepton.com
+  bucket:
+    dev: arn:aws:s3:::fishwrapper-pictures-dev/*
+    production: arn:aws:s3:::fishwrapper-pictures-production/*
   customDomain:
     domainName: ${self:custom.domain.${self:provider.stage}} 
     basePath: '' 
@@ -48,7 +51,7 @@ provider:
         - { "Fn::GetAtt": ["GlobalDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["QuizzesDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["InstaShortsDynamoDBTable", "Arn" ] }
-        - "arn:aws:s3:::fishwrapper-pictures-dev/*"
+        - 'arn:aws:s3:::fishwrapper-pictures-${self:provider.stage}/*'
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
     FEATS_TABLE: 'features-table-${self:provider.stage}' 
