@@ -1,5 +1,4 @@
 const Login = require('./login');
-//const Lib = require('./lib');
 
 /*
  * Controller class for featured articles.

@@ -191,7 +191,7 @@ app.get('/features/:index/delete', function (req, res) {
 app.post('/features', function (req, res) {
   let cb = handlerObj.callback.bind({req: req, res: res}); 
   if (req.body._method == 'PUT') {
-    Features.update(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
+    Features.update(req, dynamoDb, cb);
   } else if (req.body._method == 'POST') {
     Features.create(req, dynamoDb, cb);
   }
