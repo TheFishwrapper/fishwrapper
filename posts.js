@@ -282,6 +282,7 @@ class Posts {
       let ps = posts.map(p => Posts.idToPost(p, dynamoDb));
       Promise.all(ps).then(r => {
         let ar = r.map(a => a.Item).filter(a => !a.staging);
+        ar.map(p => p.content = markdown.toHTML(p.content));
         const left = ar.slice(0, ar.length / 2);
         const center = ar.slice(ar.length / 2);
         Lib.render(res, req, 'posts/subindex', {heading: 'Search results', left: left, center: center});
