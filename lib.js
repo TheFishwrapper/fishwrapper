@@ -24,13 +24,15 @@ class Lib {
             res.send(`<error>${er}</error>`);
           } else {
             for (let i = 0; i < data.Count; i++) {
-              out += '<url>';
               let post = data.Items[i];
-              out += `<loc>https://thefishwrapper.news/posts/${escape(post.postId)}</loc>`;
-              if (post.thumbnail) {
-               out += `<image:image><image:loc>${post.thumbnail}</image:loc></image:image>`;
+              if (!post.staging) {
+                out += '<url>';
+                out += `<loc>https://thefishwrapper.news/posts/${escape(post.postId)}</loc>`;
+                if (post.thumbnail) {
+                  out += `<image:image><image:loc>${post.thumbnail}</image:loc></image:image>`;
+                }
+                out += '</url>';
               }
-              out += '</url>';
             }
             for (let i = 0; i < dat.Count; i++) {
               out += '<url>';
