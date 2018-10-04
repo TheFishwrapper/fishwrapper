@@ -9,7 +9,7 @@ const app = express();
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const Lib = require('./lib');
+// const Lib = require('./lib');
 const Posts = require('./posts');
 const Login = require('./login');
 const Features = require('./features');
@@ -17,7 +17,9 @@ const Subscribers = require('./subscribers');
 const InfiniteTimeline = require('./infinite_timeline');
 const Quizzes = require('./quizzes');
 const InstaShorts = require('./insta_shorts');
+
 const IS_OFFLINE = process.env.IS_OFFLINE;
+const BASE_URL = 'https://thefishwrapper.news';
 
 let dynamoDb;
 if (IS_OFFLINE === 'true') {
@@ -89,7 +91,9 @@ hbs.registerHelper('last', function (context, options) {
 hbs.registerHelper('checkedIf', function (test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
 hbs.registerHelper('equal', function (a, b) { return (a == b) ? 'selected' : ''; });
-hbs.registerHelper('image', function (image) { return (image) ? image : 'https://via.placeholder.com/350?text=Image not found'; });
+hbs.registerHelper('image', function (image) { 
+  return (image) ? image : 'https://via.placeholder.com/350?text=Image not found';
+});
 hbs.registerPartials(__dirname + '/views/partials');
 
 app.use(bodyParser.json({ strict: false }));
@@ -107,7 +111,12 @@ let handlerObj = {
   callback: function (action, page, obj) {
     switch (action) {
       case 'render':
-        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET, req: this.req}, obj));
+        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET, 
+          req: this.req, title: 'The Fishwrapper', type: 'article', 
+          description: "The Fishwrapper is UW's own satirical newspaper, " +
+          "committed to publishing all the news that's unfit to print. " +
+          "Irrelevant, irreverent, irresponsible.", url: BASE_URL, 
+          ogImage: process.env.S3_BUCKET + 'logo.png'}, obj));
         break;
       case 'redirect':
         this.res.redirect(page);
@@ -119,7 +128,7 @@ let handlerObj = {
 };
 
 app.get('/', function (req, res) {
-  Posts.index(req, res, dynamoDb);
+  Posts.index(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/login', function (req, res) {
@@ -135,41 +144,43 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/posts', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
   if (req.query.search) {
-    Posts.search(req, res, dynamoDb);
+    Posts.search(req, dynamoDb, cb);
   } else if (req.query.category) {
-    Posts.category(req, res, dynamoDb);
+    Posts.category(req, dynamoDb, cb);
   } else {
-    Posts.index(req, res, dynamoDb);
+    Posts.index(req, dynamoDb, cb);
   }
 });
 
 app.get('/posts/new', function(req, res) {
-  Posts.new_post(req, res, dynamoDb);
+  Posts.new_post(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/posts/:postId', function (req, res) {
-  Posts.read(req, res, dynamoDb); 
+  Posts.read(req, dynamoDb, handlerObj.callback.bind({req: req, res: res})); 
 });
 
 app.get('/posts/:postId/edit', function (req, res) {
-  Posts.edit(req, res, dynamoDb);
+  Posts.edit(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/posts/:postId/delete', function (req, res) {
-  Posts.destroy(req, res, dynamoDb);
+  Posts.destroy(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.post('/posts', upload.single('thumbnail'), function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
   if (req.body._method == 'PUT') {
-    Posts.update(req, res, dynamoDb);
+    Posts.update(req, dynamoDb, cb);
   } else if (req.body._method == 'POST') {
-    Posts.create(req, res, dynamoDb);
+    Posts.create(req, dynamoDb, cb);
   }
 });
 
 app.get('/staging', function (req, res) {
-  Posts.staging(req, res, dynamoDb);
+  Posts.staging(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/features', function (req, res) {
@@ -198,11 +209,13 @@ app.post('/features', function (req, res) {
 });
 
 app.get('/about', function (req, res) {
-  Lib.render(res, req, 'about', {bucket: bucket});
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  cb('render', 'about');
 });
 
 app.get('/contact', function (req, res) {
-  Lib.render(res, req, 'contact', {bucket: bucket});
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  cb('render', 'contact');
 });
 
 app.get('/subscribers/new', function (req, res) {
@@ -329,7 +342,44 @@ app.post('/insta_shorts', function (req, res) {
 });
 
 app.get('/sitemap.xml', function (req, res) {
-  Lib.sitemap(req, res, dynamoDb);
+  res.type('application/xml');
+  let out = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">';
+  dynamoDb.scan({TableName: process.env.POSTS_TABLE}, function (err, data) {
+    if (err) {
+      console.error(err);
+      res.send(`<error>${err}</error>`);
+    } else {
+      dynamoDb.scan({TableName: process.env.QUIZZES_TABLE}, function (er, dat) {
+        if (er) {
+          console.error(er);
+          res.send(`<error>${er}</error>`);
+        } else {
+          for (let i = 0; i < data.Count; i++) {
+            let post = data.Items[i];
+            if (!post.staging) {
+              out += '<url>';
+              out += `<loc>https://thefishwrapper.news/posts/${escape(post.postId)}</loc>`;
+              if (post.thumbnail) {
+                out += `<image:image><image:loc>${post.thumbnail}</image:loc></image:image>`;
+              }
+              out += '</url>';
+            }
+          }
+          for (let i = 0; i < dat.Count; i++) {
+            out += '<url>';
+            let quiz = dat.Items[i];
+            out += `<loc>https://thefishwrapper.news/quizzes/${escape(quiz.quizId)}</loc>`;
+            if (quiz.thumbnail) {
+              out += `<image:image><image:loc>${quiz.thumbnail}</image:loc></image:image>`;
+            }
+            out += '</url>';
+          }
+          out += '</urlset>';
+          res.send(out);
+        }
+      });
+    }
+  });
 });
 
 app.get('/robots.txt', function (req, res) {
@@ -356,7 +406,8 @@ app.get('/googled33b7223d079ee62.html', function (req, res) { // Google search c
 });
 
 app.get('*', function (req, res) {
-  Lib.render(res, req, 'missing');
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  cb('render', 'missing');
 });
 
 module.exports.handler = serverless(app);
