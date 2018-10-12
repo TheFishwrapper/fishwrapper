@@ -1,54 +1,65 @@
-const USERS_TABLE = process.env.USERS_TABLE;
-const bucket = process.env.S3_BUCKET;
 const bcrypt = require('bcryptjs');
-const Lib = require('./lib');
 
+/*
+ * Controller class for logging in to the website.
+ */
 class Login {
 
-  static show(req, res, dynamoDb) {
-    console.log(res);
-    res.render('login', {bucket: bucket, req: req});
+  /*
+   * Renders the login page.
+   */
+  static show(req, dynamoDb, callback) {
+    callback('render', 'login');
   }
 
-  static attempt(req, res, dynamoDb) {
+  /*
+   * Attempts to login the user with the given username and password. The user
+   * is redirected to the index page on success.
+   */
+  static attempt(req, dynamoDb, callback) {
     const params = {
-      TableName: USERS_TABLE,
+      TableName: process.env.USERS_TABLE,
        Key: {
          user: req.body.username
        },
     }
     dynamoDb.get(params, function (error, result) {
       if (error) {
-        console.log(error);
-        Lib.error(res, req, error);
-      } 
-      if (result.Item) {
+        console.error(error);
+        callback('render', 'error', {error: error});
+      } else if (result.Item) {
         const hash = result.Item.password;
         bcrypt.compare(req.body.password, hash, function (err, correct) {
           if (err) {
-            console.log(err);
-            Lib.error(res, req, err);
-          }
-          if (correct) {
-            res.cookie('id_token', result.Item.user, { signed: true, httpOnly: true, sameSite: 'strict' });
-            res.redirect(302, '/');
+            console.error(err);
+            callback('render', 'error', {error: err});
+          } else if (correct) {
+            callback('cookie', '/', {cookie: 'id_token', 
+              value: result.Item.user, options: {signed: true, httpOnly: true,
+              sameSite: 'strict'}});
           } else {
-            Lib.error(res, req, 'Incorrect password or username');
+            callback('render', 'error', {error: 
+              'Incorrect password or username'});
           }
         });
       } else {
-        Lib.error(res, req, 'User not found');
+        callback('render', 'error', {error: 'User not found'});
       }
     });
   }
 
-  static logout(req, res, dynamoDb) {
-    res.cookie('id_token', '', { expires: new Date() });
-    res.redirect(302, '/');
+  /*
+   * Logs out the user by unsetting the cookie and redirecting to the index
+   * page.
+   */
+  static logout(req, dynamoDb, callback) {
+    callback('cookie', '/', {cookie: 'id_token', value: '', options: {expires: new Date()}});
   }
 
   /*
    * Verifies that the user is logged in.
+   * 
+   * DEPRECATED: use authenticate(req)
    */
   static authenticate(req, res) {
     if (!req.signedCookies['id_token']) {

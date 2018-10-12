@@ -118,6 +118,8 @@ let handlerObj = {
           "Irrelevant, irreverent, irresponsible.", url: BASE_URL, 
           ogImage: process.env.S3_BUCKET + 'logo.png'}, obj));
         break;
+      case 'cookie': // Sets cookie and redirects to page
+        this.res.cookie(obj.cookie, obj.value, obj.options);
       case 'redirect':
         this.res.redirect(page);
         break;
@@ -132,15 +134,15 @@ app.get('/', function (req, res) {
 });
 
 app.get('/login', function (req, res) {
-  Login.show(req, res, dynamoDb);
+  Login.show(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.post('/login', function (req, res) {
-  Login.attempt(req, res, dynamoDb);
+  Login.attempt(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/logout', function (req, res) {
-  Login.logout(req, res, dynamoDb);
+  Login.logout(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/posts', function (req, res) {
