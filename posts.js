@@ -40,6 +40,7 @@ class Posts {
               current.push(posts[i]);
             }
             posts[i].content = markdown.toHTML(posts[i].content);
+            posts[i].title = markdown.toHTML(posts[i].title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
             // Join posts and features
             for (var j = 0; j < feats.length; j++) {
                if (posts[i].postId == feats[j].post) {
@@ -89,6 +90,7 @@ class Posts {
         callback('render', 'error', {error: error});
       } else if (result && result.Item) {
         result.Item.content = markdown.toHTML(result.Item.content);
+        result.Item.title = markdown.toHTML(result.Item.title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
         callback('render', 'posts/show', {post: result.Item});
       } else {
         callback('render', 'error', {error: 'Post not found'});
@@ -291,7 +293,10 @@ class Posts {
           console.error(err);
           callback('render', 'error', {error: err});
         } else {
-          data.Items.map(p => p.content = markdown.toHTML(p.content));
+          data.Items.map(p => {
+            p.content = markdown.toHTML(p.content);
+            p.title = markdown.toHTML(p.title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
+          });
           let left = data.Items.slice(0, data.Count / 2);
           let center = data.Items.slice(data.Count / 2);
           callback('render', 'posts/subindex', {heading: 'Staging', left: left,
@@ -320,7 +325,10 @@ class Posts {
         callback('render', 'error', {error: err});
       } else {
         let posts = data.Items.filter(p => !p.staging);
-        posts.map(p => p.content = markdown.toHTML(p.content));
+        posts.map(p => {
+          p.content = markdown.toHTML(p.content);
+          p.title = markdown.toHTML(p.title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
+        });
         posts.sort((a, b) => {
           return new Date(b.published_on) - new Date(a.published_on);
         });

@@ -54,7 +54,17 @@ let mulS3 = multerS3({
 
 let upload = multer({ storage: mulS3 });
 
-hbs.registerHelper('blurb', function (content) { return content.substr(0, 230) + '...' });
+hbs.registerHelper('blurb', function (content) { 
+ const sentenceRegex = /\.[ <”]/g;
+ let stopAr = sentenceRegex.exec(content);
+ if (stopAr == null) {
+   return content;
+ }
+ while (stopAr.index < 320 && sentenceRegex.lastIndex != stopAr.index) {
+   stopAr = sentenceRegex.exec(content);
+ }
+ return content.substr(0, stopAr.index) + '...';
+});
 hbs.registerHelper('caro', function (items, options) {
   var out = '<div class="carousel-inner" role="listbox">';
   for (var i = 0; i < items.length; i++) {
