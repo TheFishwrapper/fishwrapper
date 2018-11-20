@@ -1,0 +1,14 @@
+{{> header}}
+<div class="row">
+  <div class="col">
+    <h1 id="crossword-title">{{crossword.title}}</h1>
+    <p>{{crossword.solution}}</p>
+    </div>
+</div>
+{{#if req.signedCookies.id_token}}
+  <div class="row">
+    <p class="mr-2"><a class="btn btn-outline-secondary" href="/crosswords/{{crossword.crossId}}/edit">Edit</a></p>
+    <p class="mr-2"><a class="btn btn-outline-secondary" href="/crosswords/{{crossword.crossId}}/delete">Delete</a></p>
+  </div>
+{{/if}}
+{{> footer}}

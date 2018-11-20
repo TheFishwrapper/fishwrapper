@@ -17,6 +17,7 @@ const Subscribers = require('./subscribers');
 const InfiniteTimeline = require('./infinite_timeline');
 const Quizzes = require('./quizzes');
 const InstaShorts = require('./insta_shorts');
+const Crosswords = require('./crosswords');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 const BASE_URL = 'https://thefishwrapper.news';
@@ -351,6 +352,40 @@ app.post('/insta_shorts', function (req, res) {
   } else if (req.body._method == 'PUT') {
     InstaShorts.update(req, res, dynamoDb);
   }
+});
+
+app.get('/crosswords', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Crosswords.index(req, dynamoDb, cb);
+});
+
+app.post('/crosswords', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  if (req.body._method == 'POST') {
+    Crosswords.create(req, dynamoDb, cb);
+  } else if (req.body._method == 'PUT') {
+    Crosswords.update(req, dynamoDb, cb);
+  }
+});
+
+app.get('/crosswords/new', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Crosswords.new_cross(req, dynamoDb, cb);
+});
+
+app.get('/crosswords/:crossId', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Crosswords.show(req, dynamoDb, cb);
+});
+
+app.get('/crosswords/:crossId/edit', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Crosswords.edit(req, dynamoDb, cb);
+});
+
+app.get('/crosswords/:crossId/delete', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Crosswords.destroy(req, dynamoDb, cb);
 });
 
 app.get('/sitemap.xml', function (req, res) {

@@ -165,7 +165,7 @@ class Features {
           index: parseInt(req.params.index, 10)
         }
       };
-      dynamoDb.delete(params, function (err, data) {
+      dynamoDb.delete(params, (err, data) => {
         if (err) {
           console.error(err);
           callback('render', 'error', {error: 'Could not find featured article'});
