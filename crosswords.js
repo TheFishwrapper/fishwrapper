@@ -60,22 +60,26 @@ class Crosswords {
    */
   static create(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      const params = {
-        TableName: process.env.CROSS_TABLE,
-        Item: {
-          crossId: req.body.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
-          title: req.body.title,
-          solution: req.body.solution
-        }
-      };
-      dynamoDb.put(params, (error) => {
-        if (error) {
-          console.error(error);
-          callback('render', 'error', {error: error});
-        } else {
-          callback('redirect', '/crosswords');
-        }
-      });
+      if (!req.body.title) {
+        callback('render', 'error', {error: 'Title is missing'});
+      } else {
+        const params = {
+          TableName: process.env.CROSS_TABLE,
+          Item: {
+            crossId: req.body.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
+            title: req.body.title,
+            solution: req.body.solution
+          }
+        };
+        dynamoDb.put(params, (error) => {
+          if (error) {
+            console.error(error);
+            callback('render', 'error', {error: error});
+          } else {
+            callback('redirect', '/crosswords');
+          }
+        });
+      }
     } else {
       callback('redirect', '/login');
     }
@@ -153,7 +157,7 @@ class Crosswords {
       dynamoDb.delete(params, (error) => {
         if (error) {
           console.error(error);
-          callback('reder', 'error', {error: error});
+          callback('render', 'error', {error: error});
         } else {
           callback('redirect', '/crosswords');
         }
