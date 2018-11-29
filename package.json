@@ -11,8 +11,8 @@
     "url": "https://github.com/CapitalistLepton/fishwrapper.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Zane Littrell",
+  "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.243.1",
     "bcryptjs": "^2.4.3",
