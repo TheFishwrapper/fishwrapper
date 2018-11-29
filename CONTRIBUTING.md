@@ -61,7 +61,7 @@ at login.js for more examples of how the `cookie` action is used.
 ## Style
 
 For all source code files:
-- Each line should be less than 80 characters
+- Each line should be no more than 80 characters
 - For indentation use 2 spaces (**no tabs**)
 - Try to keep code as clean as possible
 
