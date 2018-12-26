@@ -6,6 +6,9 @@ jspm_packages/
 .nyc_output/
 coverage/
 
+# SCSS
+.sass-cache/
+
 # Serverless directories
 .serverless
 
