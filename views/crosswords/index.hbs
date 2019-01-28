@@ -1,0 +1,17 @@
+{{> header}}
+<h1>Crossword Solutions</h1>
+{{#if req.signedCookies.id_token}}
+  <p><a href="/crosswords/new" class="btn btn-outline-secondary">New crossword</a></p>
+{{/if}}
+<div class="row">
+  {{#each crosswords}}
+    <div class="col-4">
+      <h3><a href="/crosswords/{{crossId}}">{{title}}</a></h3>
+      {{#if ../req.signedCookies.id_token}}
+        <p><a href="/crosswords/{{crossId}}/edit" class="btn btn-outline-secondary">Edit</a></p>
+        <p><a href="/crosswords/{{crossId}}/delete" class="btn btn-outline-secondary">Delete</a></p>
+      {{/if}}
+    </div>
+  {{/each}}
+</div>
+{{> footer}}
