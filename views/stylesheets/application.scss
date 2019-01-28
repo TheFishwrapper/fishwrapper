@@ -64,7 +64,7 @@ h4 {
 article {
   clear: both;
   h3, h6 {
-    font-family: $header-fonts; 
+    font-family: $header-fonts;
     font-weight: bold;
     font-size: 1.3rem;
     margin-bottom: 0rem;
@@ -356,6 +356,7 @@ a.darker:hover {
 
 #banner {
   height: 4rem;
+  font-size: 1.25rem;
   #banner-left {
    width: 10%;
    float: left;
@@ -379,6 +380,7 @@ a.darker:hover {
     float: left;
     height: 2.9rem;
     background-color: #e1cc2c;
+    padding-top: 0.4rem;
     p {
      margin: 0;
     }
