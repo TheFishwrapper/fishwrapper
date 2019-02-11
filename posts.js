@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 const Login = require('./login');
-const markdown = require('markdown').markdown;
+const MarkdownIt = require('markdown-it');
+const markdown = new MarkdownIt({ html: true });
 const SolrNode = require('solr-node');
 const solr = new SolrNode({
   host: process.env.SOLR_SITE,
@@ -39,7 +40,7 @@ class Posts {
         dynamoDb.scan({TableName: process.env.FEATS_TABLE}, (err, resul) => {
           // Remove posts in staging and sort by published date
           var posts = result.Items.filter(p => !p.staging);
-          posts.sort((a, b) => new Date(b.published_on) 
+          posts.sort((a, b) => new Date(b.published_on)
             - new Date(a.published_on));
           var pols = [];
           var local = [];
@@ -54,8 +55,8 @@ class Posts {
             } else if (posts[i].category == 'Current Events') {
               current.push(posts[i]);
             }
-            posts[i].content = markdown.toHTML(posts[i].content);
-            posts[i].title = markdown.toHTML(posts[i].title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
+            posts[i].content = markdown.render(posts[i].content);
+            posts[i].title = markdown.renderInline(posts[i].title);
             // Join posts and features
             for (var j = 0; j < feats.length; j++) {
                if (posts[i].postId == feats[j].post) {
@@ -77,7 +78,7 @@ class Posts {
                   console.error(er);
                   callback('render', 'error', {error: error});
                 } else {
-                  callback('render', 'posts/index', {politics: pols, 
+                  callback('render', 'posts/index', {politics: pols,
                     local: local, current: current, features: feats, time: time,
                     shorts: da.Items});
                 }
@@ -87,7 +88,7 @@ class Posts {
         });
       }
     });
-  } 
+  }
 
   /*
    * Renders a single specified post.
@@ -104,13 +105,13 @@ class Posts {
         console.error(error);
         callback('render', 'error', {error: error});
       } else if (result && result.Item) {
-        result.Item.content = markdown.toHTML(result.Item.content);
-        result.Item.title = markdown.toHTML(result.Item.title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
+        result.Item.content = markdown.render(result.Item.content);
+        result.Item.title = markdown.renderInline(result.Item.title);
         callback('render', 'posts/show', {post: result.Item});
       } else {
         callback('render', 'error', {error: 'Post not found'});
       }
-    }); 
+    });
   }
 
   /*
@@ -136,7 +137,7 @@ class Posts {
             content: post.content,
             staging: post.staging,
             thumbnail: req.file.location,
-            thumbnail_credit: post.thumbnail_credit 
+            thumbnail_credit: post.thumbnail_credit
           },
         };
 
@@ -156,7 +157,7 @@ class Posts {
       callback('redirect', '/login');
     }
   }
-  
+
   /*
    * Renders a form to edit the specified post.
    * NOTE:
@@ -186,7 +187,7 @@ class Posts {
     } else {
       callback('redirect', '/login');
     }
-  } 
+  }
 
   /*
    * Renders a form to create a new post.
@@ -197,7 +198,7 @@ class Posts {
     if (Login.authenticate(req)) {
       const post = {
         staging: true,
-        postId: 10 
+        postId: 10
       };
       callback('render', 'posts/new', {post: post});
     } else {
@@ -221,7 +222,7 @@ class Posts {
               postId: post.postId
             },
             UpdateExpression: 'SET title = :title, author = :author, category' +
-              ' = :category, published_on = :published_on, issue = :issue, ' + 
+              ' = :category, published_on = :published_on, issue = :issue, ' +
               'content = :content, staging = :staging, thumbnail_credit = ' +
               ':thumbnail_credit',
             ExpressionAttributeValues: {
@@ -301,7 +302,7 @@ class Posts {
         FilterExpression: 'staging = :val',
         ExpressionAttributeValues: {
           ':val': true
-        } 
+        }
       };
       dynamoDb.scan(params, function (err, data) {
         if (err) {
@@ -309,8 +310,8 @@ class Posts {
           callback('render', 'error', {error: err});
         } else {
           data.Items.map(p => {
-            p.content = markdown.toHTML(p.content);
-            p.title = markdown.toHTML(p.title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
+            p.content = markdown.render(p.content);
+            p.title = markdown.renderInline(p.title);
           });
           let left = data.Items.slice(0, data.Count / 2);
           let center = data.Items.slice(data.Count / 2);
@@ -341,8 +342,8 @@ class Posts {
       } else {
         let posts = data.Items.filter(p => !p.staging);
         posts.map(p => {
-          p.content = markdown.toHTML(p.content);
-          p.title = markdown.toHTML(p.title).replace(/^(?:<p>)?(.*?)(?:<\/p>)?$/, "$1");
+          p.content = markdown.render(p.content);
+          p.title = markdown.renderInline(p.title);
         });
         posts.sort((a, b) => {
           return new Date(b.published_on) - new Date(a.published_on);
@@ -368,18 +369,18 @@ class Posts {
       let ps = posts.map(p => Posts.idToPost(p, dynamoDb));
       Promise.all(ps).then(r => {
         let ar = r.map(a => a.Item).filter(a => !a.staging);
-        ar.map(p => p.content = markdown.toHTML(p.content));
+        ar.map(p => p.content = markdown.render(p.content));
         const left = ar.slice(0, ar.length / 2);
         const center = ar.slice(ar.length / 2);
         callback('render', 'posts/subindex', {heading: 'Search results',
           left: left, center: center});
-      }); 
-    }).catch(e => callback('reneder', 'error', {error: e})); 
+      });
+    }).catch(e => callback('reneder', 'error', {error: e}));
   }
 
   /*
    * Gets the post with the given id.
-   * Parameters: 
+   * Parameters:
    *   id: postId of the post
    *   dynamoDb: database object to use
    * NOTE:
@@ -389,14 +390,14 @@ class Posts {
     let params = {
       TableName: process.env.POSTS_TABLE,
       Key: {
-        postId: id 
+        postId: id
       },
     };
     return dynamoDb.get(params).promise();
   }
 
   /*
-   * Parses the body of the posts form and returns an object with all of the 
+   * Parses the body of the posts form and returns an object with all of the
    * fields of the form.
    */
   static parse(body) {
@@ -413,7 +414,7 @@ class Posts {
     var error = '';
     error += Posts.validate(post.postId, 'string');
     error += Posts.validate(post.title, 'string');
-    error += Posts.validate(post.author, 'string'); 
+    error += Posts.validate(post.author, 'string');
     error += Posts.validate(post.published_on, 'string');
     error += Posts.validate(post.content, 'string');
     error += Posts.validate(post.category, 'string');
@@ -432,7 +433,7 @@ class Posts {
     if (typeof param !== type) {
       return `"${param}" must be a ${type}\n`;
     } else if(type === 'string' && !param) {
-      return `"${param}" is an empty string\n`; 
+      return `"${param}" is an empty string\n`;
     } else {
       return '';
     }
