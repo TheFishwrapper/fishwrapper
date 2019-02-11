@@ -1,4 +1,5 @@
 const Login = require('./login');
+const markdown = require('markdown').markdown;
 
 /*
  * Controller class for crossword objects.
@@ -35,6 +36,7 @@ class Crosswords {
         console.error(error);
         callback('render', 'error', {error: error});
       } else {
+        result.Item.solution = markdown.toHTML(result.Item.solution);
         callback('render', 'crosswords/show', {crossword: result.Item});
       }
     });

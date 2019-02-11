@@ -28,8 +28,8 @@
         </a>
       </div>
     {{/if}}
-    <h4 class="heading">Current Events</h4>
-    {{#first current num="2"}}
+    <h4 class="heading">Local</h4>
+    {{#first local num="2"}}
       {{> posts_center}}
     {{/first}}
     <div class="greyed">
@@ -41,7 +41,7 @@
         {{/each}}
       </div>
     </div>
-    {{#last current num="2"}}
+    {{#last local num="2"}}
       {{> posts_center}}
     {{/last}}
   </div>
@@ -51,9 +51,9 @@
         <h4 class="center"><a href="/quizzes/what-famous-people-f" class="darker">Take This Quiz, and Find Out What Famous Person Feels the Exact Same Way About Politics as You Do</a></h4>
       </div>
     </div>
-    <h4 class="heading mt-4">Local</h4>
+    <h4 class="heading mt-4">Current Events</h4>
     <div id="gutter-right">
-      {{#first local num="5"}}
+      {{#first current num="5"}}
         {{> posts_gutter}}
       {{/first}}
       {{#if shorts}}
@@ -66,7 +66,7 @@
           {{/caro}}
         </div>
       {{/if}}
-      {{#last local num="5"}}
+      {{#last current num="5"}}
         {{> posts_gutter}}
       {{/last}}
     </div>

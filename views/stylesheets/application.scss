@@ -354,6 +354,16 @@ a.darker:hover {
   margin-left: 10%;
 }
 
+.post {
+  p {
+    img {
+      max-width: 100%;
+      height: auto;
+      max-height: 20rem;
+    }
+  }
+}
+
 #banner {
   height: 4rem;
   font-size: 1.25rem;
