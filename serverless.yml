@@ -1,4 +1,4 @@
-service: fishwrapper 
+service: fishwrapper
 
 custom:
   dynamodb:
@@ -13,9 +13,9 @@ custom:
     dev: arn:aws:s3:::fishwrapper-pictures-dev/*
     production: arn:aws:s3:::fishwrapper-pictures-production/*
   customDomain:
-    domainName: ${self:custom.domain.${self:provider.stage}} 
-    basePath: '' 
-    stage: ${self:provider.stage} 
+    domainName: ${self:custom.domain.${self:provider.stage}}
+    basePath: ''
+    stage: ${self:provider.stage}
     createRoute53Record: true
   apigwBinary:
     types:
@@ -47,15 +47,16 @@ provider:
         - { "Fn::GetAtt": ["FeaturesDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["SubscribersDynamoDBTable", "Arn" ] }
-        - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] } 
+        - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["GlobalDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["QuizzesDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["InstaShortsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["CrossSolnsDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["VideosDynamoDBTable", "Arn" ] }
         - 'arn:aws:s3:::fishwrapper-pictures-${self:provider.stage}/*'
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
-    FEATS_TABLE: 'features-table-${self:provider.stage}' 
+    FEATS_TABLE: 'features-table-${self:provider.stage}'
     USERS_TABLE: 'users-table-${self:provider.stage}'
     SUBSCRIBERS_TABLE: 'subscribers-table-${self:provider.stage}'
     TIME_TABLE: 'infinite-table-${self:provider.stage}'
@@ -63,6 +64,7 @@ provider:
     QUIZZES_TABLE: 'quizzes-table-${self:provider.stage}'
     INSTA_TABLE: 'insta-table-${self:provider.stage}'
     CROSS_TABLE: 'cross-table-${self:provider.stage}'
+    VIDEO_TABLE: 'video-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
@@ -84,11 +86,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: postId 
+            AttributeName: postId
             AttributeType: S
         KeySchema:
           -
-            AttributeName: postId 
+            AttributeName: postId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -100,16 +102,16 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: index 
+            AttributeName: index
             AttributeType: N
         KeySchema:
           -
-            AttributeName: index 
+            AttributeName: index
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: 'features-table-${self:provider.stage}' 
+        TableName: 'features-table-${self:provider.stage}'
 
     UsersDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'
@@ -132,11 +134,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: email 
+            AttributeName: email
             AttributeType: S
         KeySchema:
           -
-            AttributeName: email 
+            AttributeName: email
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -148,11 +150,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: id 
+            AttributeName: id
             AttributeType: N
         KeySchema:
           -
-            AttributeName: id 
+            AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -164,11 +166,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: key 
+            AttributeName: key
             AttributeType: S
         KeySchema:
           -
-            AttributeName: key 
+            AttributeName: key
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -200,7 +202,7 @@ resources:
             AttributeType: S
         KeySchema:
           -
-            AttributeName: instaId 
+            AttributeName: instaId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -216,9 +218,25 @@ resources:
             AttributeType: S
         KeySchema:
           -
-            AttributeName: crossId 
+            AttributeName: crossId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'cross-table-${self:provider.stage}'
+
+    VideosDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: videoId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: videoId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'video-table-${self:provider.stage}'
