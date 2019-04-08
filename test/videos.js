@@ -50,7 +50,7 @@ describe('Videos', () => {
           should.fail();
         } else {
           req.params.videoId = params.Item.videoId;
-          Video.show(req, db, (action, page, obj) => {
+          Videos.show(req, db, (action, page, obj) => {
             action.should.equal('render');
             page.should.equal('videos/show');
             obj.should.have.property('video');
@@ -129,7 +129,6 @@ describe('Videos', () => {
       Videos.create(req, db, (action, page, obj) => {
         action.should.equal('render');
         page.should.equal('error');
-        obj.error.should.equal('Title is missing');
         done();
       });
     });
