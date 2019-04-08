@@ -57,7 +57,7 @@ let mulS3 = multerS3({
   acl: 'public-read',
   contentType: function (req, file, cb) {
     cb(null, file.mimetype);
-  }, 
+  },
   metadata: function (req, file, cb) {
     cb(null, {
       fieldName: file.fieldname,
@@ -70,7 +70,7 @@ let mulS3 = multerS3({
 
 let upload = multer({ storage: mulS3 });
 
-hbs.registerHelper('blurb', function (content) { 
+hbs.registerHelper('blurb', function (content) {
   const sentenceRegex = /\.[ <”]/g;
   let stopAr = sentenceRegex.exec(content);
   if (!stopAr) {
@@ -101,7 +101,7 @@ hbs.registerHelper('caro', function (items, options) {
   out += '</div>';
   return out;
 });
-hbs.registerHelper('first', function (context, options) { 
+hbs.registerHelper('first', function (context, options) {
   let out = '';
   for (let i = 0; i < options.hash['num']; i++) {
     if (context[i] != undefined) {
@@ -122,7 +122,7 @@ hbs.registerHelper('last', function (context, options) {
 hbs.registerHelper('checkedIf', function (test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
 hbs.registerHelper('equal', function (a, b) { return (a == b) ? 'selected' : ''; });
-hbs.registerHelper('image', function (image) { 
+hbs.registerHelper('image', function (image) {
   return (image) ? image : 'https://via.placeholder.com/350?text=Image not found';
 });
 hbs.registerPartials(__dirname + '/views/partials');
@@ -130,11 +130,11 @@ hbs.registerPartials(__dirname + '/views/partials');
 app.use(bodyParser.json({ strict: false }));
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
-})); 
+}));
 app.use(cookie(process.env.COOKIE_SECRET));
 app.use(gzip());
 app.set('view engine', 'hbs');
-let bucket = process.env.S3_BUCKET; 
+let bucket = process.env.S3_BUCKET;
 
 let handlerObj = {
   req: null,
@@ -142,11 +142,11 @@ let handlerObj = {
   callback: function (action, page, obj) {
     switch (action) {
       case 'render':
-        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET, 
-          req: this.req, title: 'The Fishwrapper', type: 'article', 
+        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET,
+          req: this.req, title: 'The Fishwrapper', type: 'article',
           description: "The Fishwrapper is UW's own satirical newspaper, " +
           "committed to publishing all the news that's unfit to print. " +
-          "Irrelevant, irreverent, irresponsible.", url: BASE_URL, 
+          "Irrelevant, irreverent, irresponsible.", url: BASE_URL,
           ogImage: process.env.S3_BUCKET + 'logo.png'}, obj));
         break;
       case 'cookie': // Sets cookie and redirects to page
@@ -192,7 +192,7 @@ app.get('/posts/new', function(req, res) {
 });
 
 app.get('/posts/:postId', function (req, res) {
-  Posts.read(req, dynamoDb, handlerObj.callback.bind({req: req, res: res})); 
+  Posts.read(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/posts/:postId/edit', function (req, res) {
@@ -233,7 +233,7 @@ app.get('/features/:index/delete', function (req, res) {
 });
 
 app.post('/features', function (req, res) {
-  let cb = handlerObj.callback.bind({req: req, res: res}); 
+  let cb = handlerObj.callback.bind({req: req, res: res});
   if (req.body._method == 'PUT') {
     Features.update(req, dynamoDb, cb);
   } else if (req.body._method == 'POST') {
@@ -406,6 +406,11 @@ app.get('/crosswords/:crossId/edit', function (req, res) {
 app.get('/crosswords/:crossId/delete', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Crosswords.destroy(req, dynamoDb, cb);
+});
+
+app.get('/videos', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.index(req, dynamoDb, cb);
 });
 
 app.get('/sitemap.xml', function (req, res) {
