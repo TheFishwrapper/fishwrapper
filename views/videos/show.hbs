@@ -1,4 +1,10 @@
 {{> header}}
 <h1>{{video.title}}</h1>
 <p>{{video.link}}</p>
+{{#if req.signedCookies.id_token}}
+  <div class="row">
+    <a href="/videos/{{video.videoId}}/edit" class="btn btn-outline-secondary mt-3">Edit</a>
+    <a href="/videos/{{video.videoId}}/delete" class="btn btn-outline-secondary mt-3">Delete</a>
+  </div>
+{{/if}}
 {{> footer}}
