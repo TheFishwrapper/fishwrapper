@@ -33,6 +33,7 @@ const InfiniteTimeline = require('./infinite_timeline');
 const Quizzes = require('./quizzes');
 const InstaShorts = require('./insta_shorts');
 const Crosswords = require('./crosswords');
+const Videos = require('./videos');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 const BASE_URL = 'https://thefishwrapper.news';
@@ -411,6 +412,35 @@ app.get('/crosswords/:crossId/delete', function (req, res) {
 app.get('/videos', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Videos.index(req, dynamoDb, cb);
+});
+
+app.post('/videos', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  if (req.body._method == 'POST') {
+    Videos.create(req, dynamoDb, cb);
+  } else if (req.body._method == 'PUT') {
+    Videos.update(req, dynamoDb, cb);
+  }
+});
+
+app.get('/videos/new', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.new_video(req, dynamoDb, cb);
+});
+
+app.get('/videos/:videoId', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.show(req, dynamoDb, cb);
+});
+
+app.get('/videos/:videoId/edit', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.edit(req, dynamoDb, cb);
+});
+
+app.get('/videos/:videoId/delete', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.destroy(req, dynamoDb, cb);
 });
 
 app.get('/sitemap.xml', function (req, res) {
