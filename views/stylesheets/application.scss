@@ -85,6 +85,7 @@ article {
   }
   p {
     font-size: 0.8rem;
+    text-align: justify;
   }
   img {
     display: block;
@@ -356,6 +357,7 @@ a.darker:hover {
 
 .post {
   p {
+    text-align: justify;
     img {
       max-width: 100%;
       height: auto;
