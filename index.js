@@ -57,7 +57,7 @@ let mulS3 = multerS3({
   acl: 'public-read',
   contentType: function (req, file, cb) {
     cb(null, file.mimetype);
-  }, 
+  },
   metadata: function (req, file, cb) {
     cb(null, {
       fieldName: file.fieldname,
@@ -70,8 +70,8 @@ let mulS3 = multerS3({
 
 let upload = multer({ storage: mulS3 });
 
-hbs.registerHelper('blurb', function (content) { 
-  const sentenceRegex = /\.[ <”]/g;
+hbs.registerHelper('blurb', function (content) {
+  const sentenceRegex = /<\/p>/g;
   let stopAr = sentenceRegex.exec(content);
   if (!stopAr) {
     return content;
@@ -101,7 +101,7 @@ hbs.registerHelper('caro', function (items, options) {
   out += '</div>';
   return out;
 });
-hbs.registerHelper('first', function (context, options) { 
+hbs.registerHelper('first', function (context, options) {
   let out = '';
   for (let i = 0; i < options.hash['num']; i++) {
     if (context[i] != undefined) {
@@ -122,7 +122,7 @@ hbs.registerHelper('last', function (context, options) {
 hbs.registerHelper('checkedIf', function (test) { return (test) ? 'checked' : ''; });
 hbs.registerHelper('selected', function (sel) { return (sel) ? 'selected' : ''; });
 hbs.registerHelper('equal', function (a, b) { return (a == b) ? 'selected' : ''; });
-hbs.registerHelper('image', function (image) { 
+hbs.registerHelper('image', function (image) {
   return (image) ? image : 'https://via.placeholder.com/350?text=Image not found';
 });
 hbs.registerPartials(__dirname + '/views/partials');
@@ -130,11 +130,11 @@ hbs.registerPartials(__dirname + '/views/partials');
 app.use(bodyParser.json({ strict: false }));
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
-})); 
+}));
 app.use(cookie(process.env.COOKIE_SECRET));
 app.use(gzip());
 app.set('view engine', 'hbs');
-let bucket = process.env.S3_BUCKET; 
+let bucket = process.env.S3_BUCKET;
 
 let handlerObj = {
   req: null,
