@@ -33,6 +33,7 @@ const InfiniteTimeline = require('./infinite_timeline');
 const Quizzes = require('./quizzes');
 const InstaShorts = require('./insta_shorts');
 const Crosswords = require('./crosswords');
+const Videos = require('./videos');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 const BASE_URL = 'https://thefishwrapper.news';
@@ -142,11 +143,11 @@ let handlerObj = {
   callback: function (action, page, obj) {
     switch (action) {
       case 'render':
-        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET, 
-          req: this.req, title: 'The Fishwrapper', type: 'article', 
+        this.res.render(page, Object.assign({bucket: process.env.S3_BUCKET,
+          req: this.req, title: 'The Fishwrapper', type: 'article',
           description: "The Fishwrapper is UW's own satirical newspaper, " +
           "committed to publishing all the news that's unfit to print. " +
-          "Irrelevant, irreverent, irresponsible.", url: BASE_URL, 
+          "Irrelevant, irreverent, irresponsible.", url: BASE_URL,
           ogImage: process.env.S3_BUCKET + 'logo.png'}, obj));
         break;
       case 'cookie': // Sets cookie and redirects to page
@@ -192,7 +193,7 @@ app.get('/posts/new', function(req, res) {
 });
 
 app.get('/posts/:postId', function (req, res) {
-  Posts.read(req, dynamoDb, handlerObj.callback.bind({req: req, res: res})); 
+  Posts.read(req, dynamoDb, handlerObj.callback.bind({req: req, res: res}));
 });
 
 app.get('/posts/:postId/edit', function (req, res) {
@@ -233,7 +234,7 @@ app.get('/features/:index/delete', function (req, res) {
 });
 
 app.post('/features', function (req, res) {
-  let cb = handlerObj.callback.bind({req: req, res: res}); 
+  let cb = handlerObj.callback.bind({req: req, res: res});
   if (req.body._method == 'PUT') {
     Features.update(req, dynamoDb, cb);
   } else if (req.body._method == 'POST') {
@@ -406,6 +407,40 @@ app.get('/crosswords/:crossId/edit', function (req, res) {
 app.get('/crosswords/:crossId/delete', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Crosswords.destroy(req, dynamoDb, cb);
+});
+
+app.get('/videos', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.index(req, dynamoDb, cb);
+});
+
+app.post('/videos', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  if (req.body._method == 'POST') {
+    Videos.create(req, dynamoDb, cb);
+  } else if (req.body._method == 'PUT') {
+    Videos.update(req, dynamoDb, cb);
+  }
+});
+
+app.get('/videos/new', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.new_video(req, dynamoDb, cb);
+});
+
+app.get('/videos/:videoId', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.show(req, dynamoDb, cb);
+});
+
+app.get('/videos/:videoId/edit', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.edit(req, dynamoDb, cb);
+});
+
+app.get('/videos/:videoId/delete', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Videos.destroy(req, dynamoDb, cb);
 });
 
 app.get('/sitemap.xml', function (req, res) {

@@ -1,0 +1,14 @@
+{{> header}}
+<h1>Videos</h1>
+{{#if req.signedCookies.id_token}}
+  <p><a href="/videos/new" class="btn btn-outline-secondary">New video</a><p/>
+{{/if}}
+<div class="row">
+  {{#each videos}}
+    <div class="col-12">
+      <h3><a href="/videos/{{videoId}}">{{title}}</a></h3>
+      <div>{{{link}}}</div>
+    </div>
+  {{/each}}
+</div>
+{{> footer}}
