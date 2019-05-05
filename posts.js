@@ -137,7 +137,8 @@ class Posts {
             content: post.content,
             staging: post.staging,
             thumbnail: req.file.location,
-            thumbnail_credit: post.thumbnail_credit
+            thumbnail_credit: post.thumbnail_credit,
+            postStyle: post.postStyle
           },
         };
 
@@ -224,7 +225,7 @@ class Posts {
             UpdateExpression: 'SET title = :title, author = :author, category' +
               ' = :category, published_on = :published_on, issue = :issue, ' +
               'content = :content, staging = :staging, thumbnail_credit = ' +
-              ':thumbnail_credit',
+              ':thumbnail_credit, postStyle = :postStyle',
             ExpressionAttributeValues: {
               ':title': post.title,
               ':author': post.author,
@@ -233,7 +234,8 @@ class Posts {
               ':issue': post.issue,
               ':content': post.content,
               ':staging': post.staging,
-              ':thumbnail_credit': post.thumbnail_credit
+              ':thumbnail_credit': post.thumbnail_credit,
+              ':postStyle': post.postStyle
             },
         };
         if (req.file) {
@@ -411,6 +413,7 @@ class Posts {
     post.category = body.category;
     post.staging = (body.staging) ? true : false;
     post.thumbnail_credit = body.thumbnail_credit;
+    post.postStyle = body.postStyle;
     var error = '';
     error += Posts.validate(post.postId, 'string');
     error += Posts.validate(post.title, 'string');
@@ -419,6 +422,7 @@ class Posts {
     error += Posts.validate(post.content, 'string');
     error += Posts.validate(post.category, 'string');
     error += Posts.validate(post.thumbnail_credit, 'string');
+    error += Posts.validate(post.postStyle, 'string');
     if (error) {
       console.error(error);
       return null;

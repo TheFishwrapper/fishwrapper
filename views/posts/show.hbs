@@ -1,4 +1,7 @@
 {{> header}}
+<style>
+  {{{post.postStyle}}}
+</style>
 <div class="row">
   <div class="col text-center">
     <h2>{{{post.title}}}</h2>
@@ -53,7 +56,7 @@
 {{#if req.signedCookies.id_token}}
   <div class="row">
     <p class="mr-2"><a class="btn btn-outline-secondary" href="/posts/{{post.postId}}/edit">Edit</a></p>
-    <p class="mr-2"><a class="btn btn-outline-secondary" href="/posts/{{post.postId}}/delete">Delete</a></p> 
+    <p class="mr-2"><a class="btn btn-outline-secondary" href="/posts/{{post.postId}}/delete">Delete</a></p>
   </div>
-{{/if}} 
+{{/if}}
 {{> footer}}
