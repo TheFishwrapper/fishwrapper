@@ -3,17 +3,17 @@
     <div class="col">
       <h1 id="quiz-title">{{quiz.title}}</h1>
       <h6 class="mb-3">by {{quiz.author}}</h6>
-      <p>{{quiz.blurb}}</p> 
+      <p>{{quiz.blurb}}</p>
     </div>
   </div>
   <div class="row mt-5">
     <div class="col">
-     <h3>{{result.rContent}}</h3>
+     <h3>{{{result.rContent}}}</h3>
      <div class="image-container text-center">
        <img alt="Result thumbnail" class="img-fluid" src="{{image result.thumbnail}}" />
        <h6>{{result.thumbnail_credit}}</h6>
      </div>
-     <a href="/quizzes/{{quiz.quizId}}" class="btn btn-outline-secondary mt-3">Back</a> 
+     <a href="/quizzes/{{quiz.quizId}}" class="btn btn-outline-secondary mt-3">Back</a>
     </div>
   </div>
 {{> footer}}

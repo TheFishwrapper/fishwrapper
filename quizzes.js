@@ -15,7 +15,8 @@
  */
 const Lib = require('./lib');
 const Login = require('./login');
-const markdown = require('markdown').markdown;
+const MarkdownIt = require('markdown-it');
+const markdown = new MarkdownIt({html: true});
 const QUIZZES_TABLE = process.env.QUIZZES_TABLE;
 
 class Quizzes {
@@ -23,7 +24,7 @@ class Quizzes {
   static index(req, res, dynamoDb) {
     dynamoDb.scan({TableName: QUIZZES_TABLE}, function (err, data) {
       data.Items = data.Items.map(x => {
-        x.blur = markdown.toHTML(x.blurb);
+        x.blur = markdown.render(x.blurb);
         return x;
       });
       let left = data.Items.slice(0, data.Count / 2);
@@ -40,7 +41,7 @@ class Quizzes {
     if (Login.authenticate(req, res)) {
       const params = {
         TableName: QUIZZES_TABLE,
-        Item: { 
+        Item: {
           quizId: req.body.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
           title: req.body.title,
           author: req.body.author,
@@ -56,7 +57,7 @@ class Quizzes {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          res.redirect('/quizzes'); 
+          res.redirect('/quizzes');
         }
       });
     }
@@ -75,7 +76,7 @@ class Quizzes {
         Lib.error(res, req, err);
       } else {
         let quiz = data.Item;
-        quiz.blurb = markdown.toHTML(quiz.blurb);
+        quiz.blurb = markdown.render(quiz.blurb);
         Lib.render(res, req, 'quizzes/show', {quiz: quiz});
       }
     });
@@ -165,7 +166,7 @@ class Quizzes {
         if (aId && aContent) {
           a = { aId: aId, aContent: aContent, aResult: body[`aResult-${aId}`] };
         }
-        return a; 
+        return a;
       });
       q.answers = q.answers.filter(x => x);
       qs.push(q);
@@ -197,13 +198,13 @@ class Quizzes {
       }
     };
     dynamoDb.get(params, function (err, data) {
-      if (err) { 
+      if (err) {
         console.log(err);
       } else {
         let results = data.Item.results;
         let res = Quizzes.parseResults(body);
-        let final = res.map(rNew => { 
-          for (let rOld of results) { 
+        let final = res.map(rNew => {
+          for (let rOld of results) {
             if (rNew.rId == rOld.rId) {
               return Quizzes.updateResult(rNew, rOld);
             }
@@ -215,9 +216,9 @@ class Quizzes {
           Key: {
             quizId: body.quizId
           },
-          UpdateExpression: 'SET results = :results', 
+          UpdateExpression: 'SET results = :results',
           ExpressionAttributeValues: {
-            ':results': final 
+            ':results': final
           }
         };
         dynamoDb.update(par, function (err) {
@@ -230,13 +231,13 @@ class Quizzes {
   }
 
   static updateResult(rNew, rOld) {
-    let r = rOld; 
+    let r = rOld;
     if (rNew.rContent != rOld.rContent) {
       r.rContent = rNew.rContent;
     }
     if (rNew.thumbnail_credit && rNew.thumbnail_credit != rOld.thumbnail_credit) {
       r.thumbnail_credit = rNew.thumbnail_credit;
-    } 
+    }
     return r;
   }
 
@@ -262,6 +263,7 @@ class Quizzes {
         for (let j = 0; j < quiz.results.length; j++) {
           if (req.body[ques[i]] == quiz.results[j].rId) {
             res = quiz.results[j];
+            res.rContent = markdown.renderInline(res.rContent);
           }
         }
         resul.push({ q: q, r: res });
@@ -271,7 +273,7 @@ class Quizzes {
         if (!result.has(resul[i].r)) {
           result.set(resul[i].r, 1);
         } else {
-          result.set(resul[i].r, result.get(resul[i].r) + 1); 
+          result.set(resul[i].r, result.get(resul[i].r) + 1);
         }
       }
       Lib.render(res, req, 'quizzes/grade', {quiz: quiz, result: Quizzes.maxOfMap(result)});
@@ -286,7 +288,7 @@ class Quizzes {
       }
     }
     return max.k;
-  } 
-      
+  }
+
 }
 module.exports = Quizzes;
