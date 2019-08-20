@@ -49,11 +49,11 @@ class Login {
             console.error(err);
             callback('render', 'error', {error: err});
           } else if (correct) {
-            callback('cookie', '/', {cookie: 'id_token', 
+            callback('cookie', '/', {cookie: 'id_token',
               value: result.Item.user, options: {signed: true, httpOnly: true,
               sameSite: 'strict'}});
           } else {
-            callback('render', 'error', {error: 
+            callback('render', 'error', {error:
               'Incorrect password or username'});
           }
         });
@@ -73,7 +73,7 @@ class Login {
 
   /*
    * Verifies that the user is logged in.
-   * 
+   *
    * DEPRECATED: use authenticate(req)
    */
   static authenticate(req, res) {

@@ -269,7 +269,7 @@ app.post('/subscribers', function(req, res) {
 });
 
 app.get('/reindex', function (req, res) {
- if (Login.authenticate(req, res)) {
+ if (Login.authenticate(req)) {
     const solr = new SolrNode({
       host: process.env.SOLR_SITE,
       port: process.env.SOLR_PORT,
@@ -280,10 +280,14 @@ app.get('/reindex', function (req, res) {
       if (error) {
         console.log(error);
       } else {
-        result.Items.map(x => Posts.solrPost(x));
+        for (let i = 0; i < result.Items.length; i++) {
+          Posts.solrPost(result.Items[i]);
+        }
       }
+      res.redirect('/');
     });
-    res.redirect('/');
+  } else {
+    res.redirect('/login');
   }
 });
 
