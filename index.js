@@ -269,26 +269,22 @@ app.post('/subscribers', function(req, res) {
 });
 
 app.get('/reindex', function (req, res) {
- if (Login.authenticate(req)) {
-    const solr = new SolrNode({
-      host: process.env.SOLR_SITE,
-      port: process.env.SOLR_PORT,
-      core: process.env.SOLR_CORE,
-      protocol: 'http'
-    });
-    dynamoDb.scan({TableName: process.env.POSTS_TABLE}, (error, result) => {
-      if (error) {
-        console.log(error);
-      } else {
-        for (let i = 0; i < result.Items.length; i++) {
-          Posts.solrPost(result.Items[i]);
-        }
+  const solr = new SolrNode({
+    host: process.env.SOLR_SITE,
+    port: process.env.SOLR_PORT,
+    core: process.env.SOLR_CORE,
+    protocol: 'http'
+  });
+  dynamoDb.scan({TableName: process.env.POSTS_TABLE}, (error, result) => {
+    if (error) {
+      console.log(error);
+    } else {
+      for (let i = 0; i < result.Items.length; i++) {
+        Posts.solrPost(result.Items[i]);
       }
-      res.redirect('/');
-    });
-  } else {
-    res.redirect('/login');
-  }
+    }
+    res.redirect('/');
+  });
 });
 
 app.get('/infinite_timeline', function (req, res) {
