@@ -4,7 +4,8 @@
   "description": "Serverless Web App for The Fishwrapper, a satirical news site.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=text --reporter=html mocha"
+    "test": "nyc --reporter=text --reporter=html mocha",
+    "unit-test": "mocha test/login.js test/sin.js"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "serverless-apigw-binary": "^0.4.4",
     "serverless-domain-manager": "^2.4.0",
     "serverless-dynamodb-local": "^0.2.30",
-    "serverless-offline": "^3.23.0"
+    "serverless-offline": "^3.23.0",
+    "sinon": "^7.4.1"
   }
 }

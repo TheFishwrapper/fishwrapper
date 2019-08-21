@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let AWS = require('aws-sdk');
 let should = require('chai').should();
-let dotenv = require('dotenv');
 let faker = require('faker');
+let sinon = require('sinon');
+let dotenv = require('dotenv');
 let bcrypt = require('bcryptjs');
 let Login = require('../login');
 
@@ -25,18 +25,26 @@ if (result.error) {
   throw result.error;
 }
 
-let db = new AWS.DynamoDB.DocumentClient({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000'
-});
 let req = {
   signedCookies: []
 };
 
+let db = {
+  get: function(params, callback) {
+    throw new Error('Use stub instead');
+  }
+};
+
+afterEach(() => {
+  // Restore the default sandbox here
+  sinon.restore();
+});
+
+
 describe('Login', () => {
   describe('#show()', () => {
     it('should display the login page', (done) => {
-      Login.show(req, db, (action, page, obj) => {
+      Login.show(req, null, (action, page, obj) => {
         action.should.equal('render');
         page.should.equal('login');
         should.not.exist(obj);
@@ -47,61 +55,60 @@ describe('Login', () => {
   describe('#attempt()', () => {
     it('should redirect and set a cookie on success', (done) => {
       req.body = {
-        username: faker.internet.userName(), 
+        username: faker.internet.userName(),
         password: faker.internet.password()
       };
-      const params = {
+
+      const result = {
         TableName: process.env.USERS_TABLE,
         Item: {
           user: req.body.username,
           password: bcrypt.hashSync(req.body.password)
         }
       };
-      db.put(params, (err) => {
-        Login.attempt(req, db, (action, page, obj) => {
-          action.should.equal('cookie');
-          page.should.equal('/');
-          obj.cookie.should.equal('id_token');
-          obj.should.have.property('value');
-          obj.options.signed.should.equal(true);
-          obj.options.httpOnly.should.equal(true);
-          obj.options.sameSite.should.equal('strict');
-          db.delete({TableName: process.env.USERS_TABLE, Key: {user:
-            req.body.username}}, (e) => {
-            done();
-          });
-        });
+      sinon.stub(db, 'get').yields(null, result);
+
+      Login.attempt(req, db, (action, page, obj) => {
+        action.should.equal('cookie');
+        page.should.equal('/');
+        obj.cookie.should.equal('id_token');
+        obj.should.have.property('value');
+        obj.options.signed.should.equal(true);
+        obj.options.httpOnly.should.equal(true);
+        obj.options.sameSite.should.equal('strict');
+        done();
       });
     });
     it('should render an error on invalid password', (done) => {
       req.body = {
-        username: faker.internet.userName(), 
+        username: faker.internet.userName(),
         password: faker.internet.password()
       };
-      const params = {
+
+      const result = {
         TableName: process.env.USERS_TABLE,
         Item: {
           user: req.body.username,
           password: bcrypt.hashSync(faker.internet.password())
         }
       };
-      db.put(params, (err) => {
-        Login.attempt(req, db, (action, page, obj) => {
-          action.should.equal('render');
-          page.should.equal('error');
-          obj.error.should.equal('Incorrect password or username');
-          db.delete({TableName: process.env.USERS_TABLE, Key: {user:
-            req.body.username}}, (e) => {
-            done();
-          });
-        });
+      sinon.stub(db, 'get').yields(null, result);
+
+      Login.attempt(req, db, (action, page, obj) => {
+        action.should.equal('render');
+        page.should.equal('error');
+        obj.error.should.equal('Incorrect password or username');
+        done();
       });
     });
     it('should render an error on invalid username', (done) => {
       req.body = {
-        username: faker.internet.userName(), 
+        username: faker.internet.userName(),
         password: faker.internet.password()
       };
+
+      sinon.stub(db, 'get').yields(null, {});
+
       Login.attempt(req, db, (action, page, obj) => {
         action.should.equal('render');
         page.should.equal('error');
@@ -111,9 +118,12 @@ describe('Login', () => {
     });
     it('should render an error on invalid params', (done) => {
       req.body = {
-        username: faker.random.number(), 
+        username: faker.random.number(),
         password: faker.internet.password()
       };
+
+      sinon.stub(db, 'get').yields(new Error(), null);
+
       Login.attempt(req, db, (action, page, obj) => {
         action.should.equal('render');
         page.should.equal('error');
@@ -124,7 +134,7 @@ describe('Login', () => {
   });
   describe('#logout()', () => {
     it('should clear id_token and redirect to index', (done) => {
-      Login.logout(req, db, (action, page, obj) => {
+      Login.logout(req, null, (action, page, obj) => {
         action.should.equal('cookie');
         page.should.equal('/');
         obj.cookie.should.equal('id_token');
