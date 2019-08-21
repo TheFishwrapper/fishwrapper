@@ -362,9 +362,10 @@ class Posts {
    * Renders a page of all posts that returned from the solr search.
    */
   static search(req, dynamoDb, callback) {
-    let qstring = req.query.search;
+    let string = req.query.search;
+    let qstring = 'title:' + string + ' OR ' + 'content:' + string + ' OR ' + 'author:' + string;
     if (req.query.category) {
-      qstring = 'category:' + req.query.category + ' AND ' + req.query.search;
+      qstring = 'category:' + req.query.category + ' AND (' + qstring + ')';
     }
     solr.search('q='+ qstring).then(x => {
       let posts = x.response.docs.map(a => a.id);
