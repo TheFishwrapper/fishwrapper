@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "nyc --reporter=text --reporter=html mocha",
-    "unit-test": "mocha test/login.js test/sin.js"
+    "unit-test": "mocha test/login.js test/videos.js"
   },
   "repository": {
     "type": "git",

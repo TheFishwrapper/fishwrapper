@@ -35,13 +35,13 @@ let db = {
   }
 };
 
-afterEach(() => {
-  // Restore the default sandbox here
-  sinon.restore();
-});
 
 
 describe('Login', () => {
+  afterEach(() => {
+    // Restore the default sandbox here
+    sinon.restore();
+  });
   describe('#show()', () => {
     it('should display the login page', (done) => {
       Login.show(req, null, (action, page, obj) => {
