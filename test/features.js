@@ -143,12 +143,12 @@ describe('Features', () => {
       req.signedCookies['id_token'] = 1;
       req.body = {
          index: faker.random.number(),
-         post: faker.internet.url() 
+         post: faker.internet.url()
       };
       let params = {
          TableName: process.env.FEATS_TABLE,
          Key: {
-           index: req.body.index 
+           index: req.body.index
          },
          ReturnValues: 'ALL_OLD'
       };
@@ -187,7 +187,7 @@ describe('Features', () => {
       });
     });
     it('should render the edit form', (done) => {
-      req.signedCookies['id_token'] = 1; 
+      req.signedCookies['id_token'] = 1;
       createFeat(db, (item) => {
         req.params = {index: item.index};
         Features.edit(req, db, (action, page, obj) => {
@@ -196,7 +196,7 @@ describe('Features', () => {
           should.exist(obj);
           obj.should.have.property('posts').that.is.a('array');
           obj.should.have.property('feat').that.is.a('object');
-          db.delete({TableName: process.env.FEATS_TABLE, Key: 
+          db.delete({TableName: process.env.FEATS_TABLE, Key:
             {index: item.index}}, (err) => {
             if (err) {
               console.error(err);
@@ -251,10 +251,10 @@ describe('Features', () => {
             action.should.equal('render');
             page.should.equal('features/edit');
             obj.should.have.property('posts').that.is.a('array');
-            obj.posts[0].title.should.equal(params.Item.title); 
-            db.delete({TableName: process.env.FEATS_TABLE, Key: 
+            obj.posts[0].title.should.equal(params.Item.title);
+            db.delete({TableName: process.env.FEATS_TABLE, Key:
               {index: pars.Item.index}}, () => {
-              db.delete({TableName: process.env.POSTS_TABLE, Key: 
+              db.delete({TableName: process.env.POSTS_TABLE, Key:
                 {postId: pars.Item.post}}, () => {
                 done();
               });
@@ -284,7 +284,7 @@ describe('Features', () => {
         action.should.equal('redirect');
         page.should.equal('/features');
         should.not.exist(obj);
-        db.delete({TableName: process.env.FEATS_TABLE, Key: 
+        db.delete({TableName: process.env.FEATS_TABLE, Key:
           {index: req.body.index}}, (err) => {
           if (err) {
             console.error(err);

@@ -4,8 +4,7 @@
   "description": "Serverless Web App for The Fishwrapper, a satirical news site.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=text --reporter=html mocha",
-    "unit-test": "nyc --reporter=text --reporter=html mocha test/login.js test/videos.js test/crosswords.js"
+    "test": "nyc --reporter=text --reporter=html mocha --exclude test/features.js"
   },
   "repository": {
     "type": "git",
