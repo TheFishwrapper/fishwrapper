@@ -73,6 +73,17 @@ describe('Videos', () => {
         done();
       });
     });
+    it('should render an error on dynamodb failure', (done) => {
+      const error = new Error('failure of some sort');
+      sinon.stub(db, 'scan').yields(error, null);
+
+      Videos.index(req, db, (action, page, obj) => {
+        action.should.equal('render');
+        page.should.equal('error');
+        obj.error.should.equal(error);
+        done();
+      });
+    });
   });
   describe('#show()', () => {
     it('should display a specific video', (done) => {
@@ -170,6 +181,22 @@ describe('Videos', () => {
         action.should.equal('redirect');
         page.should.equal('/login');
         should.not.exist(obj);
+        done();
+      });
+    });
+    it('should render an error on dynamodb failure', (done) => {
+      req.signedCookies.id_token = 1;
+      req.body = {
+        title: faker.lorem.word(),
+        link: faker.lorem.word()
+      };
+      const error = new Error('failure of some sort');
+      sinon.stub(db, 'put').yields(error, null);
+
+      Videos.create(req, db, (action, page, obj) => {
+        action.should.equal('render');
+        page.should.equal('error');
+        obj.error.should.equal(error);
         done();
       });
     });

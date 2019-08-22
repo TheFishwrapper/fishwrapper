@@ -35,9 +35,12 @@ let db = {
   }
 };
 
-
-
 describe('Login', () => {
+  beforeEach(() => {
+    req.signedCookies = [];
+    req.params = [];
+    req.body = [];
+  });
   afterEach(() => {
     // Restore the default sandbox here
     sinon.restore();
