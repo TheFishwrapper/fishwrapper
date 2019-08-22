@@ -154,7 +154,7 @@ class Crosswords {
         TableName: process.env.CROSS_TABLE,
         Key: {
           crossId: req.params.crossId
-        } 
+        }
       };
       dynamoDb.delete(params, (error) => {
         if (error) {
