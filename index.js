@@ -253,18 +253,21 @@ app.get('/contact', function (req, res) {
 });
 
 app.get('/subscribers/new', function (req, res) {
-  Subscribers.new_subscriber(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  Subscribers.new_subscriber(req, dynamoDb, cb);
 });
 
 app.get('/subscribers/delete', function (req, res) {
-  Subscribers.delete(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  Subscribers.delete(req, dynamoDb, cb);
 });
 
 app.post('/subscribers', function(req, res) {
+  let cb = handlerObj.callback.bind({req: req, res: res});
   if (req.body._method == 'POST') {
-    Subscribers.create(req, res, dynamoDb);
+    Subscribers.create(req, dynamoDb, cb);
   } else if (req.body._method == 'DELETE') {
-    Subscribers.destroy(req, res, dynamoDb);
+    Subscribers.destroy(req, dynamoDb, cb);
   }
 });
 

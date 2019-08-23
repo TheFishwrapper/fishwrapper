@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const SUB_TABLE = process.env.SUBSCRIBERS_TABLE;
-const bucket = process.env.S3_BUCKET;
-const Lib = require('./lib');
 
+/*
+ * Controller class for registering or deleting subscribers.
+ */
 class Subscribers {
 
-  static new_subscriber(req, res, dynamoDb) {
-    Lib.render(res, req, 'subscribers/new');
+  /*
+   * Renders a form to create a new subscriber.
+   */
+  static new_subscriber(req, dynamoDb, callback) {
+    callback('render', 'subscribers/new');
   }
 
-  static create(req, res, dynamoDb) {
-    let params = {
-      TableName: SUB_TABLE, 
+  /*
+   * Creates a new db row for a new subscriber. Then, redirect to the homepage.
+   */
+  static create(req, dynamoDb, callback) {
+    const params = {
+      TableName: process.env.SUBSCRIBERS_TABLE,
       Item: {
         email: req.body.email,
       }
@@ -35,31 +41,39 @@ class Subscribers {
     }
     dynamoDb.put(params, function (error) {
       if (error) {
-        console.log(error);
-        Lib.error(res, req, 'Could not create subscriber. Make sure a proper email is supplied.');
+        console.error(error);
+        callback('render', 'error', {error: 'Could not create subscriber. ' +
+          'Make sure a proper email is supplied.'});
       } else {
-        res.redirect('/');
+        callback('redirect', '/');
       }
     });
   }
 
-  static delete(req, res, dynamoDb) {
-    Lib.render(res, req, 'subscribers/delete');
+  /*
+   * Renders a form to remove a subscriber.
+   */
+  static delete(req, dynamoDb, callback) {
+    callback('render', 'subscribers/delete');
   }
 
-  static destroy(req, res, dynamoDb) {
+  /*
+   * Deletes a subscriber if it is found. Then, redirects to the homepage.
+   */
+  static destroy(req, dynamoDb, callback) {
     const params = {
-      TableName: SUB_TABLE,
+      TableName: process.env.SUBSCRIBERS_TABLE,
       Key: {
         email: req.body.email
-      }  
+      }
     };
     dynamoDb.delete(params, function (err, data) {
       if (err) {
-        console.log(err);
-        Lib.error(res, req, 'Could not remove subscriber. Make sure a proper email is supplied.');
-      } else { 
-        res.redirect('/');
+        console.error(err);
+        callback('render', 'error', {error: 'Could not remove subscriber. ' +
+          'Make sure a proper email is supplied.'});
+      } else {
+        callback('redirect', '/');
       }
     });
   }
