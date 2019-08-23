@@ -11,8 +11,11 @@ install:
  - npm i
 
 before_script:
- - sls offline start
+ - 'sls offline start > /dev/null 2>&1 &'
 
 script:
  - npm test
  - npm run integration
+
+after_script:
+ - 'kill $(pgrep -f sls)'
