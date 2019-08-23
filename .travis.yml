@@ -4,9 +4,15 @@ node_js:
 
 before_install:
  - npm i -g serverless
+ - npm i -g geckodriver
+ - sls dynamodb install
 
 install:
  - npm i
 
+before_script:
+ - sls offline start
+
 script:
  - npm test
+ - npm run integration
