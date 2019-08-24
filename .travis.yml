@@ -2,20 +2,33 @@ language: node_js
 node_js:
  - 8.10.0
 
+# Setup xvfb for use in integration tests
+dist: xenial
+services:
+  - xvfb
+
+# Setup firefox headless addon
+env:
+  global:
+    - MOZ_HEADLESS=1
+addons:
+  firefox: latest
+
 before_install:
  - npm i -g serverless
- - npm i -g geckodriver
+ - npm i -g geckodriver # Needed for firefox tests
  - sls dynamodb install
 
 install:
  - npm i
 
 before_script:
- - 'sls offline start > /dev/null 2>&1 &'
+ - xvfb-run make test # Start graphics
+ - 'sls offline start > /dev/null 2>&1 &' # Startup the webserver
 
 script:
  - npm test
  - npm run integration
 
 after_script:
- - 'kill $(pgrep -f sls)'
+ - 'kill $(pgrep -f sls)' # Teardown the webserver
