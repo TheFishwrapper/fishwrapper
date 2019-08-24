@@ -2,7 +2,7 @@ language: node_js
 node_js:
  - 8.10.0
 
-# Setup xvfb for use in integration tests
+# Setup xvfb for graphics in integration tests
 dist: xenial
 services:
   - xvfb
@@ -23,7 +23,6 @@ install:
  - npm i
 
 before_script:
- - xvfb-run make test # Start graphics
  - 'sls offline start > /dev/null 2>&1 &' # Startup the webserver
 
 script:
