@@ -23,7 +23,7 @@ install:
  - npm i
 
 before_script:
- - 'sls offline start > /dev/null 2>&1 &' # Startup the webserver
+ - 'sls offline start > slslog.txt 2>&1 &' # Startup the webserver
 
 script:
  - npm test
@@ -31,3 +31,5 @@ script:
 
 after_script:
  - 'kill $(pgrep -f sls)' # Teardown the webserver
+ - echo
+ - cat slslog.txt # Display sls log

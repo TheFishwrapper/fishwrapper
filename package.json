@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "nyc --reporter=text --reporter=html mocha --exclude test/features.js",
-    "integration": "node test/specs/*.js"
+    "integration": "mocha test/specs/*.js"
   },
   "repository": {
     "type": "git",
