@@ -18,24 +18,27 @@ const webdriver = require('selenium-webdriver'),
 const firefox = require('selenium-webdriver/firefox');
 const chrome = require('selenium-webdriver/chrome');
 const should = require('chai').should();
+const db = require('../db/videos.js');
 
 const options = new firefox.Options();
 options.addArguments("-headless");
 
 const driver = new webdriver.Builder()
-.forBrowser('firefox')
-.setFirefoxOptions(new firefox.Options().addArguments('-headless'))
-.setChromeOptions(new chrome.Options().addArguments('--headless').addArguments('--disable-gpu'))
-.build();
+  .forBrowser('firefox')
+  .setFirefoxOptions(new firefox.Options().addArguments('-headless'))
+  .setChromeOptions(new chrome.Options().addArguments('--headless')
+    .addArguments('--disable-gpu'))
+  .build();
 
-driver.get('http://localhost:3000');
+describe('VideoIndex', () => {
+  beforeEach(() => {
+    driver.get('http://localhost:3000/videos');
+  });
+  it('should have a correct title', (done) => {
+    let title = driver.findElement(By.css('main h1')).getText();
 
-describe('IndexPage', () => {
-  it('should have a correct subtitle', (done) => {
-    let subtitle = driver.findElement(By.id('subtitle')).getText();
-
-    subtitle.then((text) => {
-      text.should.equal("It's all irrelevant.");
+    title.then((text) => {
+      text.should.equal("Videos");
       done();
     })
     .catch((error) => {
@@ -43,16 +46,17 @@ describe('IndexPage', () => {
       should.fail();
     });
   }).timeout(0);
-  it('should have a correct contact', (done) => {
-    let contact = driver.findElement(By.css('footer p')).getText();
-
-    contact.then((text) => {
-      text.should.equal('Contact us: editorial@thefishwrapper.news');
+  it('should display a video', (done) => {
+    (async function() {
+      await db.putExample();
+      let videoHeading = await driver.findElement(By.css('main div.col-12 h3'))
+        .getText();
+      let videoLink = await driver.findElement(By.css('main div.col-12 div'))
+        .getText();
+      await db.deleteExample();
+      videoHeading.should.equal(db.title);
+      videoLink.should.equal(db.link);
       done();
-    })
-    .catch((error) => {
-      console.error('Error: ' + error);
-      should.fail();
-    });
-  });
+    })();
+  }).timeout(0);
 });
