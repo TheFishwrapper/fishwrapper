@@ -16,7 +16,6 @@
 const webdriver = require('selenium-webdriver'),
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
-const chrome = require('selenium-webdriver/chrome');
 const should = require('chai').should();
 const db = require('../db/videos.js');
 
@@ -25,9 +24,7 @@ options.addArguments("-headless");
 
 const driver = new webdriver.Builder()
   .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().addArguments('-headless'))
-  .setChromeOptions(new chrome.Options().addArguments('--headless')
-    .addArguments('--disable-gpu'))
+  .setFirefoxOptions(new firefox.Options().headless())
   .build();
 
 describe('VideoIndex', () => {
