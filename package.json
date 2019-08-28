@@ -4,7 +4,7 @@
   "description": "Serverless Web App for The Fishwrapper, a satirical news site.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js | ./node_modules/coveralls/bin/coveralls.js",
+    "test": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js && nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
     "integration": "mocha test/specs/*.js"
   },
   "repository": {
