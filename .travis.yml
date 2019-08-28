@@ -16,11 +16,12 @@ addons:
 
 before_install:
  - npm i -g serverless
- - npm i -g geckodriver # Needed for firefox tests
+# Start geckodriver install
  - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
  - mkdir geckodriver
  - tar -xzf geckodriver-v0.24.0-linux64.tar.gz -C geckodriver
  - export PATH=$PATH:$PWD/geckodriver
+# End geckodriver install
  - sls dynamodb install
 
 install:
@@ -28,6 +29,7 @@ install:
 
 before_script:
  - 'sls offline start > slslog.txt 2>&1 &' # Startup the webserver
+ - sleep 5s # Give time to startup
 
 script:
  - npm test
