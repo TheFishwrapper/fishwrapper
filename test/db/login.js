@@ -16,6 +16,7 @@
 const dotenv = require('dotenv');
 const faker = require('faker');
 const AWS = require('aws-sdk');
+const bcrypt = require('bcryptjs');
 
 const result = dotenv.config();
 if (result.error) {
@@ -27,29 +28,24 @@ const db = new AWS.DynamoDB.DocumentClient({
   endpoint: 'http://localhost:8000'
 });
 
-const title = faker.lorem.sentence();
-const videoId = title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-');
-const link = faker.internet.url();
+const username = faker.internet.userName();
+const password = faker.internet.password();
 
-class VideosDB {
+class LoginDB {
 
-  static get videoID() {
-    return videoId;
+  static get username() {
+    return username;
   }
 
-  static get title() {
-    return title;
-  }
-
-  static get link() {
-    return link;
+  static get password() {
+    return password;
   }
 
   static getExample() {
     const params = {
-      TableName: process.env.VIDEO_TABLE,
+      TableName: process.env.USERS_TABLE,
       Key: {
-        videoId: videoId
+        user: username
       }
     };
     return db.get(params).promise();
@@ -57,11 +53,10 @@ class VideosDB {
 
   static putExample() {
     const params = {
-      TableName: process.env.VIDEO_TABLE,
+      TableName: process.env.USERS_TABLE,
       Item: {
-        videoId: videoId,
-        title: title,
-        link: link
+        user: username,
+        password: bcrypt.hashSync(password)
       }
     };
     return db.put(params).promise();
@@ -69,13 +64,13 @@ class VideosDB {
 
   static deleteExample() {
     const params = {
-      TableName: process.env.VIDEO_TABLE,
+      TableName: process.env.USERS_TABLE,
       Key: {
-        videoId: videoId
+        user: username
       }
     };
     return db.delete(params).promise();
   }
 }
 
-module.exports = VideosDB;
+module.exports = LoginDB;
