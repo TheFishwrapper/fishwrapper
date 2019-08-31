@@ -33,7 +33,7 @@ const link = faker.internet.url();
 
 class VideosDB {
 
-  static get videoID() {
+  static get videoId() {
     return videoId;
   }
 
