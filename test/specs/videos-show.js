@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 const webdriver = require('selenium-webdriver'),
+  until = webdriver.until,
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
@@ -27,34 +28,23 @@ const driver = new webdriver.Builder()
   .setFirefoxOptions(new firefox.Options().headless())
   .build();
 
-describe('VideoIndex', () => {
-  it('should have a correct title', async () => {
-    try {
-      driver.get('http://localhost:3000/videos');
-      let title = await driver.findElement(By.css('main h1')).getText();
-
-      title.should.equal("Videos");
-    } catch(error) {
-      console.error('Error: ' + error);
-      should.fail();
-    }
-  }).timeout(0);
+describe('VideoShow', () => {
   it('should display a video', async () => {
     try {
       await db.putExample();
-      driver.get('http://localhost:3000/videos');
+      driver.get('http://localhost:3000/videos/' + db.videoId);
 
-      let videoHeading = await driver.findElement(By.xpath(
-        '//main/div/div[1]/h3')).getText();
-      let videoLink = await driver.findElement(By.xpath(
-        '//main/div/div[1]/div')).getText();
+      let title = await driver.findElement(By.xpath('//main/div/div[1]/h1'))
+        .getText();
+      let link = await driver.findElement(By.xpath(
+        '//main/div[@class="row"]/div[2]')).getText();
 
-      videoHeading.should.equal(db.title);
-      videoLink.should.equal(db.link);
+      title.should.equal(db.title);
+      link.should.equal(db.link);
 
       await db.deleteExample();
-    } catch(error) {
-      console.error('Error: ' + error);
+    } catch (error) {
+      console.error(error);
       should.fail();
     }
   }).timeout(0);
