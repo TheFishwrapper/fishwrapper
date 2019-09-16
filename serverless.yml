@@ -152,14 +152,34 @@ resources:
           -
             AttributeName: id
             AttributeType: N
+          -
+            AttributeName: selected
+            AttributeType: B
+          -
+            AttributeName: week
+            AttributeType: N
         KeySchema:
           -
             AttributeName: id
             KeyType: HASH
+          -
+            AttributeName: week
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'infinite-table-${self:provider.stage}'
+        GlobalSecondaryIndexes:
+          - IndexName: gsiSelectedTimeline
+            KeySchema:
+              -
+                AttributeName: selected
+                KeyType: HASH
+              -
+                AttributeName: week
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
 
     GlobalDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'

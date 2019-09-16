@@ -24,7 +24,6 @@ const app = express();
 const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-// const Lib = require('./lib');
 const Posts = require('./posts');
 const Login = require('./login');
 const Features = require('./features');
@@ -291,35 +290,42 @@ app.get('/reindex', function (req, res) {
 });
 
 app.get('/infinite_timeline', function (req, res) {
-  InfiniteTimeline.index(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  InfiniteTimeline.index(req, dynamoDb, cb);
 });
 
 app.get('/infinite_timeline/new', function (req, res) {
-  InfiniteTimeline.new_story(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  InfiniteTimeline.new_story(req, dynamoDb, cb);
 });
 
 app.get('/infinite_timeline/edit', function (req, res) {
-  InfiniteTimeline.edit(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  InfiniteTimeline.edit(req, dynamoDb, cb);
 });
 
 app.post('/infinite_timeline', function (req, res) {
+  let cb = handlerObj.callback.bind({req: req, res: res});
   if (req.body._method == 'POST') {
-    InfiniteTimeline.create(req, res, dynamoDb);
+    InfiniteTimeline.create(req, dynamoDb, cb);
   } else if (req.body._method == 'PUT') {
-    InfiniteTimeline.update(req, res, dynamoDb);
+    InfiniteTimeline.update(req, dynamoDb, cb);
   }
 });
 
 app.get('/infinite_timeline/week', function (req, res) {
-  InfiniteTimeline.changeWeek(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  InfiniteTimeline.changeWeek(req, dynamoDb, cb);
 });
 
 app.post('/infinite_timeline/week', function (req, res) {
-  InfiniteTimeline.setWeek(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  InfiniteTimeline.setWeek(req, dynamoDb, cb);
 });
 
 app.get('/infinite_timeline/clean', function (req, res) {
-  InfiniteTimeline.clean(req, res, dynamoDb);
+  let cb = handlerObj.callback.bind({req: req, res: res});
+  InfiniteTimeline.clean(req, dynamoDb, cb);
 });
 
 app.get('/quizzes', function (req, res) {

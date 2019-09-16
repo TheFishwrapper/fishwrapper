@@ -13,37 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const TIME_TABLE = process.env.TIME_TABLE;
-const GLOBAL_TABLE = process.env.GLOBAL_TABLE;
-const Lib = require('./lib');
 const Login = require('./login');
 
 class InfiniteTimeline {
 
-  static index(req, res, dynamoDb) {
+  static index(req, dynamoDb, callback) {
     const params = {
-      TableName: TIME_TABLE
+      TableName: process.env.TIME_TABLE
     };
     dynamoDb.scan(params, function (err, dat) {
       if (err) {
         console.log(err);
-        Lib.error(res, req, err);
+        callback('render', 'error', {error: err});
       } else {
         let timeline = dat.Items.filter(x => x.selected);
         timeline.sort((a, b) => parseInt(a.week, 10) - parseInt(b.week, 10));
-        Lib.render(res, req, 'infinite_timeline/index', {story: timeline});
+        callback('render', 'infinite_timeline/index', {story: timeline});
       }
     });
   }
 
-  static new_story(req, res, dynamoDb) {
-    Lib.render(res, req, 'infinite_timeline/new');
+  static new_story(req, dynamoDb, callback) {
+    callback('render', 'infinite_timeline/new');
   }
 
-  static create(req, res, dynamoDb) {
-    InfiniteTimeline.getWeek(dynamoDb).then((dat) => {
+  static create(req, dynamoDb, callback) {
+    InfiniteTimeline._getWeek(dynamoDb)
+    .then((dat) => {
       const params = {
-        TableName: TIME_TABLE,
+        TableName: process.env.TIME_TABLE,
         Item: {
           id: Date.now(),
           content: req.body.content,
@@ -51,36 +49,43 @@ class InfiniteTimeline {
           selected: false
         }
       };
-      dynamoDb.put(params, function (err) {
-        if (err) {
-          console.log(err);
-          Lib.error(res, req, err);
-        } else {
-          res.redirect('/infinite_timeline');
-        }
-      });
-    }).catch((err) => Lib.error(res, req, err));
+      return dynamoDb.put(params).promise();
+     })
+    .then(() => {
+      callback('redirect', '/infinite_timeline');
+    })
+    .catch((err) => {
+      console.error(err);
+      callback('render', 'error', {error: err});
+    });
   }
 
-  static edit(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
-      InfiniteTimeline.getWeek(dynamoDb).then(w => {
-        dynamoDb.scan({TableName: TIME_TABLE}, function (err, data) {
-          if (err) {
-            console.log(err);
-            Lib.error(res, req, err);
-          } else {
-            let week;
-            if (req.query.week && !isNaN(req.query.week)) {
-              week = req.query.week;
-            } else {
-              week = w.Item.value;
-            }
-            let timeline = data.Items.filter(x => parseInt(x.week) == parseInt(week));
-            Lib.render(res, req, 'infinite_timeline/edit', {story: timeline, week: week});
-          }
+  static edit(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
+      let first = InfiniteTimeline.getWeek(dynamoDb)
+      const params = {
+        TableName: process.env.TIME_TABLE
+      };
+      let second = dynamoDb.scan(params).promise();
+      Promise.all([first, second])
+      .then(([w, data]) => {
+        let week
+        if (req.query.week && !isNaN(req.query.week)) {
+          week = req.query.week;
+        } else {
+          week = w.Item.value;
+        }
+        // Filter all timeline entries to the correct week
+        let timeline = data.Items.filter(x => {
+          return parseInt(x.week) == parseInt(week)
         });
-      }).catch(e => Lib.error(res, req, e));
+        callback('render', 'infinite_timeline/edit', {story: timeline,
+          week: week});
+      })
+      .catch((error) => {
+        console.error(error);
+        callback('render', 'error', {error: error});
+      });
     }
   }
 
@@ -113,9 +118,9 @@ class InfiniteTimeline {
     return dynamoDb.update(params).promise();
   }
 
-  static getWeek(dynamoDb) {
+  static _getWeek(dynamoDb) {
     const params = {
-      TableName: GLOBAL_TABLE,
+      TableName: process.env.GLOBAL_TABLE,
       Key: {
         key: 'TimelineWeek'
       }
