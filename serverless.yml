@@ -26,6 +26,11 @@ plugins:
   - serverless-offline
   - serverless-apigw-binary
 
+package:
+  exclude:
+    - test/**
+    - coverage/**
+
 provider:
   name: aws
   runtime: nodejs8.10
