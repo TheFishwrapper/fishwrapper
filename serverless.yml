@@ -153,11 +153,11 @@ resources:
             AttributeName: id
             AttributeType: N
           -
-            AttributeName: selected
-            AttributeType: B
-          -
             AttributeName: week
             AttributeType: N
+          -
+            AttributeName: selected
+            AttributeType: S
         KeySchema:
           -
             AttributeName: id
@@ -179,7 +179,12 @@ resources:
                 AttributeName: week
                 KeyType: RANGE
             Projection:
-              ProjectionType: ALL
+              ProjectionType: INCLUDE
+              NonKeyAttributes:
+                - content
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
     GlobalDynamoDBTable:
       Type: 'AWS::DynamoDB::Table'

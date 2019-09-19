@@ -19,16 +19,23 @@ class InfiniteTimeline {
 
   static index(req, dynamoDb, callback) {
     const params = {
-      TableName: process.env.TIME_TABLE
+      TableName: process.env.TIME_TABLE,
+      IndexName: 'gsiSelectedTimeline',
+      KeyConditionExpression: '#sel = :selVal',
+      ExpressionAttributeNames: {
+        '#sel': 'selected'
+      },
+      ExpressionAttributeValues: {
+        ':selVal': 'x'
+      },
+      ScanIndexForward: true // Sort by week in ascending order
     };
-    dynamoDb.scan(params, function (err, dat) {
+    dynamoDb.query(params, function (err, dat) {
       if (err) {
         console.log(err);
         callback('render', 'error', {error: err});
       } else {
-        let timeline = dat.Items.filter(x => x.selected);
-        timeline.sort((a, b) => parseInt(a.week, 10) - parseInt(b.week, 10));
-        callback('render', 'infinite_timeline/index', {story: timeline});
+        callback('render', 'infinite_timeline/index', {story: dat.Items});
       }
     });
   }
@@ -46,7 +53,6 @@ class InfiniteTimeline {
           id: Date.now(),
           content: req.body.content,
           week: dat.Item.value,
-          selected: false
         }
       };
       return dynamoDb.put(params).promise();
@@ -96,25 +102,36 @@ class InfiniteTimeline {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          let stories = data.Items.filter(x => parseInt(x.week) == parseInt(req.body.week));
-          let prom = stories.map(x => InfiniteTimeline.selectStory(x.id, (x.id == req.body.story), dynamoDb));
+          let stories = data.Items.filter(x => parseInt(x.week) === parseInt(req.body.week));
+          let prom = stories.map(x => InfiniteTimeline._selectStory(x.id, (x.id === req.body.story), dynamoDb));
           Promise.all(prom).then(x => res.redirect('/infinite_timeline')).catch(e => {console.log(e); Lib.error(res, req, e);});
         }
       });
     }
   }
 
-  static selectStory(id, selected, dynamoDb) {
-    const params = {
-      TableName: TIME_TABLE,
-      Key: {
-       id: id
-      },
-      UpdateExpression: 'Set selected = :val',
-      ExpressionAttributeValues: {
-        ':val': selected
-      }
-    };
+  static _selectStory(id, selected, dynamoDb) {
+    let params;
+    if (selected) {
+      params = { // Mark the story as selected
+        TableName: process.env.TIME_TABLE,
+        Key: {
+          id: id
+        },
+        UpdateExpression: 'SET selected = :val',
+        ExpressionAttributeValues: {
+          ':val': 'x'
+        }
+      };
+    } else {
+      params = { // Unselect the story
+        TableName: process.env.TIME_TABLE
+        Key: {
+          id: id
+        },
+        UpdateExpression: 'DELETE selected'
+      };
+    }
     return dynamoDb.update(params).promise();
   }
 
