@@ -69,7 +69,7 @@ class InfiniteTimeline {
         }
       };
       return dynamoDb.put(params).promise();
-     })
+    })
     .then(() => {
       callback('redirect', '/infinite_timeline');
     })
@@ -87,14 +87,14 @@ class InfiniteTimeline {
    */
   static edit(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      let first = InfiniteTimeline._getWeek(dynamoDb)
+      let first = InfiniteTimeline._getWeek(dynamoDb);
       const params = {
         TableName: process.env.TIME_TABLE
       };
       let second = dynamoDb.scan(params).promise();
       Promise.all([first, second])
       .then(([w, data]) => {
-        let week
+        let week;
         // If given a number week use that
         if (req.query.week && !isNaN(req.query.week)) {
           week = req.query.week;
@@ -104,7 +104,7 @@ class InfiniteTimeline {
         }
         // Filter all timeline entries to the correct week
         let timeline = data.Items.filter(x => {
-          return parseInt(x.week) == parseInt(week)
+          return parseInt(x.week) === parseInt(week);
         });
         callback('render', 'infinite_timeline/edit', {story: timeline,
           week: week});
@@ -130,12 +130,12 @@ class InfiniteTimeline {
       .then((data) => {
         // Get the stories from the appropriate week
         let stories = data.Items.filter(x => {
-          parseInt(x.week) === parseInt(req.body.week)
+          return parseInt(x.week) === parseInt(req.body.week);
         });
         // Mark the selected story as selected and all others as unselected
         let prom = stories.map(x => {
-          InfiniteTimeline._selectStory(x.id, (x.id === req.body.story),
-            dynamoDb)
+          return InfiniteTimeline._selectStory(x.id, (x.id === req.body.story),
+            dynamoDb);
         });
         return Promise.all(prom);
       }).then(x => {
@@ -178,7 +178,7 @@ class InfiniteTimeline {
   static setWeek(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
       const params = {
-        TableName: GLOBAL_TABLE,
+        TableName: process.env.GLOBAL_TABLE,
         Key: {
           key: 'TimelineWeek'
         },
@@ -209,7 +209,7 @@ class InfiniteTimeline {
    * NOTE:
    *   User must be logged in.
    */
-  static clean(req, res, dynamoDb) {
+  static clean(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
       dynamoDb.scan({TableName: process.env.TIME_TABLE}).promise()
       .then(data => {
@@ -224,7 +224,7 @@ class InfiniteTimeline {
           return dynamoDb.delete(params).promise();
         });
         return Promise.all(stories);
-      }).then(x => {
+      }).then(() => {
         callback('redirect', '/infinite_timeline');
       }).catch(error => {
         console.error(error);
