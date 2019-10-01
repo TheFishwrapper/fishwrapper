@@ -125,7 +125,7 @@ class Posts {
       post.postId = post.title.toLocaleLowerCase().substr(0, 20)
         .replace(/\s/g, '-');
       if (post && req.file) {
-        const params = {
+        let params = {
           TableName: process.env.POSTS_TABLE,
           Item: {
             postId: post.postId,
@@ -138,9 +138,11 @@ class Posts {
             staging: post.staging,
             thumbnail: req.file.location,
             thumbnail_credit: post.thumbnail_credit,
-            postStyle: post.postStyle
           },
         };
+        if (post.postStyle) {
+          params.Item.postStyle = post.postStyle;
+        }
 
         dynamoDb.put(params, (error) => {
           if (error) {
@@ -225,7 +227,7 @@ class Posts {
             UpdateExpression: 'SET title = :title, author = :author, category' +
               ' = :category, published_on = :published_on, issue = :issue, ' +
               'content = :content, staging = :staging, thumbnail_credit = ' +
-              ':thumbnail_credit, postStyle = :postStyle',
+              ':thumbnail_credit',
             ExpressionAttributeValues: {
               ':title': post.title,
               ':author': post.author,
@@ -235,11 +237,14 @@ class Posts {
               ':content': post.content,
               ':staging': post.staging,
               ':thumbnail_credit': post.thumbnail_credit,
-              ':postStyle': post.postStyle
             },
         };
+        if (post.postStyle) {
+          params.UpdateExpression += ', postStyle = :postStyle';
+          params.ExpressionAttributeValues[':postStyle'] = post.postStyle;
+        }
         if (req.file) {
-          params.UpdateExpression += ',thumbnail = :thumbnail';
+          params.UpdateExpression += ', thumbnail = :thumbnail';
           params.ExpressionAttributeValues[':thumbnail'] = req.file.location;
         }
         dynamoDb.update(params, (error) => {
@@ -426,7 +431,6 @@ class Posts {
     error += Posts.validate(post.content, 'string');
     error += Posts.validate(post.category, 'string');
     error += Posts.validate(post.thumbnail_credit, 'string');
-    error += Posts.validate(post.postStyle, 'string');
     if (error) {
       console.error(error);
       return null;
