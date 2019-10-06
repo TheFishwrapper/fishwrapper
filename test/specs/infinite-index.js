@@ -17,7 +17,8 @@ const webdriver = require('selenium-webdriver'),
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
-const db = require('../db/videos.js');
+const db = require('../db/infinite.js');
+const faker = require('faker');
 
 const options = new firefox.Options();
 options.addArguments("-headless");
@@ -27,35 +28,47 @@ const driver = new webdriver.Builder()
   .setFirefoxOptions(new firefox.Options().headless())
   .build();
 
-describe('VideoIndex', () => {
+describe('InfiniteTimelineIndex', () => {
   it('should have a correct title', async () => {
     try {
       driver.get('http://localhost:3000/infinite_timeline');
       let title = await driver.findElement(By.css('main h1')).getText();
+      let subhead = await driver.findElement(By.css('main h6')).getText();
 
-      title.should.equal("Videos");
+      title.should.equal('Infinite Timeline');
+      subhead.should.equal('A collaborative story produced by readers like'
+        + ' you.');
     } catch(error) {
       console.error('Error: ' + error);
       should.fail();
     }
   }).timeout(0);
-  it('should display a video', async () => {
+  it('should display the timeline', async () => {
     try {
-      await db.putExample();
-      driver.get('http://localhost:3000/videos');
+      const word1 = faker.lorem.word();
+      const word2 = faker.lorem.word();
+      const word3 = faker.lorem.word();
+      await db.put(1, word1, 1, 'x');
+      await db.put(2, word2, 1);
+      await db.put(3, word3, 2, 'x');
+      driver.get('http://localhost:3000/infinite_timeline');
 
-      let videoHeading = await driver.findElement(By.xpath(
-        '//main/div/div[1]/h3')).getText();
-      let videoLink = await driver.findElement(By.xpath(
-        '//main/div/div[1]/div')).getText();
+      let storyCount = await driver.findElements(By.css('#stories p'));
+      let text1 = await driver.findElement(By.xpath(
+        '//main/div/p[1]')).getText();
+      let text2 = await driver.findElement(By.xpath(
+        '//main/div/p[2]')).getText();
 
-      videoHeading.should.equal(db.title);
-      videoLink.should.equal(db.link);
+      text1.should.equal(word1);
+      text2.should.equal(word3);
+      storyCount.length.should.equal(2);
 
-      await db.deleteExample();
+      await db.delete(1);
+      await db.delete(2);
+      await db.delete(3);
     } catch(error) {
       console.error('Error: ' + error);
-      should.fail();
+      throw error;
     }
   }).timeout(0);
 });

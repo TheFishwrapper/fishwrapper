@@ -162,9 +162,6 @@ resources:
           -
             AttributeName: id
             KeyType: HASH
-          -
-            AttributeName: week
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
