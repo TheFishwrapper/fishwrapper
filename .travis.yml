@@ -37,4 +37,4 @@ script:
 
 after_script:
  - 'kill $(pgrep -f sls)' # Teardown the webserver
- - cat slslog.txt # Display sls log
+ #- cat slslog.txt # Display sls log
