@@ -59,15 +59,16 @@ class InfiniteTimeline {
    */
   static create(req, dynamoDb, callback) {
     InfiniteTimeline._getWeek(dynamoDb)
-    .then((dat) => {
+    .then((data) => {
       const params = {
         TableName: process.env.TIME_TABLE,
         Item: {
           id: Date.now(),
           content: req.body.content,
-          week: dat.Item.value,
+          week: data.Item.value,
         }
       };
+      console.log(params);
       return dynamoDb.put(params).promise();
     })
     .then(() => {

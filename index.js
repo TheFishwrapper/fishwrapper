@@ -306,9 +306,9 @@ app.get('/infinite_timeline/edit', function (req, res) {
 
 app.post('/infinite_timeline', function (req, res) {
   let cb = handlerObj.callback.bind({req: req, res: res});
-  if (req.body._method == 'POST') {
+  if (req.body._method === 'POST') {
     InfiniteTimeline.create(req, dynamoDb, cb);
-  } else if (req.body._method == 'PUT') {
+  } else if (req.body._method === 'PUT') {
     InfiniteTimeline.update(req, dynamoDb, cb);
   }
 });

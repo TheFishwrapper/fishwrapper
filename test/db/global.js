@@ -27,50 +27,39 @@ const db = new AWS.DynamoDB.DocumentClient({
   endpoint: 'http://localhost:8000'
 });
 
-class InfiniteDB {
+const key = 'TimelineWeek';
+const week = 1;
 
-  static put(id, content, week, selected) {
+class GlobalDB {
+
+  static get key() {
+    return key;
+  }
+
+  static get value() {
+    return week;
+  }
+
+  static put() {
     const params = {
-      TableName: process.env.TIME_TABLE,
+      TableName: process.env.GLOBAL_TABLE,
       Item: {
-        id: id,
-        content: content,
-        week: week
+        key: key,
+        value: week,
       }
     };
-    if (selected) {
-      params.Item.selected = selected;
-    }
     return db.put(params).promise();
   }
 
-  static get(id) {
+  static delete() {
     const params = {
-      TableName: process.env.TIME_TABLE,
+      TableName: process.env.GLOBAL_TABLE,
       Key: {
-        id: id
-      }
-    };
-    return db.get(params).promise();
-  }
-
-  static scan() {
-    const params = {
-      TableName: process.env.TIME_TABLE
-    };
-    return db.scan(params).promise();
-  }
-
-  static delete(id) {
-    const params = {
-      TableName: process.env.TIME_TABLE,
-      Key: {
-        id: id
+        key: key
       }
     };
     return db.delete(params).promise();
   }
-
 }
 
-module.exports = InfiniteDB;
+module.exports = GlobalDB;
