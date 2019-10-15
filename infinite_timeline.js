@@ -65,7 +65,7 @@ class InfiniteTimeline {
         Item: {
           id: Date.now(),
           content: req.body.content,
-          week: data.Item.value,
+          week: parseInt(data.Item.value, 10),
         }
       };
       console.log(params);
@@ -134,8 +134,10 @@ class InfiniteTimeline {
           return parseInt(x.week) === parseInt(req.body.week);
         });
         // Mark the selected story as selected and all others as unselected
+        const story = parseInt(req.body.story, 10);
         let prom = stories.map(x => {
-          return InfiniteTimeline._selectStory(x.id, (x.id === req.body.story),
+          console.log(x.id, req.body.story);
+          return InfiniteTimeline._selectStory(x.id, (x.id === story),
             dynamoDb);
         });
         return Promise.all(prom);
@@ -188,7 +190,7 @@ class InfiniteTimeline {
             '#value': 'value',
         },
         ExpressionAttributeValues: {
-          ':val': req.body.week
+          ':val': parseInt(req.body.week, 10)
         }
       };
       dynamoDb.update(params, function (error, data) {
@@ -259,9 +261,10 @@ class InfiniteTimeline {
         Key: {
           id: id
         },
-        UpdateExpression: 'DELETE selected'
+        UpdateExpression: 'REMOVE selected'
       };
     }
+    console.log(params);
     return dynamoDb.update(params).promise();
   }
 
