@@ -6,14 +6,11 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-  domain:
-    dev: fish.capitalistlepton.com
-    production: thefishwrapper.news
   bucket:
     dev: arn:aws:s3:::fishwrapper-pictures-dev/*
     production: arn:aws:s3:::fishwrapper-pictures-production/*
   customDomain:
-    domainName: ${self:custom.domain.${self:provider.stage}}
+    domainName: ${ssm:domain-${self:provider.stage}}
     basePath: ''
     stage: ${self:provider.stage}
     createRoute53Record: true
