@@ -14,6 +14,3 @@ coverage/
 
 # Mac OS
 .DS_Store
-
-# Secrets to hide from Git
-.env
