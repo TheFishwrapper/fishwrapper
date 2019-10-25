@@ -43,6 +43,7 @@
     "serverless-domain-manager": "^2.4.0",
     "serverless-dynamodb-local": "^0.2.30",
     "serverless-offline": "^3.23.0",
+    "serverless-offline-ssm": "^4.0.0",
     "sinon": "^7.4.1"
   }
 }

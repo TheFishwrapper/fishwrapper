@@ -22,6 +22,7 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-apigw-binary
+  - serverless-offline-ssm
 
 package:
   exclude:
