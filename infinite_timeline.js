@@ -136,7 +136,6 @@ class InfiniteTimeline {
         // Mark the selected story as selected and all others as unselected
         const story = parseInt(req.body.story, 10);
         let prom = stories.map(x => {
-          console.log(x.id, req.body.story);
           return InfiniteTimeline._selectStory(x.id, (x.id === story),
             dynamoDb);
         });

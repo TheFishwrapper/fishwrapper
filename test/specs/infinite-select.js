@@ -82,4 +82,39 @@ describe('InfiniteTimelineSelect', () => {
       throw error;
     }
   }).timeout(0);
+  it('should select a story from a given week', async () => {
+    try {
+      await Login.login(driver);
+      await weekDB.put();
+      const word1 = faker.lorem.word();
+      const word2 = faker.lorem.word();
+      const word3 = faker.lorem.word();
+      await db.put(1, word1, weekDB.value);
+      await db.put(2, word2, 0);
+      await db.put(3, word3, weekDB.value);
+      driver.get('http://localhost:3000/infinite_timeline/edit');
+
+      driver.findElement(By.id('2')).should.be.rejected;
+      const displayedElem = await driver.findElement(By.id('1')).isDisplayed();
+
+      await driver.findElement(By.id('3')).click();
+      await driver.findElement(By.id('form-submit')).click();
+
+      await driver.wait(until.urlIs('http://localhost:3000/infinite_timeline'));
+
+      const selected = await db.get(3);
+      const unselected = await db.get(1);
+      selected.Item.selected.should.equal('x');
+      should.not.exist(unselected.Item.selected);
+      displayedElem.should.be.true;
+
+      await db.delete(1);
+      await db.delete(2);
+      await db.delete(3);
+      await weekDB.delete();
+    } catch(error) {
+      console.error('Error: ' + error);
+      throw error;
+    }
+  }).timeout(0);
 });
