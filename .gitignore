@@ -12,5 +12,5 @@ coverage/
 # Serverless directories
 .serverless
 
-# Mac OS 
+# Mac OS
 .DS_Store

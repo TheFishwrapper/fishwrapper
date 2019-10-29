@@ -22,10 +22,10 @@ before_install:
  - tar -xzf geckodriver-v0.24.0-linux64.tar.gz -C geckodriver
  - export PATH=$PATH:$PWD/geckodriver
 # End geckodriver install
- - sls dynamodb install
 
 install:
  - npm i
+ - sls dynamodb install
 
 before_script:
  - 'sls offline start > slslog.txt 2>&1 &' # Startup the webserver
