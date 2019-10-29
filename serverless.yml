@@ -59,6 +59,11 @@ provider:
         - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["SubscribersDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] }
+        - Fn::Join:
+          - "/"
+          -
+            - { "Fn::GetAtt": ["InfiniteTimelineDynamoDBTable", "Arn" ] }
+            - "index/*"
         - { "Fn::GetAtt": ["GlobalDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["QuizzesDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["InstaShortsDynamoDBTable", "Arn" ] }
