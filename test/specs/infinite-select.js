@@ -57,7 +57,7 @@ describe('InfiniteTimelineSelect', () => {
       await db.put(1, word1, weekDB.value);
       await db.put(2, word2, 0);
       await db.put(3, word3, weekDB.value);
-      driver.get('http://localhost:3000/infinite_timeline/edit');
+      await driver.get('http://localhost:3000/infinite_timeline/edit');
 
       driver.findElement(By.id('2')).should.be.rejected;
       const displayedElem = await driver.findElement(By.id('1')).isDisplayed();
@@ -92,7 +92,7 @@ describe('InfiniteTimelineSelect', () => {
       await db.put(1, word1, weekDB.value);
       await db.put(2, word2, 0, 'x');
       await db.put(3, word3, 0);
-      driver.get('http://localhost:3000/infinite_timeline/edit?week=0');
+      await driver.get('http://localhost:3000/infinite_timeline/edit?week=0');
 
       driver.findElement(By.id('1')).should.be.rejected;
       const displayedElem = await driver.findElement(By.id('2')).isDisplayed();

@@ -51,6 +51,16 @@ class GlobalDB {
     return db.put(params).promise();
   }
 
+  static get(key) {
+    const params = {
+      TableName: process.env.GLOBAL_TABLE,
+      Key: {
+        key: key
+      }
+    };
+    return db.get(params).promise();
+  }
+
   static delete() {
     const params = {
       TableName: process.env.GLOBAL_TABLE,
