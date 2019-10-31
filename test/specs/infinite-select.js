@@ -90,12 +90,12 @@ describe('InfiniteTimelineSelect', () => {
       const word2 = faker.lorem.word();
       const word3 = faker.lorem.word();
       await db.put(1, word1, weekDB.value);
-      await db.put(2, word2, 0);
-      await db.put(3, word3, weekDB.value);
-      driver.get('http://localhost:3000/infinite_timeline/edit');
+      await db.put(2, word2, 0, 'x');
+      await db.put(3, word3, 0);
+      driver.get('http://localhost:3000/infinite_timeline/edit?week=0');
 
-      driver.findElement(By.id('2')).should.be.rejected;
-      const displayedElem = await driver.findElement(By.id('1')).isDisplayed();
+      driver.findElement(By.id('1')).should.be.rejected;
+      const displayedElem = await driver.findElement(By.id('2')).isDisplayed();
 
       await driver.findElement(By.id('3')).click();
       await driver.findElement(By.id('form-submit')).click();
@@ -103,7 +103,7 @@ describe('InfiniteTimelineSelect', () => {
       await driver.wait(until.urlIs('http://localhost:3000/infinite_timeline'));
 
       const selected = await db.get(3);
-      const unselected = await db.get(1);
+      const unselected = await db.get(2);
       selected.Item.selected.should.equal('x');
       should.not.exist(unselected.Item.selected);
       displayedElem.should.be.true;

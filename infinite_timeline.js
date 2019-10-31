@@ -38,7 +38,7 @@ class InfiniteTimeline {
     };
     dynamoDb.query(params, function (err, dat) {
       if (err) {
-        console.log(err);
+        console.error(err);
         callback('render', 'error', {error: err});
       } else {
         callback('render', 'infinite_timeline/index', {story: dat.Items});
@@ -68,7 +68,6 @@ class InfiniteTimeline {
           week: parseInt(data.Item.value, 10),
         }
       };
-      console.log(params);
       return dynamoDb.put(params).promise();
     })
     .then(() => {
@@ -263,7 +262,6 @@ class InfiniteTimeline {
         UpdateExpression: 'REMOVE selected'
       };
     }
-    console.log(params);
     return dynamoDb.update(params).promise();
   }
 

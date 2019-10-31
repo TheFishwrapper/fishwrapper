@@ -301,7 +301,7 @@ describe('InfiniteTimeline', () => {
         Key: {
           id: 2
         },
-        UpdateExpression: 'DELETE selected'
+        UpdateExpression: 'REMOVE selected'
       };
 
       InfiniteTimeline.update(req, db, (action, page, obj) => {
