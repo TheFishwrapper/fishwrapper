@@ -26,28 +26,38 @@ const weekDB = require('../db/global.js');
 const Login = require('../lib/login.js');
 const faker = require('faker');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
-
-
-describe('InfiniteTimelineSelect', () => {
-  it('should require login', async () => {
+describe('InfiniteTimelineSelect', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
     try {
-      driver.get('http://localhost:3000/infinite_timeline/edit');
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should require login', async function() {
+    this.timeout(0);
+    try {
+      await driver.get('http://localhost:3000/infinite_timeline/edit');
       await driver.wait(until.urlContains('/login'));
-      let url = await driver.getCurrentUrl();
+
+      const url = await driver.getCurrentUrl();
       url.should.equal('http://localhost:3000/login');
     } catch (error) {
       console.error(error);
       throw error;
     }
-  }).timeout(0);
-  it('should select a story from the week', async () => {
+  });
+  it('should select a story from the week', async function() {
+    this.timeout(0);
     try {
       await Login.login(driver);
       await weekDB.put();
@@ -81,8 +91,9 @@ describe('InfiniteTimelineSelect', () => {
       console.error('Error: ' + error);
       throw error;
     }
-  }).timeout(0);
-  it('should select a story from a given week', async () => {
+  });
+  it('should select a story from a given week', async function() {
+    this.timeout(0);
     try {
       await Login.login(driver);
       await weekDB.put();
@@ -112,9 +123,10 @@ describe('InfiniteTimelineSelect', () => {
       await db.delete(2);
       await db.delete(3);
       await weekDB.delete();
+      await Login.logout(driver);
     } catch(error) {
       console.error('Error: ' + error);
       throw error;
     }
-  }).timeout(0);
+  });
 });

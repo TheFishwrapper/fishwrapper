@@ -20,23 +20,32 @@ const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
 const db = require('../db/videos.js');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
-
-describe('VideoShow', () => {
-  it('should display a video', async () => {
+describe('VideoShow', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
+    try {
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should display a video', async function() {
+    this.timeout(0);
     try {
       await db.putExample();
-      driver.get('http://localhost:3000/videos/' + db.videoId);
+      await driver.get('http://localhost:3000/videos/' + db.videoId);
 
-      let title = await driver.findElement(By.xpath('//main/div/div[1]/h1'))
+      const title = await driver.findElement(By.xpath('//main/div/div[1]/h1'))
         .getText();
-      let link = await driver.findElement(By.xpath(
+      const link = await driver.findElement(By.xpath(
         '//main/div[@class="row"]/div[2]')).getText();
 
       title.should.equal(db.title);
@@ -45,7 +54,7 @@ describe('VideoShow', () => {
       await db.deleteExample();
     } catch (error) {
       console.error(error);
-      should.fail();
+      throw error;
     }
-  }).timeout(0);
+  });
 });

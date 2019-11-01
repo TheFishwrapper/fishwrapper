@@ -21,47 +21,57 @@ const should = require('chai').should();
 const db = require('../db/videos.js');
 const Login = require('../lib/login.js');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
-
-describe('VideoDelete', () => {
-  it('should require login', async () => {
+describe('VideoDelete', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
+    try {
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should require login', async function() {
+    this.timeout(0);
     try {
       await db.putExample();
-      driver.get('http://localhost:3000/videos/' + db.videoId + '/delete');
+      await driver.get('http://localhost:3000/videos/' + db.videoId + '/delete');
       await driver.wait(until.urlContains('/login'));
-      let url = await driver.getCurrentUrl();
+
+      const url = await driver.getCurrentUrl();
       url.should.equal('http://localhost:3000/login');
+
       await db.deleteExample();
     } catch (error) {
       console.error(error);
-      should.fail();
+      throw error;
     }
-  }).timeout(0);
-  it('should delete the video', async () => {
+  });
+  it('should delete the video', async function() {
+    this.timeout(0);
     try {
       await Login.login(driver);
       await db.putExample();
-      driver.get('http://localhost:3000/videos/' + db.videoId + '/delete');
+      await driver.get('http://localhost:3000/videos/' + db.videoId + '/delete');
 
       await driver.wait(until.urlIs('http://localhost:3000/videos'));
-      let url = await driver.getCurrentUrl();
-      url.should.equal('http://localhost:3000/videos');
 
       // Ensure that a db Item was deleted
-      let item = await db.getExample();
+      const item = await db.getExample();
       item.should.be.empty;
 
       await db.deleteExample();
       await Login.logout(driver);
     } catch (error) {
       console.error(error);
-      should.fail();
+      throw error;
     }
-  }).timeout(0);
+  });
 });

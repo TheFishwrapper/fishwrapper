@@ -18,39 +18,46 @@ const webdriver = require('selenium-webdriver'),
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
+describe('IndexPage', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
+    try {
+      await driver.quit();
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  });
+  it('should have a correct subtitle', async function() {
+    this.timeout(0);
+    try {
+      await driver.get('http://localhost:3000');
+      const subtitle = await driver.findElement(By.id('subtitle')).getText();
 
-driver.get('http://localhost:3000');
+      subtitle.should.equal("It's all irrelevant.");
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  });
+  it('should have a correct contact', async function() {
+    this.timeout(0);
+    try {
+      await driver.get('http://localhost:3000');
+      const contact = await driver.findElement(By.css('footer p')).getText();
 
-describe('IndexPage', () => {
-  it('should have a correct subtitle', (done) => {
-    let subtitle = driver.findElement(By.id('subtitle')).getText();
-
-    subtitle.then((text) => {
-      text.should.equal("It's all irrelevant.");
-      done();
-    })
-    .catch((error) => {
-      console.error('Error: ' + error);
-      should.fail();
-    });
-  }).timeout(0);
-  it('should have a correct contact', (done) => {
-    let contact = driver.findElement(By.css('footer p')).getText();
-
-    contact.then((text) => {
-      text.should.equal('Contact us: editorial@thefishwrapper.news');
-      done();
-    })
-    .catch((error) => {
-      console.error('Error: ' + error);
-      should.fail();
-    });
+      contact.should.equal('Contact us: editorial@thefishwrapper.news');
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   });
 });

@@ -22,20 +22,29 @@ const db = require('../db/infinite.js');
 const weekDB = require('../db/global.js');
 const faker = require('faker');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
-
-describe('InfiniteTimelineNew', () => {
-  it('should have create a new story', async () => {
+describe('InfiniteTimelineNew', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
+    try {
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should create a new story', async function() {
+    this.timeout(0);
     try {
       await weekDB.put();
       const word = faker.lorem.word();
-      driver.get('http://localhost:3000/infinite_timeline/new');
+      await driver.get('http://localhost:3000/infinite_timeline/new');
 
       await driver.findElement(By.name('content')).sendKeys(word);
       await driver.findElement(By.id('form-submit')).click();
@@ -53,5 +62,5 @@ describe('InfiniteTimelineNew', () => {
       console.error('Error: ' + error);
       throw error;
     }
-  }).timeout(0);
+  });
 });

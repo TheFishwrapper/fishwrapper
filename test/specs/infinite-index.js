@@ -20,16 +20,25 @@ const should = require('chai').should();
 const db = require('../db/infinite.js');
 const faker = require('faker');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
-
-describe('InfiniteTimelineIndex', () => {
-  it('should have a correct title', async () => {
+describe('InfiniteTimelineIndex', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
+    try {
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should have a correct title', async function() {
+    this.timeout(0);
     try {
       driver.get('http://localhost:3000/infinite_timeline');
       let title = await driver.findElement(By.css('main h1')).getText();
@@ -42,8 +51,9 @@ describe('InfiniteTimelineIndex', () => {
       console.error('Error: ' + error);
       should.fail();
     }
-  }).timeout(0);
-  it('should display the timeline', async () => {
+  });
+  it('should display the timeline', async function() {
+    this.timeout(0);
     try {
       const word1 = faker.lorem.word();
       const word2 = faker.lorem.word();
@@ -70,5 +80,5 @@ describe('InfiniteTimelineIndex', () => {
       console.error('Error: ' + error);
       throw error;
     }
-  }).timeout(0);
+  });
 });

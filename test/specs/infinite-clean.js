@@ -23,16 +23,38 @@ const weekDB = require('../db/global.js');
 const Login = require('../lib/login.js');
 const faker = require('faker');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
+describe('InfiniteTimelineClean', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
+    try {
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should require login', async function() {
+    this.timeout(0);
+    try {
+      await driver.get('http://localhost:3000/infinite_timeline/clean');
+      await driver.wait(until.urlContains('/login'));
 
-describe('InfiniteTimelineClean', () => {
-  it('should delete unselected stories', async () => {
+      const url = await driver.getCurrentUrl();
+      url.should.equal('http://localhost:3000/login');
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  });
+  it('should delete unselected stories', async function() {
+    this.timeout(0);
     try {
       await Login.login(driver);
       const word1 = faker.lorem.word();
@@ -52,9 +74,10 @@ describe('InfiniteTimelineClean', () => {
 
       await db.delete(2);
       await weekDB.delete();
+      await Login.logout(driver);
     } catch(error) {
       console.error('Error: ' + error);
       throw error;
     }
-  }).timeout(0);
+  });
 });

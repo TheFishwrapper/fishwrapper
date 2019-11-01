@@ -19,34 +19,44 @@ const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
 const db = require('../db/videos.js');
 
-const options = new firefox.Options();
-options.addArguments("-headless");
+let driver;
 
-const driver = new webdriver.Builder()
-  .forBrowser('firefox')
-  .setFirefoxOptions(new firefox.Options().headless())
-  .build();
-
-describe('VideoIndex', () => {
-  it('should have a correct title', async () => {
+describe('VideoIndex', function() {
+  beforeEach(function() {
+    driver = new webdriver.Builder()
+      .forBrowser('firefox')
+      .setFirefoxOptions(new firefox.Options().headless())
+      .build();
+  });
+  afterEach(async function() {
+    this.timeout(0);
     try {
-      driver.get('http://localhost:3000/videos');
-      let title = await driver.findElement(By.css('main h1')).getText();
+      await driver.quit();
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('should have a correct title', async function() {
+    this.timeout(0);
+    try {
+      await driver.get('http://localhost:3000/videos');
+      const title = await driver.findElement(By.css('main h1')).getText();
 
-      title.should.equal("Videos");
+      title.should.equal('Videos');
     } catch(error) {
       console.error('Error: ' + error);
-      should.fail();
+      throw error;
     }
-  }).timeout(0);
-  it('should display a video', async () => {
+  });
+  it('should display a video', async function() {
+    this.timeout(0);
     try {
       await db.putExample();
-      driver.get('http://localhost:3000/videos');
+      await driver.get('http://localhost:3000/videos');
 
-      let videoHeading = await driver.findElement(By.xpath(
+      const videoHeading = await driver.findElement(By.xpath(
         '//main/div/div[1]/h3')).getText();
-      let videoLink = await driver.findElement(By.xpath(
+      const videoLink = await driver.findElement(By.xpath(
         '//main/div/div[1]/div')).getText();
 
       videoHeading.should.equal(db.title);
@@ -55,7 +65,7 @@ describe('VideoIndex', () => {
       await db.deleteExample();
     } catch(error) {
       console.error('Error: ' + error);
-      should.fail();
+      throw error;
     }
-  }).timeout(0);
+  });
 });
