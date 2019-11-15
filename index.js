@@ -112,7 +112,8 @@ hbs.registerHelper('first', function (context, options) {
 });
 hbs.registerHelper('last', function (context, options) {
   let out = '';
-  for (let i = options.hash['num']; i < context.length; i++) {
+  // Limit to 10 items max
+  for (let i = options.hash['num']; i < Math.min(context.length, 10); i++) {
     if (context[i] != undefined) {
       out += options.fn(context[i]);
     }

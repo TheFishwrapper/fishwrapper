@@ -3,9 +3,9 @@
   <div id="left" class="col-md-3 col-12">
     <h4 class="heading">Politics</h4>
     <div id="gutter-left">
-    {{#each politics}}
+    {{#first politics num="10"}}
       {{> posts_gutter}}
-    {{/each}}
+    {{/first}}
     </div>
   </div>
   <div class="col">
@@ -70,6 +70,14 @@
         {{> posts_gutter}}
       {{/last}}
     </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <h4 class="heading mt-4">Arts & Culture</h4>
+    {{#first culture num="10"}}
+      {{> posts_center}}
+    {{/first}}
   </div>
 </div>
 {{> footer}}

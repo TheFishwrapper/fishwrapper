@@ -45,6 +45,7 @@ class Posts {
           var pols = [];
           var local = [];
           var current = [];
+          var culture = [];
           var feats = resul.Items.sort((a, b) => a.index - b.index);
           // Sort posts by category
           for (var i = 0; result && i < posts.length; i++) {
@@ -54,6 +55,8 @@ class Posts {
               local.push(posts[i]);
             } else if (posts[i].category == 'Current Events') {
               current.push(posts[i]);
+            } else if (posts[i].category == 'Arts & Culture') {
+              culture.push(posts[i]);
             }
             posts[i].content = markdown.render(posts[i].content);
             posts[i].title = markdown.renderInline(posts[i].title);
@@ -80,7 +83,7 @@ class Posts {
                 } else {
                   callback('render', 'posts/index', {politics: pols,
                     local: local, current: current, features: feats, time: time,
-                    shorts: da.Items});
+                    shorts: da.Items, culture: culture});
                 }
               });
             }
