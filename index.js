@@ -76,14 +76,6 @@ hbs.registerHelper('blurb', function (content) {
   if (!stopAr) {
     return content;
   }
-  let last;
-  while (stopAr && stopAr.index < 320) {
-    last = stopAr;
-    stopAr = sentenceRegex.exec(content);
-  }
-  if (!stopAr) {
-    stopAr = last;
-  }
   return content.substr(0, stopAr.index) + '...';
 });
 hbs.registerHelper('caro', function (items, options) {
@@ -112,8 +104,8 @@ hbs.registerHelper('first', function (context, options) {
 });
 hbs.registerHelper('last', function (context, options) {
   let out = '';
-  // Limit to 10 items max
-  for (let i = options.hash['num']; i < Math.min(context.length, 10); i++) {
+  let num = parseInt(options.hash['start']) + parseInt(options.hash['num']);
+  for (let i = options.hash['start']; i < Math.min(context.length, num); i++) {
     if (context[i] != undefined) {
       out += options.fn(context[i]);
     }

@@ -3,7 +3,7 @@
   <div id="left" class="col-md-3 col-12">
     <h4 class="heading">Politics</h4>
     <div id="gutter-left">
-    {{#first politics num="10"}}
+    {{#first politics num="9"}}
       {{> posts_gutter}}
     {{/first}}
     </div>
@@ -41,7 +41,7 @@
         {{/each}}
       </div>
     </div>
-    {{#last local num="2"}}
+    {{#last local start="2" num="8"}}
       {{> posts_center}}
     {{/last}}
   </div>
@@ -66,7 +66,7 @@
           {{/caro}}
         </div>
       {{/if}}
-      {{#last current num="5"}}
+      {{#last current start="5" num="6"}}
         {{> posts_gutter}}
       {{/last}}
     </div>
