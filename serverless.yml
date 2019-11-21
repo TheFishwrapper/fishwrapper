@@ -39,7 +39,7 @@ package:
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   stage: ${opt:stage, 'dev'}
   region: us-east-1
   iamRoleStatements:
