@@ -69,6 +69,7 @@ provider:
         - { "Fn::GetAtt": ["InstaShortsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["CrossSolnsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["VideosDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["IssuesDynamoDBTable", "Arn" ] }
         - 'arn:aws:s3:::fishwrapper-pictures-${self:provider.stage}/*'
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
@@ -278,3 +279,19 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'video-table-${self:provider.stage}'
+
+    IssuesDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: issueId
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: issueId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'issues-table-${self:provider.stage}'
