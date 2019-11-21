@@ -3,7 +3,11 @@
   <div id="left" class="col-md-3 col-12">
     <h4 class="heading">Politics</h4>
     <div id="gutter-left">
-    {{#first politics num="9"}}
+    {{#first politics num="3"}}
+      {{> posts_gutter}}
+    {{/first}}
+    <h4 class="heading mt-4">Arts & Culture</h4>
+    {{#first culture num="3"}}
       {{> posts_gutter}}
     {{/first}}
     </div>
@@ -41,7 +45,7 @@
         {{/each}}
       </div>
     </div>
-    {{#last local start="2" num="8"}}
+    {{#last local start="2" num="2"}}
       {{> posts_center}}
     {{/last}}
   </div>
@@ -53,7 +57,7 @@
     </div>
     <h4 class="heading mt-4">Current Events</h4>
     <div id="gutter-right">
-      {{#first current num="5"}}
+      {{#first current num="2"}}
         {{> posts_gutter}}
       {{/first}}
       {{#if shorts}}
@@ -66,7 +70,7 @@
           {{/caro}}
         </div>
       {{/if}}
-      {{#last current start="5" num="6"}}
+      {{#last current start="2" num="3"}}
         {{> posts_gutter}}
       {{/last}}
     </div>
@@ -74,10 +78,6 @@
 </div>
 <div class="row">
   <div class="col">
-    <h4 class="heading mt-4">Arts & Culture</h4>
-    {{#first culture num="10"}}
-      {{> posts_center}}
-    {{/first}}
   </div>
 </div>
 {{> footer}}
