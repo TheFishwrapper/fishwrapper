@@ -33,6 +33,7 @@ const Quizzes = require('./quizzes');
 const InstaShorts = require('./insta_shorts');
 const Crosswords = require('./crosswords');
 const Videos = require('./videos');
+const Issues = require('./issues');
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 const BASE_URL = 'https://thefishwrapper.news';
@@ -443,6 +444,40 @@ app.get('/videos/:videoId/edit', function (req, res) {
 app.get('/videos/:videoId/delete', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Videos.destroy(req, dynamoDb, cb);
+});
+
+app.get('/issues', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Issues.index(req, dynamoDb, cb);
+});
+
+app.post('/issues', upload.single('link'), function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  if (req.body._method === 'POST') {
+    Issues.create(req, dynamoDb, cb);
+  } else if (req.body._method === 'PUT') {
+    Issues.update(req, dynamoDb, cb);
+  }
+});
+
+app.get('/issues/new', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Issues.new_issue(req, dynamoDb, cb);
+});
+
+app.get('/issues/:issueId', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Issues.show(req, dynamoDb, cb);
+});
+
+app.get('/issues/:issueId/edit', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Issues.edit(req, dynamoDb, cb);
+});
+
+app.get('/issues/:issueId/edit', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  Issues.destroy(req, dynamoDb, cb);
 });
 
 app.get('/sitemap.xml', function (req, res) {

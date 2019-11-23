@@ -1,0 +1,9 @@
+<form action="/issues" method="POST">
+  <label for="title">Issue:</label>
+  <input type="text" name="title" value="{{issue.issueId}}" /><br />
+  <label for="link">Issue file:</label>
+  <input name="link" type="text" /><br />
+  <input type="hidden" name="_method" value="{{method}}" />
+
+  <input id="form-submit" type="submit" value="Submit" class="btn btn-outline-secondary" />
+</form>

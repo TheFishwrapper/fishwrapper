@@ -82,6 +82,7 @@ provider:
     INSTA_TABLE: 'insta-table-${self:provider.stage}'
     CROSS_TABLE: 'cross-table-${self:provider.stage}'
     VIDEO_TABLE: 'video-table-${self:provider.stage}'
+    ISSUE_TABLE: 'issues-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'

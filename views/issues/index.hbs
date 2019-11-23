@@ -1,0 +1,13 @@
+{{> header}}
+<h1>Issues</h1>
+{{#if req.signedCookies.id_token}}
+  <p><a href="/issues/new" class="btn btn-outline-secondary">New issue</a><p/>
+{{/if}}
+<div class="row">
+  {{#each issues}}
+    <div class="col-12">
+      <h3><a href="/issues/{{issueId}}">Issue #{{issueId}}</a></h3>
+    </div>
+  {{/each}}
+</div>
+{{> footer}}

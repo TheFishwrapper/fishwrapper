@@ -32,7 +32,7 @@ class Issues {
       callback('render', 'issues/index', {issues: data.Items});
     })
     .catch(error => {
-      console.error(err);
+      console.error(error);
       callback('render', 'error', {error: error});
     });
   }
@@ -86,7 +86,7 @@ class Issues {
         TableName: process.env.ISSUE_TABLE,
         Item: {
           issueId: parseInt(req.body.issueId, 10),
-          link: req.body.link,
+          link: req.file.location,
         }
       };
       return dynamoDb.put(params).promise()
@@ -143,7 +143,7 @@ class Issues {
         },
         UpdateExpression: 'SET link = :link',
         ExpressionAttributeValues: {
-          ':link': req.body.link,
+          ':link': req.file.location,
         }
       };
       dynamoDb.update(params).promise()
@@ -185,4 +185,4 @@ class Issues {
     }
   }
 }
-module.exports = InfiniteTimeline;
+module.exports = Issues;

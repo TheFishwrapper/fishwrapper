@@ -1,0 +1,16 @@
+{{> header}}
+<div class="row">
+  <div class="col-12">
+    <h1>Issue #{{issue.issueId}}</h1>
+  </div>
+  <div class="col-12">
+    {{{issue.link}}}
+  </div>
+</div>
+{{#if req.signedCookies.id_token}}
+  <div class="row">
+    <a href="/issues/{{issue.issueId}}/edit" class="btn btn-outline-secondary mt-3">Edit</a>
+    <a href="/issues/{{issue.issueId}}/delete" class="btn btn-outline-secondary mt-3">Delete</a>
+  </div>
+{{/if}}
+{{> footer}}
