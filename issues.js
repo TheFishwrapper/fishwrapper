@@ -41,24 +41,20 @@ class Issues {
    * Displays the given issue.
    */
   static show(req, dynamoDb, callback) {
-    if (Login.authenticate(req)) {
-      const params = {
-        TableName: process.env.ISSUE_TABLE,
-        Key: {
-          issueId: req.query.issueId
-        }
-      };
-      dynamoDb.get(params).promise()
-      .then(data => {
-        callback('render', 'issues/show', {issue: data.Item});
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
-    } else {
-      callback('redirect', '/login');
-    }
+    const params = {
+      TableName: process.env.ISSUE_TABLE,
+      Key: {
+        issueId: req.params.issueId
+      }
+    };
+    dynamoDb.get(params).promise()
+    .then(data => {
+      callback('render', 'issues/show', {issue: data.Item});
+    })
+    .catch(error => {
+      console.error(error);
+      callback('render', 'error', {error: error});
+    });
   }
 
   /*
@@ -89,7 +85,7 @@ class Issues {
           link: req.file.location,
         }
       };
-      return dynamoDb.put(params).promise()
+      dynamoDb.put(params).promise()
       .then(() => {
         callback('redirect', '/issues');
       })
@@ -112,7 +108,7 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.query.issueId
+          issueId: req.params.issueId
         }
       };
       dynamoDb.get(params).promise()
@@ -169,7 +165,7 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.query.issueId
+          issueId: req.params.issueId
         }
       };
       dynamoDb.delete(params).promise()
