@@ -21,6 +21,8 @@ custom:
     'domain-dev': 'dev.example.com'
     'cookieSecret': 'shhhhhhh'
     's3Bucket': 'https://s3.amazonaws.com/fishwrapper-assets-dev/'
+#    'storageBucket': 'fishwrapper-pictures-dev'
+    'storageBucket': 'zane-fishwrapper-store'
     'solrPort': '8983'
     'solrCore': 'example'
     'solrSite': 'solr'
@@ -85,7 +87,7 @@ provider:
     ISSUE_TABLE: 'issues-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
-    PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
+    PICS_BUCKET: ${ssm:storageBucket}
     SOLR_SITE: ${ssm:solrSite}
     SOLR_PORT: ${ssm:solrPort}
     SOLR_CORE: '${ssm:solrCore}-${self:provider.stage}'

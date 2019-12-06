@@ -50,6 +50,13 @@ class IssuesDB {
     return db.get(params).promise();
   }
 
+  static scan() {
+    const params = {
+      TableName: process.env.ISSUE_TABLE,
+    };
+    return db.scan(params).promise();
+  }
+
   static delete(id) {
     const params = {
       TableName: process.env.ISSUE_TABLE,
