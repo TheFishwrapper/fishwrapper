@@ -142,6 +142,7 @@ class Issues {
           ':link': req.file.location,
         }
       };
+      console.log(params);
       dynamoDb.update(params).promise()
       .then(() => {
         callback('redirect', '/issues');
