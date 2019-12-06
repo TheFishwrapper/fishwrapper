@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let should = require('chai').should();
-let faker = require('faker');
-let sinon = require('sinon');
-let dotenv = require('dotenv');
-let bcrypt = require('bcryptjs');
-let Login = require('../login');
+const should = require('chai').should();
+const faker = require('faker');
+const sinon = require('sinon');
+const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs');
+const Login = require('../login');
 
-const result = dotenv.config();
+const result = dotenv.config(
+  { path: process.cwd() + '/test/.env' });
 if (result.error) {
   throw result.error;
 }

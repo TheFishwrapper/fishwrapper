@@ -17,15 +17,6 @@ custom:
   apigwBinary:
     types:
       - '*/*'
-  serverless-offline-ssm:
-    'domain-dev': 'dev.example.com'
-    'cookieSecret': 'shhhhhhh'
-    's3Bucket': 'https://s3.amazonaws.com/fishwrapper-assets-dev/'
-#    'storageBucket': 'fishwrapper-pictures-dev'
-    'storageBucket': 'zane-fishwrapper-store'
-    'solrPort': '8983'
-    'solrCore': 'example'
-    'solrSite': 'solr'
 
 plugins:
   - serverless-domain-manager

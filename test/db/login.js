@@ -18,7 +18,8 @@ const faker = require('faker');
 const AWS = require('aws-sdk');
 const bcrypt = require('bcryptjs');
 
-const result = dotenv.config();
+const result = dotenv.config(
+  { path: process.cwd() + '/test/.env' });
 if (result.error) {
   throw result.error;
 }

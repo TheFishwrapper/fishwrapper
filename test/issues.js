@@ -19,7 +19,8 @@ const dotenv = require('dotenv');
 const faker = require('faker');
 const Issues = require('../issues');
 
-const result = dotenv.config();
+const result = dotenv.config(
+  { path: process.cwd() + '/test/.env' });
 if (result.error) {
   throw result.error;
 }
