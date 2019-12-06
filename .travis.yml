@@ -1,6 +1,6 @@
 language: node_js
 node_js:
- - 8.10.0
+ - 12
 
 # Setup xvfb for graphics in integration tests
 dist: xenial
@@ -28,6 +28,7 @@ install:
  - sls dynamodb install
 
 before_script:
+ - echo "domain-dev=dev.example.com\ncookieSecret=shhhh\ns3Bucket=$S3_BUCKET\nstorageBucket=$STORAGE\nsolrPort=8983\nsolrCore=example\nsolrSite=solr" > .env
  - 'sls offline start > slslog.txt 2>&1 &' # Startup the webserver
  - sleep 5s # Give time to startup
 
@@ -37,4 +38,4 @@ script:
 
 after_script:
  - 'kill $(pgrep -f sls)' # Teardown the webserver
- #- cat slslog.txt # Display sls log
+ - cat slslog.txt # Display sls log
