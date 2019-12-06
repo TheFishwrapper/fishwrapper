@@ -28,13 +28,15 @@ install:
  - sls dynamodb install
 
 before_script:
+ # Provide ssm variables for serverless offline in .env file
  - echo "domain-dev=dev.example.com\ncookieSecret=shhhh\ns3Bucket=$S3_BUCKET\nstorageBucket=$STORAGE\nsolrPort=8983\nsolrCore=example\nsolrSite=solr" > .env
  - 'sls offline start > slslog.txt 2>&1 &' # Startup the webserver
  - sleep 5s # Give time to startup
 
 script:
  - npm test
- - npm run integration
+# - npm run integration
+ - npx mocha test/specs/issues-new.js
 
 after_script:
  - 'kill $(pgrep -f sls)' # Teardown the webserver

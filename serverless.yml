@@ -19,11 +19,11 @@ custom:
       - '*/*'
 
 plugins:
+  - serverless-offline-ssm
   - serverless-domain-manager
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-apigw-binary
-  - serverless-offline-ssm
 
 package:
   exclude:
