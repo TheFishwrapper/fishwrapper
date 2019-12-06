@@ -25,12 +25,11 @@ before_install:
 
 install:
  - npm i
+ # Provide ssm variables for serverless offline in .env file
+ - echo -e "domain-dev=dev.example.com\ncookieSecret=shhhh\ns3Bucket=$S3_BUCKET\nstorageBucket=$STORAGE\nsolrPort=8983\nsolrCore=example\nsolrSite=solr" > .env
  - sls dynamodb install
 
 before_script:
- # Provide ssm variables for serverless offline in .env file
- - echo -e "domain-dev=dev.example.com\ncookieSecret=shhhh\ns3Bucket=$S3_BUCKET\nstorageBucket=$STORAGE\nsolrPort=8983\nsolrCore=example\nsolrSite=solr" > .env
- - cat .env
  - 'sls offline start > slslog.txt 2>&1 &' # Startup the webserver
  - sleep 5s # Give time to startup
 
