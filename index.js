@@ -446,6 +446,7 @@ app.get('/videos/:videoId/delete', function (req, res) {
   Videos.destroy(req, dynamoDb, cb);
 });
 
+/* WIP Issues
 app.get('/issues', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Issues.index(req, dynamoDb, cb);
@@ -479,6 +480,7 @@ app.get('/issues/:issueId/edit', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Issues.destroy(req, dynamoDb, cb);
 });
+*/
 
 app.get('/sitemap.xml', function (req, res) {
   res.type('application/xml');
