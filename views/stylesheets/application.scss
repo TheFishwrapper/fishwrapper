@@ -399,4 +399,13 @@ a.darker:hover {
   }
 }
 
+.keep-reading {
+  a {
+    color: $link-hover;
+  }
+  a:hover {
+    color: $link-fg;
+  }
+}
+
 /*# sourceMappingURL=application.css.map */
