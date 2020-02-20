@@ -58,7 +58,7 @@ describe('InfiniteTimelineWeek', function() {
       throw error;
     }
   });
-  it('should give the current week', async function() {
+  it('should set the current week', async function() {
     this.timeout(0);
     try {
       await Login.login(driver);
@@ -66,8 +66,8 @@ describe('InfiniteTimelineWeek', function() {
       await driver.get('http://localhost:3000/infinite_timeline/week');
 
       const weekEl = await driver.findElement(By.id('week'))
-      weekEl.clear();
-      weekEl.sendKeys('2');
+      await weekEl.clear();
+      await weekEl.sendKeys('2');
       await driver.findElement(By.id('form-submit')).click();
 
       await driver.wait(until.urlIs('http://localhost:3000/infinite_timeline'));
