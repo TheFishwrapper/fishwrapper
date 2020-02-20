@@ -27,7 +27,25 @@ browser.
 > If on a Mac or Linux machine this is accomplished by running `ps aux | grep
 > dynamodb` and then running `kill (pid from last command)`
 
+Also, Serverless is expecting certain configurations from AWS SSM. These must
+be provided with a file name '.env' in the base directory. As this file contains
+sensitive information about the server configuration, it is not tracked in Git.
+See the configuration section for more information.
+
 ## Testing
 To run the unit tests for this application simply run `npm test`. To run the
 integration tests, you need to have both Firefox and the Gecko driver installed.
 Then, run `sls offline start` and in another tab run `npm run integration`.
+
+## Configuration
+
+These are the settings expected by the program from AWS SSM that may be provided
+from the .env file for offline operation
+
+- cookieSecret: A string token that is used to encrypt secure cookies
+- domain-dev: URL of the domain to deploy to in the dev stage
+- s3Bucket: URL of the S3 bucket used to store images
+- solrCore: The name of the Apache Solr core being used
+- solrPort: The port number of the Solr instance
+- solrSite: URL of the Solr instance
+- storageBucket: Name of the S3 bucket used for storing PDFs of the print issues

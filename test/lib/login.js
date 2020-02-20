@@ -26,7 +26,7 @@ class LoginHelper {
 
   static async login(driver) {
     await db.putExample();
-    driver.get('http://localhost:3000/login');
+    await driver.get('http://localhost:3000/login');
     await driver.findElement(By.name('username')).sendKeys(db.username);
     await driver.findElement(By.name('password')).sendKeys(db.password);
     await driver.findElement(By.id('submit-form')).click();
@@ -34,7 +34,7 @@ class LoginHelper {
   }
 
   static async logout(driver) {
-    driver.get('http://localhost:3000/logout');
+    await driver.get('http://localhost:3000/logout');
   }
 }
 

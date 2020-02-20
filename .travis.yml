@@ -1,6 +1,6 @@
 language: node_js
 node_js:
- - 8.10.0
+ - 12
 
 # Setup xvfb for graphics in integration tests
 dist: xenial
@@ -25,6 +25,8 @@ before_install:
 
 install:
  - npm i
+ # Provide ssm variables for serverless offline in .env file
+ - echo -e "domain-dev=dev.example.com\ncookieSecret=shhhh\ns3Bucket=$S3_BUCKET\nstorageBucket=$STORAGE\nsolrPort=8983\nsolrCore=example\nsolrSite=solr" > .env
  - sls dynamodb install
 
 before_script:
@@ -37,4 +39,4 @@ script:
 
 after_script:
  - 'kill $(pgrep -f sls)' # Teardown the webserver
- #- cat slslog.txt # Display sls log
+ - cat slslog.txt # Display sls log

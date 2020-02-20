@@ -17,20 +17,13 @@ custom:
   apigwBinary:
     types:
       - '*/*'
-  serverless-offline-ssm:
-    'domain-dev': 'dev.example.com'
-    'cookieSecret': 'shhhhhhh'
-    's3Bucket': 'https://s3.amazonaws.com/fishwrapper-assets-dev/'
-    'solrPort': '8983'
-    'solrCore': 'example'
-    'solrSite': 'solr'
 
 plugins:
+  - serverless-offline-ssm
   - serverless-domain-manager
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-apigw-binary
-  - serverless-offline-ssm
 
 package:
   exclude:
@@ -69,6 +62,7 @@ provider:
         - { "Fn::GetAtt": ["InstaShortsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["CrossSolnsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["VideosDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["IssuesDynamoDBTable", "Arn" ] }
         - 'arn:aws:s3:::fishwrapper-pictures-${self:provider.stage}/*'
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
@@ -81,9 +75,10 @@ provider:
     INSTA_TABLE: 'insta-table-${self:provider.stage}'
     CROSS_TABLE: 'cross-table-${self:provider.stage}'
     VIDEO_TABLE: 'video-table-${self:provider.stage}'
+    ISSUE_TABLE: 'issues-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
-    PICS_BUCKET: 'fishwrapper-pictures-${self:provider.stage}'
+    PICS_BUCKET: ${ssm:storageBucket}
     SOLR_SITE: ${ssm:solrSite}
     SOLR_PORT: ${ssm:solrPort}
     SOLR_CORE: '${ssm:solrCore}-${self:provider.stage}'
@@ -278,3 +273,19 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'video-table-${self:provider.stage}'
+
+    IssuesDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: issueId
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: issueId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'issues-table-${self:provider.stage}'

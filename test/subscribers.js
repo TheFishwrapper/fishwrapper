@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let should = require('chai').should();
-let sinon = require('sinon');
-let dotenv = require('dotenv');
-let faker = require('faker');
-let Subscribers = require('../subscribers');
+const should = require('chai').should();
+const sinon = require('sinon');
+const dotenv = require('dotenv');
+const faker = require('faker');
+const Subscribers = require('../subscribers');
 
-const result = dotenv.config();
+const result = dotenv.config(
+  { path: process.cwd() + '/test/.env' });
 if (result.error) {
   throw result.error;
 }

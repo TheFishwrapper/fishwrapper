@@ -20,7 +20,8 @@ const dotenv = require('dotenv');
 const faker = require('faker');
 const InfiniteTimeline = require('../infinite_timeline');
 
-const result = dotenv.config();
+const result = dotenv.config(
+  { path: process.cwd() + '/test/.env' });
 if (result.error) {
   throw result.error;
 }

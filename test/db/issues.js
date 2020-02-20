@@ -16,7 +16,6 @@
 const dotenv = require('dotenv');
 const faker = require('faker');
 const AWS = require('aws-sdk');
-const bcrypt = require('bcryptjs');
 
 const result = dotenv.config(
   { path: process.cwd() + '/test/.env' });
@@ -29,49 +28,46 @@ const db = new AWS.DynamoDB.DocumentClient({
   endpoint: 'http://localhost:8000'
 });
 
-const username = faker.internet.userName();
-const password = faker.internet.password();
+class IssuesDB {
 
-class LoginDB {
-
-  static get username() {
-    return username;
-  }
-
-  static get password() {
-    return password;
-  }
-
-  static getExample() {
+  static put(id, link) {
     const params = {
-      TableName: process.env.USERS_TABLE,
-      Key: {
-        user: username
-      }
-    };
-    return db.get(params).promise();
-  }
-
-  static putExample() {
-    const params = {
-      TableName: process.env.USERS_TABLE,
+      TableName: process.env.ISSUE_TABLE,
       Item: {
-        user: username,
-        password: bcrypt.hashSync(password)
+        issueId: id,
+        link: link,
       }
     };
     return db.put(params).promise();
   }
 
-  static deleteExample() {
+  static get(id) {
     const params = {
-      TableName: process.env.USERS_TABLE,
+      TableName: process.env.ISSUE_TABLE,
       Key: {
-        user: username
+        issueId: id
+      }
+    };
+    return db.get(params).promise();
+  }
+
+  static scan() {
+    const params = {
+      TableName: process.env.ISSUE_TABLE,
+    };
+    return db.scan(params).promise();
+  }
+
+  static delete(id) {
+    const params = {
+      TableName: process.env.ISSUE_TABLE,
+      Key: {
+        issueId: id
       }
     };
     return db.delete(params).promise();
   }
+
 }
 
-module.exports = LoginDB;
+module.exports = IssuesDB;

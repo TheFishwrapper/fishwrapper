@@ -1,0 +1,9 @@
+<form action="/issues" method="POST" enctype="multipart/form-data">
+  <label for="title">Issue:</label>
+  <input type="text" name="issueId" value="{{issue.issueId}}" /><br />
+  <label for="link">Issue file:</label>
+  <input type="file" name="link" /><br />
+  <input type="hidden" name="_method" value="{{method}}" />
+
+  <input id="form-submit" type="submit" value="Submit" class="btn btn-outline-secondary" />
+</form>

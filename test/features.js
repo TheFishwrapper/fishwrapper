@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-let AWS = require('aws-sdk');
-let should = require('chai').should();
-let dotenv = require('dotenv');
-let faker = require('faker');
-let Features = require('../features');
+const AWS = require('aws-sdk');
+const should = require('chai').should();
+const dotenv = require('dotenv');
+const faker = require('faker');
+const Features = require('../features');
 
-const result = dotenv.config();
+const result = dotenv.config(
+  { path: process.cwd() + '/test/.env' });
 if (result.error) {
   throw result.error;
 }

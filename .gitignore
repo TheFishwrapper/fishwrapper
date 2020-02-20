@@ -12,5 +12,9 @@ coverage/
 # Serverless directories
 .serverless
 
+# Serverless ssm offline
+.env
+!/test/.env
+
 # Mac OS
 .DS_Store

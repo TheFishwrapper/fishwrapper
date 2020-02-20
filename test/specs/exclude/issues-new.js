@@ -18,14 +18,12 @@ const webdriver = require('selenium-webdriver'),
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
-const db = require('../db/infinite.js');
-const weekDB = require('../db/global.js');
+const db = require('../db/issues.js');
 const Login = require('../lib/login.js');
-const faker = require('faker');
 
 let driver;
 
-describe('InfiniteTimelineWeek', function() {
+describe('IssuesNew', function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
       .forBrowser('firefox')
@@ -40,41 +38,36 @@ describe('InfiniteTimelineWeek', function() {
       throw error;
     }
   });
-  it('should give the current week', async function() {
+  it('should require a login', async function() {
     this.timeout(0);
     try {
-      await Login.login(driver);
-      await weekDB.put();
-      await driver.get('http://localhost:3000/infinite_timeline/week');
+      await driver.get('http://localhost:3000/issues/new');
+      await driver.wait(until.urlContains('/login'));
 
-      const week = await driver.findElement(By.id('week')).getAttribute('value');
-
-      week.should.equal('' + weekDB.value);
-
-      await weekDB.delete();
-      await Login.logout(driver);
+      const url = await driver.getCurrentUrl();
+      url.should.equal('http://localhost:3000/login');
     } catch(error) {
       console.error('Error: ' + error);
-      throw error;
+      should.fail();
     }
   });
-  it('should set the current week', async function() {
+  it('should create a new issue', async function() {
     this.timeout(0);
     try {
       await Login.login(driver);
-      await weekDB.put();
-      await driver.get('http://localhost:3000/infinite_timeline/week');
+      await driver.get('http://localhost:3000/issues/new');
 
-      const weekEl = await driver.findElement(By.id('week'))
-      await weekEl.clear();
-      await weekEl.sendKeys('2');
+      await driver.findElement(By.name('issueId')).sendKeys('1');
+      await driver.findElement(By.name('link')).sendKeys(process.cwd()
+        + '/test/assets/test.pdf');
       await driver.findElement(By.id('form-submit')).click();
 
-      await driver.wait(until.urlIs('http://localhost:3000/infinite_timeline'));
+      await driver.wait(until.urlIs('http://localhost:3000/issues'));
 
-      const week = await weekDB.get('TimelineWeek');
-      week.Item.value.should.equal(2);
-      await weekDB.delete();
+      const data = await db.get(1);
+      data.Item.link.should.have.string('test.pdf');
+
+      await db.delete(1);
       await Login.logout(driver);
     } catch(error) {
       console.error('Error: ' + error);

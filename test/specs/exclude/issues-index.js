@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 const webdriver = require('selenium-webdriver'),
-  until = webdriver.until,
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
-const db = require('../db/infinite.js');
-const weekDB = require('../db/global.js');
-const Login = require('../lib/login.js');
+const db = require('../db/issues.js');
 const faker = require('faker');
 
 let driver;
 
-describe('InfiniteTimelineWeek', function() {
+describe('IssuesIndex', function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
       .forBrowser('firefox')
@@ -40,42 +37,37 @@ describe('InfiniteTimelineWeek', function() {
       throw error;
     }
   });
-  it('should give the current week', async function() {
+  it('should have a correct title', async function() {
     this.timeout(0);
     try {
-      await Login.login(driver);
-      await weekDB.put();
-      await driver.get('http://localhost:3000/infinite_timeline/week');
+      driver.get('http://localhost:3000/issues');
+      let title = await driver.findElement(By.xpath('/html/body/main/h1'))
+        .getText();
 
-      const week = await driver.findElement(By.id('week')).getAttribute('value');
-
-      week.should.equal('' + weekDB.value);
-
-      await weekDB.delete();
-      await Login.logout(driver);
+      title.should.equal('Issues');
     } catch(error) {
       console.error('Error: ' + error);
-      throw error;
+      should.fail();
     }
   });
-  it('should set the current week', async function() {
+  it('should display an issue', async function() {
     this.timeout(0);
     try {
-      await Login.login(driver);
-      await weekDB.put();
-      await driver.get('http://localhost:3000/infinite_timeline/week');
+      const fakeLink = faker.internet.url();
+      await db.put(1, fakeLink);
+      driver.get('http://localhost:3000/issues');
 
-      const weekEl = await driver.findElement(By.id('week'))
-      await weekEl.clear();
-      await weekEl.sendKeys('2');
-      await driver.findElement(By.id('form-submit')).click();
+      let storyCount = await driver.findElements(By.className('issue'));
+      let title = await driver.findElement(
+        By.xpath('/html/body/main/div/div[1]/h3/a')).getText();
+      let link = await driver.findElement(
+        By.xpath('/html/body/main/div/div[1]/p')).getText();
 
-      await driver.wait(until.urlIs('http://localhost:3000/infinite_timeline'));
+      title.should.equal('Issue #1');
+      link.should.equal(fakeLink);
+      storyCount.length.should.equal(1);
 
-      const week = await weekDB.get('TimelineWeek');
-      week.Item.value.should.equal(2);
-      await weekDB.delete();
-      await Login.logout(driver);
+      await db.delete(1);
     } catch(error) {
       console.error('Error: ' + error);
       throw error;
