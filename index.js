@@ -532,7 +532,9 @@ app.get('/issues/:issueId/edit', function (req, res) {
 app.get("/sitemap.xml", function(req, res) {
   res.type("application/xml");
   let out =
-    '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">';
+    '<?xml version="1.0" encoding="UTF-8"?><urlset' +
+    ' xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' +
+    ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">';
   dynamoDb.scan({ TableName: process.env.POSTS_TABLE }, function(err, data) {
     if (err) {
       console.error(err);
@@ -554,7 +556,8 @@ app.get("/sitemap.xml", function(req, res) {
                 post.postId
               )}</loc>`;
               if (post.thumbnail) {
-                out += `<image:image><image:loc>${post.thumbnail}</image:loc></image:image>`;
+                out += `<image:image><image:loc>${post.thumbnail}</image:loc>'
+                + '</image:image>`;
               }
               out += "</url>";
             }
@@ -566,7 +569,8 @@ app.get("/sitemap.xml", function(req, res) {
               quiz.quizId
             )}</loc>`;
             if (quiz.thumbnail) {
-              out += `<image:image><image:loc>${quiz.thumbnail}</image:loc></image:image>`;
+              out += `<image:image><image:loc>${quiz.thumbnail}</image:loc>'
+              + '</image:image>`;
             }
             out += "</url>";
           }
@@ -586,7 +590,8 @@ app.get("/robots.txt", function(req, res) {
 app.get("/googled33b7223d079ee62.html", function(req, res) {
   // Google search console verification
   const re = /https:\/\/s3.amazonaws.com\//;
-  let bucket = process.env.S3_BUCKET.replace(re, ""); // Get basename of the bucket
+  // Get basename of the bucket
+  let bucket = process.env.S3_BUCKET.replace(re, "");
   bucket = bucket.substring(0, bucket.length - 1); // Remove trailing '/'
   const params = {
     Bucket: bucket,
