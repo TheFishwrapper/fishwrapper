@@ -6,10 +6,12 @@
     {{#first politics num="3"}}
       {{> posts_gutter}}
     {{/first}}
+    {{> keep_reading category="Politics" }}
     <h4 class="heading mt-4">Arts & Culture</h4>
     {{#first culture num="3"}}
       {{> posts_gutter}}
     {{/first}}
+    {{> keep_reading category="Arts+%26+Culture" }}
     </div>
   </div>
   <div class="col">
@@ -48,6 +50,7 @@
     {{#last local start="2" num="2"}}
       {{> posts_center}}
     {{/last}}
+    {{> keep_reading category="Local" }}
   </div>
   <div id="right" class="col-md-3 col-12">
     <div class="greyed">
@@ -73,6 +76,7 @@
       {{#last current start="2" num="3"}}
         {{> posts_gutter}}
       {{/last}}
+      {{> keep_reading category="Current+Events" }}
     </div>
   </div>
 </div>
