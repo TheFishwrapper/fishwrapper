@@ -355,26 +355,31 @@ app.post('/quizzes/:quizId', function (req, res) {
 });
 
 app.get('/insta_shorts', function (req, res) {
-  InstaShorts.index(req, res, dynamoDb);
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.index(req, dynamoDb, cb);
 });
 
 app.get('/insta_shorts/new', function (req, res) {
-  InstaShorts.new_short(req, res, dynamoDb);
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.new_short(req, dynamoDb, cb);
 });
 
 app.get('/insta_shorts/:instaId/edit', function (req, res) {
-  InstaShorts.edit(req, res, dynamoDb);
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.edit(req, dynamoDb, cb);
 });
 
 app.get('/insta_shorts/:instaId/delete', function (req, res) {
-  InstaShorts.destroy(req, res, dynamoDb);
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.destroy(req, dynamoDb, cb);
 });
 
 app.post('/insta_shorts', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
   if (req.body._method == 'POST') {
-    InstaShorts.create(req, res, dynamoDb);
+    InstaShorts.create(req, dynamoDb, cb);
   } else if (req.body._method == 'PUT') {
-    InstaShorts.update(req, res, dynamoDb);
+    InstaShorts.update(req, dynamoDb, cb);
   }
 });
 
