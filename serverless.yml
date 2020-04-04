@@ -6,9 +6,6 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-  bucket:
-    dev: arn:aws:s3:::fishwrapper-pictures-dev/*
-    production: arn:aws:s3:::fishwrapper-pictures-production/*
   customDomain:
     domainName: ${ssm:domain-${self:provider.stage}}
     basePath: ''
@@ -64,6 +61,7 @@ provider:
         - { "Fn::GetAtt": ["VideosDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["IssuesDynamoDBTable", "Arn" ] }
         - 'arn:aws:s3:::fishwrapper-pictures-${self:provider.stage}/*'
+        - 'arn:aws:s3:::${ssm:storageBucket}/*'
   environment:
     POSTS_TABLE: 'posts-table-${self:provider.stage}'
     FEATS_TABLE: 'features-table-${self:provider.stage}'
