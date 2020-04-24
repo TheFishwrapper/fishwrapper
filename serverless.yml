@@ -60,6 +60,7 @@ provider:
         - { "Fn::GetAtt": ["CrossSolnsDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["VideosDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["IssuesDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["FauxAdsDynamoDBTable", "Arn" ] }
         - 'arn:aws:s3:::fishwrapper-pictures-${self:provider.stage}/*'
         - 'arn:aws:s3:::${ssm:storageBucket}/*'
   environment:
@@ -74,6 +75,7 @@ provider:
     CROSS_TABLE: 'cross-table-${self:provider.stage}'
     VIDEO_TABLE: 'video-table-${self:provider.stage}'
     ISSUE_TABLE: 'issues-table-${self:provider.stage}'
+    ADS_TABLE: 'ads-table-${self:provider.stage}'
     COOKIE_SECRET: ${ssm:cookieSecret}
     S3_BUCKET: ${ssm:s3Bucket}
     PICS_BUCKET: ${ssm:storageBucket}
@@ -287,3 +289,19 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: 'issues-table-${self:provider.stage}'
+
+    FauxAdsDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: adId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: adId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'ads-table-${self:provider.stage}'
