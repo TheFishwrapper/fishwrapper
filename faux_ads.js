@@ -26,20 +26,18 @@ class FauxAds {
    *   User must be logged in.
    */
   static index(req, dynamoDb, callback) {
-    // The DynamoDB table name is in process.env.ADS_TABLE
-    const params = {TableName: process.env.ADS_TABLE};
-    dynamoDb.scan(params, (error, result) => {
-        if (error) {
-          console.error(error);
-          callback('render', 'error', {error: error});
-        } else {
-          if (Logn.authenticate(req)) {
-            callback('render', 'faux_ads/index', {ad: result.Item});
-          } else {
-            callback('redirect', '/login');
-          }
-        }
-    });
+    if (Login.authenticate(req)) {
+      const params = {TableName: process.env.ADS_TABLE};
+      dynamoDb.scan(params).promise()
+      .then((data) => {
+        callback('render', 'faux_ads/index', {ad: data.Item});
+      }).catch((error) => {
+        console.error(error);
+        callback('render', 'error', {error: error});
+      });
+    } else {
+      callback('redirect', '/login');
+    }
   }
 
   /*
@@ -48,25 +46,23 @@ class FauxAds {
    *   User must be logged in.
    */
   static show(req, dynamoDb, callback) {
-    const params = {
-      TableName: process.env.ADS_TABLE,
-      Key : {
-        adId: req.params.videoId
-      }
-    };
-    dyanmoDb.get(params, (error, result) => {
-      if (error) {
+    if (Login.authenticate(req)) {
+      const params = {
+        TableName: process.env.ADS_TABLE,
+        Key : {
+          adId: req.params.adId
+        }
+      };
+      dynamoDb.get(params).promise()
+      .then((data) => {
+        callback('render', 'faux_ads/show', {ad: data.Item});
+      }).catch((error) => {
         console.error(error);
         callback('render', 'error', {error: error});
-      } else {
-        if (Login.authenticate(req)) {
-          // TODO: Figure out correct JSON object to use
-          callback('render', 'faux_ads/show', {ad: result.Items});
-        } else {
-          callback('redirect', '/login');
-        }
-      }
-    });
+      });
+    } else {
+      callback('redirect', '/login');
+    }
   }
 
   /*
@@ -89,8 +85,8 @@ class FauxAds {
    */
   static create(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      if (!req.body.title || !req.body.photo || req.body.altText) {
-        callback('render', 'error', {error: "Missing title, photo, or alternate description"});
+      if (!req.body.title || !req.body.photo || !req.body.altText) {
+        callback('render', 'error', {error: "Missing title, photo, or altText"});
       } else {
         const params = {
           TableName: process.env.ADS_TABLE,
@@ -102,13 +98,12 @@ class FauxAds {
             altText: req.body.altText
           }
         };
-        dyanmoDb.put(params, (error) => {
-          if (error) {
-            console.error(error);
-            callback('render', 'error', {error: error});
-          } else {
-            callback('redirect', '/faux_ads');
-          }
+        dynamoDb.put(params).promise()
+        .then((data) => {
+          callback('redirect', '/faux_ads');
+        }).catch((error) => {
+          console.error(error);
+          callback('render', 'error', {error: error});
         });
       }
     } else {
@@ -129,12 +124,12 @@ class FauxAds {
           adId: req.params.adId
         }
       };
-      dynamoDb.get(params, (error, result) => {
-        if (error) {
-          callback('render', error', {error: error});
-        } else {
-          callback('render', 'faux_ads/edit', {ad: result.Item});
-        }
+      dynamoDb.get(params).promise()
+      .then((data) => {
+        callback('render', 'faux_ads/edit', {ad: result.Item});
+      }).catch((error) => {
+        console.error(error);
+        callback('render', 'error', {error: error});
       });
     } else {
       callback('redirect', '/login');
@@ -153,20 +148,20 @@ class FauxAds {
         Key: {
           adId: req.body.adId
         },
-        UpdateExpression: 'SET photo = :photo, title = :title, altText = :altText',
+        UpdateExpression: 'SET title = :title, photo = :photo,'
+          + ' altText = :altText',
         ExpressionAttributeValues: {
-          ':photo': req.body.photo,
           ':title': req.body.title,
+          ':photo': req.body.photo,
           ':altText': req.body.altText
         }
-      }
-      dynamoDb.update(params, (error) => {
-        if (error) {
-          console.error(error);
-          callback('render', 'error', {error: error});
-        } else {
-          callback('redirect', '/videos');
-        }
+      };
+      dynamoDb.update(params).promise()
+      .then((data) => {
+        console.error(error);
+        callback('render', 'error', {error: error});
+      }).catch((error) => {
+        callback('redirect', '/faux_ads');
       });
     } else {
       callback('redirect', '/login');
@@ -186,17 +181,18 @@ class FauxAds {
           adId: req.params.adId
         }
       };
-      dynamoDb.delete(params, (error) => {
-        if (error) {
-          console.error(error);
-          callback('render', 'error', {error: error});
-        } else {
-          callback('redirect', '/faux_ads');
-        }
+      dynamoDb.delete(params).promise()
+      .then((data) => {
+        callback('redirect', '/faux_ads');
+      }).catch((error) => {
+        console.error(error);
+        callback('render', 'error', {error: error});
       });
     } else {
-      callback('redirect', '/login')
+      callback('redirect', '/login');
     }
   }
+
 }
+
 module.exports = FauxAds;
