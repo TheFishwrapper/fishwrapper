@@ -1,0 +1,14 @@
+{{> header}}
+<div class="row">
+  <div class="col-12">
+    <h1>{{ad.title}}</h1>
+    <img src="/faux_ads/{{ad.photo}}" alt="{{ad.altText}}">
+  </div>
+</div>
+{{#if req.signedCookies.id_token}}
+  <div class="row">
+    <p class="mr-2"><a href="/faux_ads/{{ad.adId}}/edit" class="btn btn-outline-secondary mt-3">Edit</a></p>
+    <p class="mr-2"><a href="/faux_ads/{{ad.adId}}/delete" class="btn btn-outline-secondary mt-3">Delete</a></p>
+  </div>
+{{/if}}
+{{> footer}}

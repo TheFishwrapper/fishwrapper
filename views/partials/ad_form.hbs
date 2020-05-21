@@ -1,0 +1,10 @@
+<form action="/faux_ads" method="POST">
+  <label for="title">Title:</label>
+  <input type="text" name="title" value="{{ad.title}}" /><br />
+  <label for="photo">Photo:</label>
+  <input name="photo" type="file"/><br />
+  <input type="hidden" name="adId" value="{{ad.adId}}" />
+  <input type="hidden" name="_method" value="{{method}}" />
+
+  <input type="submit" value="Submit" class="btn btn-outline-secondary" />
+</form>
