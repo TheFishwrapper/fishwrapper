@@ -44,7 +44,7 @@ class Issues {
     const params = {
       TableName: process.env.ISSUE_TABLE,
       Key: {
-        issueId: req.params.issueId
+        issueId: Number(req.params.issueId)
       }
     };
     dynamoDb.get(params).promise()
