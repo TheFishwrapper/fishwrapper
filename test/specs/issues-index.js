@@ -60,11 +60,8 @@ describe('IssuesIndex', function() {
       let storyCount = await driver.findElements(By.className('issue'));
       let title = await driver.findElement(
         By.xpath('/html/body/main/div/div[1]/h3/a')).getText();
-      let link = await driver.findElement(
-        By.xpath('/html/body/main/div/div[1]/p')).getText();
 
       title.should.equal('Issue #1');
-      link.should.equal(fakeLink);
       storyCount.length.should.equal(1);
 
       await db.delete(1);
