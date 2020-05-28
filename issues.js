@@ -81,7 +81,7 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Item: {
-          issueId: parseInt(req.body.issueId, 10),
+          issueId: Number(req.body.issueId),
           link: req.file.location,
         }
       };

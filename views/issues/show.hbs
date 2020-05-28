@@ -9,7 +9,11 @@
     <span>/</span>
     <span id="total-pages">0</span>
     <button id="next">Next</button>
-
+  </div>
+  <div class="col-12">
+    <div id="spinner" class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
     <canvas id="pdf-viewer" data-url={{{issue.link}}}></canvas>
 
     <p>Download the PDF <a href={{{issue.link}}}>here</a></p>
