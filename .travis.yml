@@ -34,7 +34,7 @@ before_script:
  - sleep 5s # Give time to startup
 
 script:
- - npm test
+ - npm run test-ci
  - npm run integration
 
 after_script:
