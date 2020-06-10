@@ -1,6 +1,6 @@
 # The Fishwrapper
 [![Build Status](https://travis-ci.org/TheFishwrapper/fishwrapper.svg?branch=master)](https://travis-ci.org/TheFishwrapper/fishwrapper)
-[![Coverage Status](https://coveralls.io/repos/github/CapitalistLepton/fishwrapper/badge.svg?branch=master)](https://coveralls.io/github/CapitalistLepton/fishwrapper?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/TheFishwrapper/fishwrapper/badge.svg?branch=master)](https://coveralls.io/github/TheFishwrapper/fishwrapper?branch=master)
 
 This is the source code for The Fishwrapper website. It utilizes the
 [Serverless framework](https://serverless.com/) and uses AWS services to create
