@@ -1,5 +1,5 @@
 # The Fishwrapper
-[![Build Status](https://travis-ci.org/CapitalistLepton/fishwrapper.svg?branch=master)](https://travis-ci.org/CapitalistLepton/fishwrapper)
+[![Build Status](https://travis-ci.org/TheFishwrapper/fishwrapper.svg?branch=master)](https://travis-ci.org/TheFishwrapper/fishwrapper)
 [![Coverage Status](https://coveralls.io/repos/github/CapitalistLepton/fishwrapper/badge.svg?branch=master)](https://coveralls.io/github/CapitalistLepton/fishwrapper?branch=master)
 
 This is the source code for The Fishwrapper website. It utilizes the
