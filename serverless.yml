@@ -14,6 +14,9 @@ custom:
   apigwBinary:
     types:
       - '*/*'
+  serverless-offline-ssm:
+    stages:
+      - offline
 
 plugins:
   - serverless-offline-ssm
