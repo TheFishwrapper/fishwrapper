@@ -1,0 +1,16 @@
+{{> header}}
+<h1>Faux Ads</h1>
+{{#if req.signedCookies.id_token}}
+  <p><a href="/faux_ads/new" class="btn btn-outline-secondary">New faux ad</a><p/>
+{{/if}}
+<div class="row">
+  {{#each ad}}
+    <h3><a href="/faux_ads/{{adId}}">{{title}}</a></h3>
+    <img src="/faux_ads/{{photo}}" alt="{{altText}}">
+    {{#if ../req.signedCookies.id_token}}
+      <p><a href="/faux_ads/{{adId}}/edit" class="btn btn-outline-secondary">Edit</a></p>
+      <p><a href="/faux_ads/{{adId}}/delete" class="btn btn-outline-secondary">Delete</a></p>
+    {{/if}}
+  {{/each}}
+</div>
+{{> footer}}

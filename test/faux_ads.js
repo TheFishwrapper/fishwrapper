@@ -70,7 +70,7 @@ describe('FauxAds', () => {
           return Promise.resolve(result);
         }
       };
-      sinon.stub(db, 'scan').retuns(scanPromise);
+      sinon.stub(db, 'scan').returns(scanPromise);
 
       req.signedCookies.id_token = 1;
 
