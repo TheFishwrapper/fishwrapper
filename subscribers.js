@@ -20,6 +20,21 @@
 class Subscribers {
 
   /*
+   * Returns a list of subscribers to the callback method
+   */
+  static index(req, dynamoDb, callback) {
+    const params = {TableName: process.env.SUBSCRIBERS_TABLE};
+    dynamoDb.scan(params, (error, result) => {
+      if (error) {
+        console.error(error);
+        callback('render', 'error', {error: error});
+      } else {
+        callback('render', 'subscribers/index', {subscribers: result.Items});
+      }
+    })
+  }
+
+  /*
    * Renders a form to create a new subscriber.
    */
   static new_subscriber(req, dynamoDb, callback) {
