@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 const webdriver = require('selenium-webdriver'),
+  until = webdriver.until,
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
 const db = require('../db/issues.js');
+const Login = require('../lib/login.js');
 const faker = require('faker');
 
 let driver;
 
-describe('IssuesIndex', function() {
+describe('IssuesEdit', function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
       .forBrowser('firefox')
@@ -37,40 +39,47 @@ describe('IssuesIndex', function() {
       throw error;
     }
   });
-  it('should have a correct title', async function() {
-    this.timeout(0);
-    try {
-      driver.get('http://localhost:3000/issues');
-      let title = await driver.findElement(By.xpath('/html/body/main/h1'))
-        .getText();
-
-      title.should.equal('Issues');
-    } catch(error) {
-      console.error('Error: ' + error);
-      should.fail();
-    }
-  });
-  it('should display an issue', async function() {
+  it('should require login', async function() {
     this.timeout(0);
     try {
       const fakeLink = faker.internet.url();
       await db.put(1, fakeLink);
-      driver.get('http://localhost:3000/issues');
+      await driver.get('http://localhost:3000/issues/1/edit');
+      await driver.wait(until.urlContains('/login'));
 
-      let storyCount = await driver.findElements(By.className('issue'));
-      let title = await driver.findElement(
-        By.xpath('/html/body/main/div/div[1]/h3/a')).getText();
-      let link = await driver.findElement(
-        By.xpath('/html/body/main/div/div[1]/p')).getText();
-
-      title.should.equal('Issue #1');
-      link.should.equal(fakeLink);
-      storyCount.length.should.equal(1);
-
-      await db.delete(1);
-    } catch(error) {
-      console.error('Error: ' + error);
+      const url = await driver.getCurrentUrl();
+      url.should.equal('http://localhost:3000/login');
+    } catch (error) {
+      console.error(error);
       throw error;
     }
   });
+/* Uses file field so hard to test currently
+  it('should change the issue link', async function() {
+    this.timeout(0);
+    try {
+      const fakeLink = faker.internet.url();
+      await db.put(1, fakeLink);
+      await Login.login(driver);
+      await driver.get('http://localhost:3000/issues/1/edit');
+
+      await driver.findElement(By.name('link')).sendKeys(process.cwd()
+        + '/test/assets/test.pdf');
+      await driver.findElement(By.id('form-submit')).click();
+
+      await driver.wait(until.urlIs('http://localhost:3000/issues'));
+
+      // Ensure that a db Item was changed with the matching data
+      const item = await db.get(1);
+      item.Item.link.should.not.equal(fakeLink);
+      item.Item.link.should.have.string('test.pdf');
+
+      await db.delete(1);
+      await Login.logout(driver);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  });
+*/
 });

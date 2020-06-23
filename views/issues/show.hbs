@@ -4,7 +4,21 @@
     <h1>Issue #{{issue.issueId}}</h1>
   </div>
   <div class="col-12">
-    {{{issue.link}}}
+    <button id="prev">Previous</button>
+    <span id="page-num">0</span>
+    <span>/</span>
+    <span id="total-pages">0</span>
+    <button id="next">Next</button>
+  </div>
+  <div class="col-12">
+    <div id="spinner" class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <canvas id="pdf-viewer" data-url={{{issue.link}}}></canvas>
+
+    <p>Download the PDF <a href={{{issue.link}}}>here</a></p>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
+    <script src="https://fishwrapper-assets-dev.s3.amazonaws.com/pdf-viewer.js"></script>
   </div>
 </div>
 {{#if req.signedCookies.id_token}}

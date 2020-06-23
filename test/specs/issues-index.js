@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 const webdriver = require('selenium-webdriver'),
-  until = webdriver.until,
   By = webdriver.By;
 const firefox = require('selenium-webdriver/firefox');
 const should = require('chai').should();
 const db = require('../db/issues.js');
-const Login = require('../lib/login.js');
 const faker = require('faker');
 
 let driver;
 
-describe('IssuesEdit', function() {
+describe('IssuesIndex', function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
       .forBrowser('firefox')
@@ -39,44 +37,36 @@ describe('IssuesEdit', function() {
       throw error;
     }
   });
-  it('should require login', async function() {
+  it('should have a correct title', async function() {
     this.timeout(0);
     try {
-      const fakeLink = faker.internet.url();
-      await db.put(1, fakeLink);
-      await driver.get('http://localhost:3000/issues/1/edit');
-      await driver.wait(until.urlContains('/login'));
+      driver.get('http://localhost:3000/issues');
+      let title = await driver.findElement(By.xpath('/html/body/main/h1'))
+        .getText();
 
-      const url = await driver.getCurrentUrl();
-      url.should.equal('http://localhost:3000/login');
-    } catch (error) {
-      console.error(error);
-      throw error;
+      title.should.equal('Issues');
+    } catch(error) {
+      console.error('Error: ' + error);
+      should.fail();
     }
   });
-  it('should change the issue link', async function() {
+  it('should display an issue', async function() {
     this.timeout(0);
     try {
       const fakeLink = faker.internet.url();
       await db.put(1, fakeLink);
-      await Login.login(driver);
-      await driver.get('http://localhost:3000/issues/1/edit');
+      driver.get('http://localhost:3000/issues');
 
-      await driver.findElement(By.name('link')).sendKeys(process.cwd()
-        + '/test/assets/test.pdf');
-      await driver.findElement(By.id('form-submit')).click();
+      let storyCount = await driver.findElements(By.className('issue'));
+      let title = await driver.findElement(
+        By.xpath('/html/body/main/div/div[1]/h3/a')).getText();
 
-      await driver.wait(until.urlIs('http://localhost:3000/issues'));
-
-      // Ensure that a db Item was changed with the matching data
-      const item = await db.get(1);
-      item.Item.link.should.not.equal(fakeLink);
-      item.Item.link.should.have.string('test.pdf');
+      title.should.equal('Issue #1');
+      storyCount.length.should.equal(1);
 
       await db.delete(1);
-      await Login.logout(driver);
-    } catch (error) {
-      console.error(error);
+    } catch(error) {
+      console.error('Error: ' + error);
       throw error;
     }
   });

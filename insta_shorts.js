@@ -13,34 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Lib = require("./lib");
-const Login = require("./login");
-const INSTA_TABLE = process.env.INSTA_TABLE;
+const Login = require('./login');
 
 class InstaShorts {
-  static index(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
-      dynamoDb.scan({ TableName: INSTA_TABLE }, function(err, data) {
-        if (err) {
-          console.log(err);
-          Lib.error(res, req, err);
-        } else {
-          Lib.render(res, req, "insta_shorts/index", { shorts: data.Items });
-        }
-      });
-    }
-  }
 
-  static new_short(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
-      Lib.render(res, req, "insta_shorts/new");
-    }
-  }
-
-  static create(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  static index(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: INSTA_TABLE,
+        TableName: process.env.INSTA_TABLE
+      }
+      dynamoDb.scan(params).promise()
+      .then(data => {
+        callback('render', 'insta_shorts/index', {shorts: data.Items});
+      })
+      .catch(error => {
+        console.error(error);
+        callback('render', 'error', {error: error});
+      });
+    } else {
+      callback('redirect', '/login');
+    }
+  }
+
+  static new_short(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
+      callback('render','insta_shorts/new');
+    } else {
+      callback('redirect', '/login');
+    }
+  }
+
+  static create(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
+      const params = {
+        TableName: process.env.INSTA_TABLE,
         Item: {
           instaId: req.body.content
             .toLocaleLowerCase()
@@ -49,75 +55,84 @@ class InstaShorts {
           content: req.body.content
         }
       };
-      dynamoDb.put(params, function(err) {
-        if (err) {
-          console.log(err);
-          Lib.error(res, req, err);
-        } else {
-          res.redirect("/insta_shorts");
-        }
+      dynamoDb.put(params).promise()
+      .then(() => {
+        callback('redirect', '/insta_shorts');
+      })
+      .catch(error => {
+        console.error(error);
+        callback('render', 'error', {error: error});
       });
+
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static edit(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  static edit(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: INSTA_TABLE,
+        TableName: process.env.INSTA_TABLE,
         Key: {
           instaId: req.params.instaId
         }
       };
-      dynamoDb.get(params, function(err, data) {
-        if (err) {
-          console.log(err);
-          Lib.error(res, req, err);
-        } else {
-          Lib.render(res, req, "insta_shorts/edit", { short: data.Item });
-        }
+      dynamoDb.get(params).promise()
+      .then(data => {
+        callback('render', 'insta_shorts/edit', {short: data.Item});
+      })
+      .catch(error => {
+        console.error(error);
+        callback('render', 'error', {error: error});
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static update(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  static update(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: INSTA_TABLE,
+        TableName: process.env.INSTA_TABLE,
         Key: {
           instaId: req.body.instaId
         },
         UpdateExpression: "SET content = :content",
         ExpressionAttributeValues: {
-          ":content": req.body.content
+          ':content': req.body.content
         }
       };
-      dynamoDb.update(params, function(err) {
-        if (err) {
-          console.log(err);
-          Lib.error(res, req, err);
-        } else {
-          res.redirect("/insta_shorts");
-        }
+      dynamoDb.update(params).promise()
+      .then(() => {
+        callback('redirect', '/insta_shorts');
+      })
+      .catch( error => {
+        console.error(error);
+        callback('render', 'error', {error:error});
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 
-  static destroy(req, res, dynamoDb) {
-    if (Login.authenticate(req, res)) {
+  static destroy(req, dynamoDb, callback) {
+    if (Login.authenticate(req)) {
       const params = {
-        TableName: INSTA_TABLE,
+        TableName: process.env.INSTA_TABLE,
         Key: {
           instaId: req.params.instaId
         }
       };
-      dynamoDb.delete(params, function(err) {
-        if (err) {
-          console.log(err);
-          Lib.error(res, rew, err);
-        } else {
-          res.redirect("/insta_shorts");
-        }
+      dynamoDb.delete(params).promise()
+      .then(() => {
+        callback('redirect', '/insta_shorts');
+      })
+      .catch(error => {
+        console.error(error);
+        callback('render', 'error', {error: error});
       });
+    } else {
+      callback('redirect', '/login');
     }
   }
 }

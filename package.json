@@ -4,8 +4,8 @@
   "description": "Serverless Web App for The Fishwrapper, a satirical news site.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js 2> /dev/null && nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
-    "test-error": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js",
+    "test": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js",
+    "test-ci": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js 2> /dev/null && nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
     "integration": "mocha test/specs/*.js",
     "lint": "eslint ."
   },
@@ -25,7 +25,7 @@
     "detect-libc": "^1.0.3",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "hbs": "^4.0.4",
+    "hbs": "^4.1.0",
     "markdown": "^0.5.0",
     "markdown-it": "^8.4.2",
     "multer": "^1.3.1",
@@ -43,14 +43,14 @@
     "eslint-plugin-prettier": "^3.1.2",
     "faker": "^4.1.0",
     "mocha": "^5.2.0",
-    "nyc": "^13.0.1",
     "prettier": "1.19.1",
+    "nyc": "^15.1.0",
     "selenium-webdriver": "^4.0.0-alpha.4",
     "serverless-apigw-binary": "^0.4.4",
     "serverless-domain-manager": "^2.4.0",
     "serverless-dynamodb-local": "^0.2.30",
     "serverless-offline": "^3.33.0",
-    "serverless-offline-ssm": "^4.0.0",
+    "serverless-offline-ssm": "^5.0.1",
     "sinon": "^7.4.1"
   }
 }

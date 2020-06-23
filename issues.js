@@ -45,7 +45,7 @@ class Issues {
     const params = {
       TableName: process.env.ISSUE_TABLE,
       Key: {
-        issueId: req.params.issueId
+        issueId: Number(req.params.issueId)
       }
     };
     dynamoDb
@@ -84,8 +84,8 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Item: {
-          issueId: parseInt(req.body.issueId, 10),
-          link: req.file.location
+          issueId: Number(req.body.issueId),
+          link: req.file.location,
         }
       };
       dynamoDb

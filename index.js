@@ -401,27 +401,32 @@ app.post("/quizzes/:quizId", function(req, res) {
   Quizzes.grade(req, res, dynamoDb);
 });
 
-app.get("/insta_shorts", function(req, res) {
-  InstaShorts.index(req, res, dynamoDb);
+app.get('/insta_shorts', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.index(req, dynamoDb, cb);
 });
 
-app.get("/insta_shorts/new", function(req, res) {
-  InstaShorts.new_short(req, res, dynamoDb);
+app.get('/insta_shorts/new', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.new_short(req, dynamoDb, cb);
 });
 
-app.get("/insta_shorts/:instaId/edit", function(req, res) {
-  InstaShorts.edit(req, res, dynamoDb);
+app.get('/insta_shorts/:instaId/edit', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.edit(req, dynamoDb, cb);
 });
 
-app.get("/insta_shorts/:instaId/delete", function(req, res) {
-  InstaShorts.destroy(req, res, dynamoDb);
+app.get('/insta_shorts/:instaId/delete', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  InstaShorts.destroy(req, dynamoDb, cb);
 });
 
-app.post("/insta_shorts", function(req, res) {
-  if (req.body._method == "POST") {
-    InstaShorts.create(req, res, dynamoDb);
-  } else if (req.body._method == "PUT") {
-    InstaShorts.update(req, res, dynamoDb);
+app.post('/insta_shorts', function (req, res) {
+  const cb = handlerObj.callback.bind({req: req, res: res});
+  if (req.body._method == 'POST') {
+    InstaShorts.create(req, dynamoDb, cb);
+  } else if (req.body._method == 'PUT') {
+    InstaShorts.update(req, dynamoDb, cb);
   }
 });
 
@@ -493,7 +498,6 @@ app.get("/videos/:videoId/delete", function(req, res) {
   Videos.destroy(req, dynamoDb, cb);
 });
 
-/* WIP Issues
 app.get('/issues', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Issues.index(req, dynamoDb, cb);
@@ -523,11 +527,10 @@ app.get('/issues/:issueId/edit', function (req, res) {
   Issues.edit(req, dynamoDb, cb);
 });
 
-app.get('/issues/:issueId/edit', function (req, res) {
+app.get('/issues/:issueId/delete', function (req, res) {
   const cb = handlerObj.callback.bind({req: req, res: res});
   Issues.destroy(req, dynamoDb, cb);
 });
-*/
 
 app.get("/sitemap.xml", function(req, res) {
   res.type("application/xml");
