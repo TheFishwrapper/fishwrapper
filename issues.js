@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Login = require('./login');
+const Login = require("./login");
 
 /*
  * Controller class for the infinite timeline.
  */
 class Issues {
-
   /*
    * Renders an index page with links to all the issue PDFs.
    */
   static index(req, dynamoDb, callback) {
     const params = {
-      TableName: process.env.ISSUE_TABLE,
+      TableName: process.env.ISSUE_TABLE
     };
-    dynamoDb.scan(params).promise()
-    .then(data => {
-      callback('render', 'issues/index', {issues: data.Items});
-    })
-    .catch(error => {
-      console.error(error);
-      callback('render', 'error', {error: error});
-    });
+    dynamoDb
+      .scan(params)
+      .promise()
+      .then(data => {
+        callback("render", "issues/index", { issues: data.Items });
+      })
+      .catch(error => {
+        console.error(error);
+        callback("render", "error", { error: error });
+      });
   }
 
   /*
@@ -47,14 +48,16 @@ class Issues {
         issueId: req.params.issueId
       }
     };
-    dynamoDb.get(params).promise()
-    .then(data => {
-      callback('render', 'issues/show', {issue: data.Item});
-    })
-    .catch(error => {
-      console.error(error);
-      callback('render', 'error', {error: error});
-    });
+    dynamoDb
+      .get(params)
+      .promise()
+      .then(data => {
+        callback("render", "issues/show", { issue: data.Item });
+      })
+      .catch(error => {
+        console.error(error);
+        callback("render", "error", { error: error });
+      });
   }
 
   /*
@@ -64,9 +67,9 @@ class Issues {
    */
   static new_issue(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      callback('render', 'issues/new');
+      callback("render", "issues/new");
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -82,19 +85,21 @@ class Issues {
         TableName: process.env.ISSUE_TABLE,
         Item: {
           issueId: parseInt(req.body.issueId, 10),
-          link: req.file.location,
+          link: req.file.location
         }
       };
-      dynamoDb.put(params).promise()
-      .then(() => {
-        callback('redirect', '/issues');
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      dynamoDb
+        .put(params)
+        .promise()
+        .then(() => {
+          callback("redirect", "/issues");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -111,16 +116,18 @@ class Issues {
           issueId: req.params.issueId
         }
       };
-      dynamoDb.get(params).promise()
-      .then(data => {
-        callback('render', 'issues/edit', {issue: data.Item});
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      dynamoDb
+        .get(params)
+        .promise()
+        .then(data => {
+          callback("render", "issues/edit", { issue: data.Item });
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -135,24 +142,26 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.body.issueId,
+          issueId: req.body.issueId
         },
-        UpdateExpression: 'SET link = :link',
+        UpdateExpression: "SET link = :link",
         ExpressionAttributeValues: {
-          ':link': req.file.location,
+          ":link": req.file.location
         }
       };
       console.log(params);
-      dynamoDb.update(params).promise()
-      .then(() => {
-        callback('redirect', '/issues');
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      dynamoDb
+        .update(params)
+        .promise()
+        .then(() => {
+          callback("redirect", "/issues");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -169,16 +178,18 @@ class Issues {
           issueId: req.params.issueId
         }
       };
-      dynamoDb.delete(params).promise()
-      .then(() => {
-        callback('redirect', '/issues');
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      dynamoDb
+        .delete(params)
+        .promise()
+        .then(() => {
+          callback("redirect", "/issues");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 }

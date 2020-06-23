@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 
 /*
  * Controller class for logging in to the website.
  */
 class Login {
-
   /*
    * Renders the login page.
    */
   static show(req, dynamoDb, callback) {
-    callback('render', 'login');
+    callback("render", "login");
   }
 
   /*
@@ -34,31 +33,34 @@ class Login {
   static attempt(req, dynamoDb, callback) {
     const params = {
       TableName: process.env.USERS_TABLE,
-       Key: {
-         user: req.body.username
-       },
-    }
-    dynamoDb.get(params, function (error, result) {
+      Key: {
+        user: req.body.username
+      }
+    };
+    dynamoDb.get(params, function(error, result) {
       if (error) {
         console.error(error);
-        callback('render', 'error', {error: error});
+        callback("render", "error", { error: error });
       } else if (result.Item) {
         const hash = result.Item.password;
-        bcrypt.compare(req.body.password, hash, function (err, correct) {
+        bcrypt.compare(req.body.password, hash, function(err, correct) {
           if (err) {
             console.error(err);
-            callback('render', 'error', {error: err});
+            callback("render", "error", { error: err });
           } else if (correct) {
-            callback('cookie', '/', {cookie: 'id_token',
-              value: result.Item.user, options: {signed: true, httpOnly: true,
-              sameSite: 'strict'}});
+            callback("cookie", "/", {
+              cookie: "id_token",
+              value: result.Item.user,
+              options: { signed: true, httpOnly: true, sameSite: "strict" }
+            });
           } else {
-            callback('render', 'error', {error:
-              'Incorrect password or username'});
+            callback("render", "error", {
+              error: "Incorrect password or username"
+            });
           }
         });
       } else {
-        callback('render', 'error', {error: 'User not found'});
+        callback("render", "error", { error: "User not found" });
       }
     });
   }
@@ -68,7 +70,11 @@ class Login {
    * page.
    */
   static logout(req, dynamoDb, callback) {
-    callback('cookie', '/', {cookie: 'id_token', value: '', options: {expires: new Date()}});
+    callback("cookie", "/", {
+      cookie: "id_token",
+      value: "",
+      options: { expires: new Date() }
+    });
   }
 
   /*
@@ -77,8 +83,8 @@ class Login {
    * DEPRECATED: use authenticate(req)
    */
   static authenticate(req, res) {
-    if (!req.signedCookies['id_token']) {
-      res.redirect('/login');
+    if (!req.signedCookies["id_token"]) {
+      res.redirect("/login");
       return false;
     } else {
       return true;
@@ -89,7 +95,7 @@ class Login {
    * Verifies that the user is logged in.
    */
   static authenticate(req) {
-    if (!req.signedCookies['id_token']) {
+    if (!req.signedCookies["id_token"]) {
       return false;
     } else {
       return true;

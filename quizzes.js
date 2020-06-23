@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Lib = require('./lib');
-const Login = require('./login');
-const MarkdownIt = require('markdown-it');
-const markdown = new MarkdownIt({html: true});
+const Lib = require("./lib");
+const Login = require("./login");
+const MarkdownIt = require("markdown-it");
+const markdown = new MarkdownIt({ html: true });
 const QUIZZES_TABLE = process.env.QUIZZES_TABLE;
 
 class Quizzes {
-
   static index(req, res, dynamoDb) {
-    dynamoDb.scan({TableName: QUIZZES_TABLE}, function (err, data) {
+    dynamoDb.scan({ TableName: QUIZZES_TABLE }, function(err, data) {
       data.Items = data.Items.map(x => {
         x.blur = markdown.render(x.blurb);
         return x;
       });
       let left = data.Items.slice(0, data.Count / 2);
       let center = data.Items.slice(data.Count / 2);
-      Lib.render(res, req, 'quizzes/index', {left: left, center: center});
+      Lib.render(res, req, "quizzes/index", { left: left, center: center });
     });
   }
 
   static new(req, res, dynamoDb) {
-    Lib.render(res, req, 'quizzes/new');
+    Lib.render(res, req, "quizzes/new");
   }
 
   static create(req, res, dynamoDb) {
@@ -42,7 +41,10 @@ class Quizzes {
       const params = {
         TableName: QUIZZES_TABLE,
         Item: {
-          quizId: req.body.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
+          quizId: req.body.title
+            .toLocaleLowerCase()
+            .substr(0, 20)
+            .replace(/\s/g, "-"),
           title: req.body.title,
           author: req.body.author,
           blurb: req.body.blurb,
@@ -52,12 +54,12 @@ class Quizzes {
           results: Quizzes.parseResults(req.body)
         }
       };
-      dynamoDb.put(params, function (err, data) {
+      dynamoDb.put(params, function(err, data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          res.redirect('/quizzes');
+          res.redirect("/quizzes");
         }
       });
     }
@@ -70,14 +72,14 @@ class Quizzes {
         quizId: req.params.quizId
       }
     };
-    dynamoDb.get(params, function (err, data) {
+    dynamoDb.get(params, function(err, data) {
       if (err) {
         console.log(err);
         Lib.error(res, req, err);
       } else {
         let quiz = data.Item;
         quiz.blurb = markdown.render(quiz.blurb);
-        Lib.render(res, req, 'quizzes/show', {quiz: quiz});
+        Lib.render(res, req, "quizzes/show", { quiz: quiz });
       }
     });
   }
@@ -90,12 +92,12 @@ class Quizzes {
           quizId: req.params.quizId
         }
       };
-      dynamoDb.get(params, function (err, data) {
+      dynamoDb.get(params, function(err, data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          Lib.render(res, req, 'quizzes/edit', {quiz: data.Item});
+          Lib.render(res, req, "quizzes/edit", { quiz: data.Item });
         }
       });
     }
@@ -109,25 +111,26 @@ class Quizzes {
         Key: {
           quizId: req.body.quizId
         },
-        UpdateExpression: 'SET title = :title, author = :author, blurb = :blurb, thumbnail_credit = :thumbnail_credit, questions = :questions',
+        UpdateExpression:
+          "SET title = :title, author = :author, blurb = :blurb, thumbnail_credit = :thumbnail_credit, questions = :questions",
         ExpressionAttributeValues: {
-          ':title': req.body.title,
-          ':author': req.body.author,
-          ':blurb': req.body.blurb,
-          ':thumbnail_credit': req.body.thumbnail_credit,
-          ':questions': Quizzes.parseQuestions(req.body),
+          ":title": req.body.title,
+          ":author": req.body.author,
+          ":blurb": req.body.blurb,
+          ":thumbnail_credit": req.body.thumbnail_credit,
+          ":questions": Quizzes.parseQuestions(req.body)
         }
       };
       if (req.file) {
-        params.UpdateExpression += ', thumbnail = :thumbnail';
-        params.ExpressionAttributeValues[':thumbnail'] = req.file.location;
+        params.UpdateExpression += ", thumbnail = :thumbnail";
+        params.ExpressionAttributeValues[":thumbnail"] = req.file.location;
       }
-      dynamoDb.update(params, function (err, data) {
+      dynamoDb.update(params, function(err, data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          res.redirect('/quizzes');
+          res.redirect("/quizzes");
         }
       });
     }
@@ -141,48 +144,58 @@ class Quizzes {
           quizId: req.params.quizId
         }
       };
-      dynamoDb.delete(params, function (err, data) {
+      dynamoDb.delete(params, function(err, data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          res.redirect('/quizzes');
+          res.redirect("/quizzes");
         }
       });
     }
   }
 
   static parseQuestions(body) {
-    let qids = Object.keys(body).filter(x => x.startsWith('qContent-q')).map(x => x.substring(9));
+    let qids = Object.keys(body)
+      .filter(x => x.startsWith("qContent-q"))
+      .map(x => x.substring(9));
     let qs = [];
     for (var i = 0; i < qids.length; i++) {
-      if (qids[i] && body['qContent-' + qids[i]]) {
-      let q = { qId: qids[i], qContent: body['qContent-' + qids[i]] };
-      let ans = Object.keys(body).filter(x => x.endsWith(qids[i]) && x.startsWith('aContent-a'));
-      q.answers = ans.map(x => {
-        let aId = x.substring(9);
-        let aContent = body[x];
-        let a = null;
-        if (aId && aContent) {
-          a = { aId: aId, aContent: aContent, aResult: body[`aResult-${aId}`] };
-        }
-        return a;
-      });
-      q.answers = q.answers.filter(x => x);
-      qs.push(q);
+      if (qids[i] && body["qContent-" + qids[i]]) {
+        let q = { qId: qids[i], qContent: body["qContent-" + qids[i]] };
+        let ans = Object.keys(body).filter(
+          x => x.endsWith(qids[i]) && x.startsWith("aContent-a")
+        );
+        q.answers = ans.map(x => {
+          let aId = x.substring(9);
+          let aContent = body[x];
+          let a = null;
+          if (aId && aContent) {
+            a = {
+              aId: aId,
+              aContent: aContent,
+              aResult: body[`aResult-${aId}`]
+            };
+          }
+          return a;
+        });
+        q.answers = q.answers.filter(x => x);
+        qs.push(q);
       }
     }
     return qs;
   }
 
   static parseResults(body) {
-    let res = Object.keys(body).filter(x => x.startsWith('rContent-r')).map(x => x.substring(9));
+    let res = Object.keys(body)
+      .filter(x => x.startsWith("rContent-r"))
+      .map(x => x.substring(9));
     let rs = [];
     for (var i = 0; i < res.length; i++) {
-      if (res[i] && body['rContent-' + res[i]]) {
-        let r = { rId: res[i], rContent: body['rContent-' + res[i]] };
-        if (body['rThumbnailCredit-' + res[i]]) {
-          r.thumbnail_credit = body['rThumbnailCredit-' + res[i]];
+      if (res[i] && body["rContent-" + res[i]]) {
+        let r = { rId: res[i], rContent: body["rContent-" + res[i]] };
+        if (body["rThumbnailCredit-" + res[i]]) {
+          r.thumbnail_credit = body["rThumbnailCredit-" + res[i]];
         }
         rs.push(r);
       }
@@ -197,7 +210,7 @@ class Quizzes {
         quizId: body.quizId
       }
     };
-    dynamoDb.get(params, function (err, data) {
+    dynamoDb.get(params, function(err, data) {
       if (err) {
         console.log(err);
       } else {
@@ -216,12 +229,12 @@ class Quizzes {
           Key: {
             quizId: body.quizId
           },
-          UpdateExpression: 'SET results = :results',
+          UpdateExpression: "SET results = :results",
           ExpressionAttributeValues: {
-            ':results': final
+            ":results": final
           }
         };
-        dynamoDb.update(par, function (err) {
+        dynamoDb.update(par, function(err) {
           if (err) {
             console.log(err);
           }
@@ -235,20 +248,23 @@ class Quizzes {
     if (rNew.rContent != rOld.rContent) {
       r.rContent = rNew.rContent;
     }
-    if (rNew.thumbnail_credit && rNew.thumbnail_credit != rOld.thumbnail_credit) {
+    if (
+      rNew.thumbnail_credit &&
+      rNew.thumbnail_credit != rOld.thumbnail_credit
+    ) {
       r.thumbnail_credit = rNew.thumbnail_credit;
     }
     return r;
   }
 
   static grade(req, res, dynamoDb) {
-     const params = {
+    const params = {
       TableName: QUIZZES_TABLE,
       Key: {
         quizId: req.params.quizId
       }
     };
-    dynamoDb.get(params, function (err, data) {
+    dynamoDb.get(params, function(err, data) {
       let quiz = data.Item;
       let ques = Object.keys(req.body);
       let resul = [];
@@ -276,19 +292,21 @@ class Quizzes {
           result.set(resul[i].r, result.get(resul[i].r) + 1);
         }
       }
-      Lib.render(res, req, 'quizzes/grade', {quiz: quiz, result: Quizzes.maxOfMap(result)});
+      Lib.render(res, req, "quizzes/grade", {
+        quiz: quiz,
+        result: Quizzes.maxOfMap(result)
+      });
     });
   }
 
   static maxOfMap(map) {
     let max = { k: null, v: -1 };
-    for (let [key, value] of  map) {
+    for (let [key, value] of map) {
       if (value > max.v) {
         max = { k: key, v: value };
       }
     }
     return max.k;
   }
-
 }
 module.exports = Quizzes;

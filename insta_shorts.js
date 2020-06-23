@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Lib = require('./lib');
-const Login = require('./login');
-const INSTA_TABLE = process.env.INSTA_TABLE
+const Lib = require("./lib");
+const Login = require("./login");
+const INSTA_TABLE = process.env.INSTA_TABLE;
 
 class InstaShorts {
-
   static index(req, res, dynamoDb) {
     if (Login.authenticate(req, res)) {
-      dynamoDb.scan({TableName: INSTA_TABLE}, function (err, data) {
+      dynamoDb.scan({ TableName: INSTA_TABLE }, function(err, data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          Lib.render(res, req, 'insta_shorts/index', {shorts: data.Items});
+          Lib.render(res, req, "insta_shorts/index", { shorts: data.Items });
         }
       });
     }
@@ -34,7 +33,7 @@ class InstaShorts {
 
   static new_short(req, res, dynamoDb) {
     if (Login.authenticate(req, res)) {
-      Lib.render(res, req, 'insta_shorts/new');
+      Lib.render(res, req, "insta_shorts/new");
     }
   }
 
@@ -43,16 +42,19 @@ class InstaShorts {
       const params = {
         TableName: INSTA_TABLE,
         Item: {
-          instaId: req.body.content.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
+          instaId: req.body.content
+            .toLocaleLowerCase()
+            .substr(0, 20)
+            .replace(/\s/g, "-"),
           content: req.body.content
-        } 
+        }
       };
-      dynamoDb.put(params, function (err) {
+      dynamoDb.put(params, function(err) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          res.redirect('/insta_shorts');
+          res.redirect("/insta_shorts");
         }
       });
     }
@@ -66,12 +68,12 @@ class InstaShorts {
           instaId: req.params.instaId
         }
       };
-      dynamoDb.get(params, function (err, data) {
+      dynamoDb.get(params, function(err, data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          Lib.render(res, req, 'insta_shorts/edit', {short: data.Item});
+          Lib.render(res, req, "insta_shorts/edit", { short: data.Item });
         }
       });
     }
@@ -84,17 +86,17 @@ class InstaShorts {
         Key: {
           instaId: req.body.instaId
         },
-        UpdateExpression: 'SET content = :content',
+        UpdateExpression: "SET content = :content",
         ExpressionAttributeValues: {
-          ':content': req.body.content
-        } 
+          ":content": req.body.content
+        }
       };
-      dynamoDb.update(params, function (err) {
+      dynamoDb.update(params, function(err) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
         } else {
-          res.redirect('/insta_shorts');
+          res.redirect("/insta_shorts");
         }
       });
     }
@@ -108,12 +110,12 @@ class InstaShorts {
           instaId: req.params.instaId
         }
       };
-      dynamoDb.delete(params, function (err) {
+      dynamoDb.delete(params, function(err) {
         if (err) {
           console.log(err);
           Lib.error(res, rew, err);
         } else {
-          res.redirect('/insta_shorts');
+          res.redirect("/insta_shorts");
         }
       });
     }
