@@ -32,7 +32,7 @@ const Quizzes = require("./quizzes");
 const InstaShorts = require("./insta_shorts");
 const Crosswords = require("./crosswords");
 const Videos = require("./videos");
-//const Issues = require("./issues");
+const Issues = require("./issues");
 
 const IS_OFFLINE = process.env.IS_OFFLINE;
 const BASE_URL = "https://thefishwrapper.news";
