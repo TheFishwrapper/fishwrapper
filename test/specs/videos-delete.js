@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/videos.js');
-const Login = require('../lib/login.js');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/videos.js");
+const Login = require("../lib/login.js");
 
 let driver;
 
-describe('VideoDelete', function() {
+describe("VideoDelete", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -38,15 +38,17 @@ describe('VideoDelete', function() {
       throw error;
     }
   });
-  it('should require login', async function() {
+  it("should require login", async function() {
     this.timeout(0);
     try {
       await db.putExample();
-      await driver.get('http://localhost:3000/videos/' + db.videoId + '/delete');
-      await driver.wait(until.urlContains('/login'));
+      await driver.get(
+        "http://localhost:3000/videos/" + db.videoId + "/delete"
+      );
+      await driver.wait(until.urlContains("/login"));
 
       const url = await driver.getCurrentUrl();
-      url.should.equal('http://localhost:3000/login');
+      url.should.equal("http://localhost:3000/login");
 
       await db.deleteExample();
     } catch (error) {
@@ -54,14 +56,16 @@ describe('VideoDelete', function() {
       throw error;
     }
   });
-  it('should delete the video', async function() {
+  it("should delete the video", async function() {
     this.timeout(0);
     try {
       await Login.login(driver);
       await db.putExample();
-      await driver.get('http://localhost:3000/videos/' + db.videoId + '/delete');
+      await driver.get(
+        "http://localhost:3000/videos/" + db.videoId + "/delete"
+      );
 
-      await driver.wait(until.urlIs('http://localhost:3000/videos'));
+      await driver.wait(until.urlIs("http://localhost:3000/videos"));
 
       // Ensure that a db Item was deleted
       const item = await db.getExample();

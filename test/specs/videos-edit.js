@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/videos.js');
-const Login = require('../lib/login.js');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/videos.js");
+const Login = require("../lib/login.js");
 
 let driver;
 
-describe('VideoEdit', function() {
+describe("VideoEdit", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -38,31 +38,31 @@ describe('VideoEdit', function() {
       throw error;
     }
   });
-  it('should require login', async function() {
+  it("should require login", async function() {
     this.timeout(0);
     try {
-      await driver.get('http://localhost:3000/videos/' + db.videoId + '/edit');
-      await driver.wait(until.urlContains('/login'));
+      await driver.get("http://localhost:3000/videos/" + db.videoId + "/edit");
+      await driver.wait(until.urlContains("/login"));
 
       const url = await driver.getCurrentUrl();
-      url.should.equal('http://localhost:3000/login');
+      url.should.equal("http://localhost:3000/login");
     } catch (error) {
       console.error(error);
       throw error;
     }
   });
-  it('should change the video link', async function() {
+  it("should change the video link", async function() {
     this.timeout(0);
-    const link = 'example-link';
+    const link = "example-link";
     try {
       await Login.login(driver);
       await db.putExample();
-      await driver.get('http://localhost:3000/videos/' + db.videoId + '/edit');
+      await driver.get("http://localhost:3000/videos/" + db.videoId + "/edit");
 
-      const elem = await driver.findElement(By.name('link'));
+      const elem = await driver.findElement(By.name("link"));
       await elem.clear();
       await elem.sendKeys(link);
-      await driver.findElement(By.id('form-submit')).click();
+      await driver.findElement(By.id("form-submit")).click();
 
       // Ensure that a db Item was changed with the matching data
       const item = await db.getExample();
@@ -76,18 +76,18 @@ describe('VideoEdit', function() {
       throw error;
     }
   });
-  it('should change the video title', async function() {
+  it("should change the video title", async function() {
     this.timeout(0);
-    const title = 'Example Title';
+    const title = "Example Title";
     try {
       await Login.login(driver);
       await db.putExample();
-      await driver.get('http://localhost:3000/videos/' + db.videoId + '/edit');
+      await driver.get("http://localhost:3000/videos/" + db.videoId + "/edit");
 
-      const elem = await driver.findElement(By.name('title'));
+      const elem = await driver.findElement(By.name("title"));
       await elem.clear();
       await elem.sendKeys(title);
-      await driver.findElement(By.id('form-submit')).click();
+      await driver.findElement(By.id("form-submit")).click();
 
       // Ensure that a db Item was changed with the matching data
       const item = await db.getExample();

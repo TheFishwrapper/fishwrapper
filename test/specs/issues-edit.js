@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/issues.js');
-const Login = require('../lib/login.js');
-const faker = require('faker');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/issues.js");
+const Login = require("../lib/login.js");
+const faker = require("faker");
 
 let driver;
 
-describe('IssuesEdit', function() {
+describe("IssuesEdit", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -39,22 +39,22 @@ describe('IssuesEdit', function() {
       throw error;
     }
   });
-  it('should require login', async function() {
+  it("should require login", async function() {
     this.timeout(0);
     try {
       const fakeLink = faker.internet.url();
       await db.put(1, fakeLink);
-      await driver.get('http://localhost:3000/issues/1/edit');
-      await driver.wait(until.urlContains('/login'));
+      await driver.get("http://localhost:3000/issues/1/edit");
+      await driver.wait(until.urlContains("/login"));
 
       const url = await driver.getCurrentUrl();
-      url.should.equal('http://localhost:3000/login');
+      url.should.equal("http://localhost:3000/login");
     } catch (error) {
       console.error(error);
       throw error;
     }
   });
-/* Uses file field so hard to test currently
+  /* Uses file field so hard to test currently
   it('should change the issue link', async function() {
     this.timeout(0);
     try {

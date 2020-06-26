@@ -13,33 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Login = require('./login');
+const Login = require("./login");
 
 class InstaShorts {
-
   static index(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
       const params = {
         TableName: process.env.INSTA_TABLE
-      }
-      dynamoDb.scan(params).promise()
-      .then(data => {
-        callback('render', 'insta_shorts/index', {shorts: data.Items});
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      };
+      dynamoDb
+        .scan(params)
+        .promise()
+        .then(data => {
+          callback("render", "insta_shorts/index", { shorts: data.Items });
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
   static new_short(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      callback('render','insta_shorts/new');
+      callback("render", "insta_shorts/new");
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -48,21 +49,25 @@ class InstaShorts {
       const params = {
         TableName: process.env.INSTA_TABLE,
         Item: {
-          instaId: req.body.content.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
+          instaId: req.body.content
+            .toLocaleLowerCase()
+            .substr(0, 20)
+            .replace(/\s/g, "-"),
           content: req.body.content
         }
       };
-      dynamoDb.put(params).promise()
-      .then(() => {
-        callback('redirect', '/insta_shorts');
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
-
+      dynamoDb
+        .put(params)
+        .promise()
+        .then(() => {
+          callback("redirect", "/insta_shorts");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -74,16 +79,18 @@ class InstaShorts {
           instaId: req.params.instaId
         }
       };
-      dynamoDb.get(params).promise()
-      .then(data => {
-        callback('render', 'insta_shorts/edit', {short: data.Item});
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      dynamoDb
+        .get(params)
+        .promise()
+        .then(data => {
+          callback("render", "insta_shorts/edit", { short: data.Item });
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -94,21 +101,23 @@ class InstaShorts {
         Key: {
           instaId: req.body.instaId
         },
-        UpdateExpression: 'SET content = :content',
+        UpdateExpression: "SET content = :content",
         ExpressionAttributeValues: {
-          ':content': req.body.content
+          ":content": req.body.content
         }
       };
-      dynamoDb.update(params).promise()
-      .then(() => {
-        callback('redirect', '/insta_shorts');
-      })
-      .catch( error => {
-        console.error(error);
-        callback('render', 'error', {error:error});
-      });
+      dynamoDb
+        .update(params)
+        .promise()
+        .then(() => {
+          callback("redirect", "/insta_shorts");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -120,16 +129,18 @@ class InstaShorts {
           instaId: req.params.instaId
         }
       };
-      dynamoDb.delete(params).promise()
-      .then(() => {
-        callback('redirect', '/insta_shorts');
-      })
-      .catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+      dynamoDb
+        .delete(params)
+        .promise()
+        .then(() => {
+          callback("redirect", "/insta_shorts");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 }

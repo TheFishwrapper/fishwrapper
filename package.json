@@ -6,7 +6,8 @@
   "scripts": {
     "test": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js",
     "test-ci": "nyc --reporter=lcov --reporter=text mocha --exclude test/features.js 2> /dev/null && nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
-    "integration": "mocha test/specs/*.js"
+    "integration": "mocha test/specs/*.js",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -37,8 +38,12 @@
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.6",
     "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
     "faker": "^4.1.0",
     "mocha": "^5.2.0",
+    "prettier": "1.19.1",
     "nyc": "^15.1.0",
     "selenium-webdriver": "^4.0.0-alpha.4",
     "serverless-apigw-binary": "^0.4.4",

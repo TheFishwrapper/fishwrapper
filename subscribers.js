@@ -18,12 +18,11 @@
  * Controller class for registering or deleting subscribers.
  */
 class Subscribers {
-
   /*
    * Renders a form to create a new subscriber.
    */
   static new_subscriber(req, dynamoDb, callback) {
-    callback('render', 'subscribers/new');
+    callback("render", "subscribers/new");
   }
 
   /*
@@ -33,19 +32,22 @@ class Subscribers {
     const params = {
       TableName: process.env.SUBSCRIBERS_TABLE,
       Item: {
-        email: req.body.email,
+        email: req.body.email
       }
     };
     if (req.body.phone) {
       params.Item.phone = req.body.phone;
     }
-    dynamoDb.put(params, function (error) {
+    dynamoDb.put(params, function(error) {
       if (error) {
         console.error(error);
-        callback('render', 'error', {error: 'Could not create subscriber. ' +
-          'Make sure a proper email is supplied.'});
+        callback("render", "error", {
+          error:
+            "Could not create subscriber. " +
+            "Make sure a proper email is supplied."
+        });
       } else {
-        callback('redirect', '/');
+        callback("redirect", "/");
       }
     });
   }
@@ -54,7 +56,7 @@ class Subscribers {
    * Renders a form to remove a subscriber.
    */
   static delete(req, dynamoDb, callback) {
-    callback('render', 'subscribers/delete');
+    callback("render", "subscribers/delete");
   }
 
   /*
@@ -67,13 +69,16 @@ class Subscribers {
         email: req.body.email
       }
     };
-    dynamoDb.delete(params, function (err, data) {
+    dynamoDb.delete(params, function(err, data) {
       if (err) {
         console.error(err);
-        callback('render', 'error', {error: 'Could not remove subscriber. ' +
-          'Make sure a proper email is supplied.'});
+        callback("render", "error", {
+          error:
+            "Could not remove subscriber. " +
+            "Make sure a proper email is supplied."
+        });
       } else {
-        callback('redirect', '/');
+        callback("redirect", "/");
       }
     });
   }

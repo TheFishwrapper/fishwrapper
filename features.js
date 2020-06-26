@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Login = require('./login');
+const Login = require("./login");
 
 /*
  * Controller class for featured articles.
  */
 class Features {
-
   /*
    * Renders the index page with all the featured articles.
    * NOTE:
@@ -31,14 +30,15 @@ class Features {
       dynamoDb.scan(params, (error, result) => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('render', 'features/index', 
-            {feats: result.Items.sort((a,b) => a.index - b.index)}); 
+          callback("render", "features/index", {
+            feats: result.Items.sort((a, b) => a.index - b.index)
+          });
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -54,13 +54,13 @@ class Features {
       dynamoDb.scan(params, (error, result) => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('render', 'features/new', {posts: result.Items});
+          callback("render", "features/new", { posts: result.Items });
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -79,16 +79,16 @@ class Features {
           post: req.body.post
         }
       };
-      dynamoDb.put(params, (error) => {
+      dynamoDb.put(params, error => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('redirect', '/features');
+          callback("redirect", "/features");
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -109,29 +109,36 @@ class Features {
       dynamoDb.get(params, (error, result) => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-        if (result.Item) {
-          dynamoDb.scan({TableName: process.env.POSTS_TABLE}, (err, resul) => {
-            if (err) {
-              console.error(err);
-              callback('render', 'error', {error: err});
-            } else {
-              let posts = resul.Items.map(x => {
-                x.sel = x.postId == result.Item.post;
-                return x;
-              });
-              callback('render', 'features/edit', {posts: posts, 
-                feat: result.Item});
-            }
-           });
-        } else {
-          callback('render', 'error', {error: 'Featured article not found'});
-        }
+          if (result.Item) {
+            dynamoDb.scan(
+              { TableName: process.env.POSTS_TABLE },
+              (err, resul) => {
+                if (err) {
+                  console.error(err);
+                  callback("render", "error", { error: err });
+                } else {
+                  let posts = resul.Items.map(x => {
+                    x.sel = x.postId == result.Item.post;
+                    return x;
+                  });
+                  callback("render", "features/edit", {
+                    posts: posts,
+                    feat: result.Item
+                  });
+                }
+              }
+            );
+          } else {
+            callback("render", "error", {
+              error: "Featured article not found"
+            });
+          }
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -148,21 +155,23 @@ class Features {
         Key: {
           index: parseInt(req.body.index, 10)
         },
-        UpdateExpression: 'SET post = :post',
+        UpdateExpression: "SET post = :post",
         ExpressionAttributeValues: {
-          ':post': req.body.post
+          ":post": req.body.post
         }
       };
-      dynamoDb.update(params, (error) => {
+      dynamoDb.update(params, error => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: 'Could not update featured article'});
+          callback("render", "error", {
+            error: "Could not update featured article"
+          });
         } else {
-          callback('redirect', '/features');
+          callback("redirect", "/features");
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -183,13 +192,15 @@ class Features {
       dynamoDb.delete(params, (err, data) => {
         if (err) {
           console.error(err);
-          callback('render', 'error', {error: 'Could not find featured article'});
+          callback("render", "error", {
+            error: "Could not find featured article"
+          });
         } else {
-          callback('redirect', '/features');
+          callback("redirect", "/features");
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 }

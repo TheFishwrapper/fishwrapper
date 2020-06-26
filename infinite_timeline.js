@@ -13,35 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Login = require('./login');
+const Login = require("./login");
 
 /*
  * Controller class for the infinite timeline.
  */
 class InfiniteTimeline {
-
   /*
    * Renders an index page with the current selected stories.
    */
   static index(req, dynamoDb, callback) {
     const params = {
       TableName: process.env.TIME_TABLE,
-      IndexName: 'gsiSelectedTimeline',
-      KeyConditionExpression: '#sel = :selVal',
+      IndexName: "gsiSelectedTimeline",
+      KeyConditionExpression: "#sel = :selVal",
       ExpressionAttributeNames: {
-        '#sel': 'selected'
+        "#sel": "selected"
       },
       ExpressionAttributeValues: {
-        ':selVal': 'x'
+        ":selVal": "x"
       },
       ScanIndexForward: true // Sort by week in ascending order
     };
-    dynamoDb.query(params, function (err, dat) {
+    dynamoDb.query(params, function(err, dat) {
       if (err) {
         console.error(err);
-        callback('render', 'error', {error: err});
+        callback("render", "error", { error: err });
       } else {
-        callback('render', 'infinite_timeline/index', {story: dat.Items});
+        callback("render", "infinite_timeline/index", { story: dat.Items });
       }
     });
   }
@@ -50,7 +49,7 @@ class InfiniteTimeline {
    * Renders a form to create a new submission for the infinite timeline.
    */
   static new_story(req, dynamoDb, callback) {
-    callback('render', 'infinite_timeline/new');
+    callback("render", "infinite_timeline/new");
   }
 
   /*
@@ -59,24 +58,24 @@ class InfiniteTimeline {
    */
   static create(req, dynamoDb, callback) {
     InfiniteTimeline._getWeek(dynamoDb)
-    .then((data) => {
-      const params = {
-        TableName: process.env.TIME_TABLE,
-        Item: {
-          id: Date.now(),
-          content: req.body.content,
-          week: parseInt(data.Item.value, 10),
-        }
-      };
-      return dynamoDb.put(params).promise();
-    })
-    .then(() => {
-      callback('redirect', '/infinite_timeline');
-    })
-    .catch((err) => {
-      console.error(err);
-      callback('render', 'error', {error: err});
-    });
+      .then(data => {
+        const params = {
+          TableName: process.env.TIME_TABLE,
+          Item: {
+            id: Date.now(),
+            content: req.body.content,
+            week: parseInt(data.Item.value, 10)
+          }
+        };
+        return dynamoDb.put(params).promise();
+      })
+      .then(() => {
+        callback("redirect", "/infinite_timeline");
+      })
+      .catch(err => {
+        console.error(err);
+        callback("render", "error", { error: err });
+      });
   }
 
   /*
@@ -93,28 +92,30 @@ class InfiniteTimeline {
       };
       let second = dynamoDb.scan(params).promise();
       Promise.all([first, second])
-      .then(([w, data]) => {
-        let week;
-        // If given a number week use that
-        if (req.query.week && !isNaN(req.query.week)) {
-          week = req.query.week;
-        // Otherwise use the current week from the database
-        } else {
-          week = w.Item.value;
-        }
-        // Filter all timeline entries to the correct week
-        let timeline = data.Items.filter(x => {
-          return parseInt(x.week) === parseInt(week);
+        .then(([w, data]) => {
+          let week;
+          // If given a number week use that
+          if (req.query.week && !isNaN(req.query.week)) {
+            week = req.query.week;
+            // Otherwise use the current week from the database
+          } else {
+            week = w.Item.value;
+          }
+          // Filter all timeline entries to the correct week
+          let timeline = data.Items.filter(x => {
+            return parseInt(x.week) === parseInt(week);
+          });
+          callback("render", "infinite_timeline/edit", {
+            story: timeline,
+            week: week
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
         });
-        callback('render', 'infinite_timeline/edit', {story: timeline,
-          week: week});
-      })
-      .catch((error) => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -126,30 +127,36 @@ class InfiniteTimeline {
    */
   static update(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      dynamoDb.scan({TableName: process.env.TIME_TABLE}).promise()
-      .then((data) => {
-        // Get the stories from the appropriate week
-        let stories = data.Items.filter(x => {
-          return parseInt(x.week) === parseInt(req.body.week);
+      dynamoDb
+        .scan({ TableName: process.env.TIME_TABLE })
+        .promise()
+        .then(data => {
+          // Get the stories from the appropriate week
+          let stories = data.Items.filter(x => {
+            return parseInt(x.week) === parseInt(req.body.week);
+          });
+          // Mark the selected story as selected and all others as unselected
+          const story = parseInt(req.body.story, 10);
+          let prom = stories.map(x => {
+            return InfiniteTimeline._selectStory(
+              x.id,
+              x.id === story,
+              dynamoDb
+            );
+          });
+          return Promise.all(prom);
+        })
+        .then(x => {
+          callback("redirect", "/infinite_timeline");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
         });
-        // Mark the selected story as selected and all others as unselected
-        const story = parseInt(req.body.story, 10);
-        let prom = stories.map(x => {
-          return InfiniteTimeline._selectStory(x.id, (x.id === story),
-            dynamoDb);
-        });
-        return Promise.all(prom);
-      }).then(x => {
-        callback('redirect', '/infinite_timeline');
-      }).catch((error) => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
-
 
   /*
    * Renders a form to change the week value for submissions.
@@ -159,14 +166,15 @@ class InfiniteTimeline {
   static changeWeek(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
       InfiniteTimeline._getWeek(dynamoDb)
-      .then(w => {
-        callback('render', 'infinite_timeline/week', {week: w.Item.value});
-      }).catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
+        .then(w => {
+          callback("render", "infinite_timeline/week", { week: w.Item.value });
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
+        });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -181,26 +189,26 @@ class InfiniteTimeline {
       const params = {
         TableName: process.env.GLOBAL_TABLE,
         Key: {
-          key: 'TimelineWeek'
+          key: "TimelineWeek"
         },
-        UpdateExpression: 'Set #value = :val',
+        UpdateExpression: "Set #value = :val",
         ExpressionAttributeNames: {
-            '#value': 'value',
+          "#value": "value"
         },
         ExpressionAttributeValues: {
-          ':val': parseInt(req.body.week, 10)
+          ":val": parseInt(req.body.week, 10)
         }
       };
-      dynamoDb.update(params, function (error, data) {
+      dynamoDb.update(params, function(error, data) {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('redirect', '/infinite_timeline');
+          callback("redirect", "/infinite_timeline");
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -212,27 +220,31 @@ class InfiniteTimeline {
    */
   static clean(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      dynamoDb.scan({TableName: process.env.TIME_TABLE}).promise()
-      .then(data => {
-        let stories = data.Items.filter(x => !x.selected);
-        stories = stories.map(x => {
-          const params = {
-            TableName: process.env.TIME_TABLE,
-            Key: {
-              id: x.id
-            }
-          };
-          return dynamoDb.delete(params).promise();
+      dynamoDb
+        .scan({ TableName: process.env.TIME_TABLE })
+        .promise()
+        .then(data => {
+          let stories = data.Items.filter(x => !x.selected);
+          stories = stories.map(x => {
+            const params = {
+              TableName: process.env.TIME_TABLE,
+              Key: {
+                id: x.id
+              }
+            };
+            return dynamoDb.delete(params).promise();
+          });
+          return Promise.all(stories);
+        })
+        .then(() => {
+          callback("redirect", "/infinite_timeline");
+        })
+        .catch(error => {
+          console.error(error);
+          callback("render", "error", { error: error });
         });
-        return Promise.all(stories);
-      }).then(() => {
-        callback('redirect', '/infinite_timeline');
-      }).catch(error => {
-        console.error(error);
-        callback('render', 'error', {error: error});
-      });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -243,23 +255,25 @@ class InfiniteTimeline {
   static _selectStory(id, selected, dynamoDb) {
     let params;
     if (selected) {
-      params = { // Mark the story as selected
+      params = {
+        // Mark the story as selected
         TableName: process.env.TIME_TABLE,
         Key: {
           id: id
         },
-        UpdateExpression: 'SET selected = :val',
+        UpdateExpression: "SET selected = :val",
         ExpressionAttributeValues: {
-          ':val': 'x'
+          ":val": "x"
         }
       };
     } else {
-      params = { // Unselect the story
+      params = {
+        // Unselect the story
         TableName: process.env.TIME_TABLE,
         Key: {
           id: id
         },
-        UpdateExpression: 'REMOVE selected'
+        UpdateExpression: "REMOVE selected"
       };
     }
     return dynamoDb.update(params).promise();
@@ -272,7 +286,7 @@ class InfiniteTimeline {
     const params = {
       TableName: process.env.GLOBAL_TABLE,
       Key: {
-        key: 'TimelineWeek'
+        key: "TimelineWeek"
       }
     };
     return dynamoDb.get(params).promise();

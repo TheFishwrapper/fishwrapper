@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const should = require('chai').should();
-const sinon = require('sinon');
-const dotenv = require('dotenv');
-const faker = require('faker');
-const Issues = require('../issues');
+const should = require("chai").should();
+const sinon = require("sinon");
+const dotenv = require("dotenv");
+const faker = require("faker");
+const Issues = require("../issues");
 
-const result = dotenv.config(
-  { path: process.cwd() + '/test/.env' });
+const result = dotenv.config({ path: process.cwd() + "/test/.env" });
 if (result.error) {
   throw result.error;
 }
@@ -33,10 +32,10 @@ let req = {
 
 let db = {
   scan: function(params, callback) {
-    throw new Error('Use stub instead');
+    throw new Error("Use stub instead");
   },
   get: function(params, callback) {
-    throw new Error('Use stub instead');
+    throw new Error("Use stub instead");
   },
   put: function(params, callback) {
     callback(null); // no error
@@ -49,7 +48,7 @@ let db = {
   }
 };
 
-describe('Issues', () => {
+describe("Issues", () => {
   beforeEach(() => {
     req.signedCookies = [];
     req.params = [];
@@ -60,8 +59,8 @@ describe('Issues', () => {
     // Restore the default sandbox here
     sinon.restore();
   });
-  describe('#index()', () => {
-    it('should render the index page', (done) => {
+  describe("#index()", () => {
+    it("should render the index page", done => {
       const result = {
         TableName: process.env.ISSUE_TABLE,
         Items: [1, 2, 3, 4]
@@ -73,17 +72,17 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'scan').returns(scanPromise);
+      sinon.stub(db, "scan").returns(scanPromise);
 
       Issues.index(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('issues/index');
+        action.should.equal("render");
+        page.should.equal("issues/index");
         obj.issues.should.equal(result.Items);
         done();
       });
     });
-    it('should render an error on database error', (done) => {
-      const error = new Error('some failure');
+    it("should render an error on database error", done => {
+      const error = new Error("some failure");
       const scanPromise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -91,23 +90,23 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'scan').returns(scanPromise);
+      sinon.stub(db, "scan").returns(scanPromise);
 
       Issues.index(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
   });
-  describe('#show()', () => {
-    it('should display a specific issue', (done) => {
+  describe("#show()", () => {
+    it("should display a specific issue", done => {
       const result = {
         TableName: process.env.ISSUE_TABLE,
         Item: {
-          issueId: 'test-id',
-          link: 'blank'
+          issueId: "test-id",
+          link: "blank"
         }
       };
       const promise = {
@@ -118,19 +117,19 @@ describe('Issues', () => {
         }
       };
       req.params.issueId = result.Item.issueId;
-      sinon.stub(db, 'get').returns(promise);
+      sinon.stub(db, "get").returns(promise);
 
       Issues.show(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('issues/show');
-        obj.should.have.property('issue');
+        action.should.equal("render");
+        page.should.equal("issues/show");
+        obj.should.have.property("issue");
         obj.issue.issueId.should.equal(result.Item.issueId);
         obj.issue.link.should.equal(result.Item.link);
         done();
       });
     });
-    it('should render an error on some error', (done) => {
-      const error = new Error('some error');
+    it("should render an error on some error", done => {
+      const error = new Error("some error");
       const promise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -138,47 +137,47 @@ describe('Issues', () => {
           });
         }
       };
-      req.params.issueId = 'test-id';
-      sinon.stub(db, 'get').returns(promise);
+      req.params.issueId = "test-id";
+      sinon.stub(db, "get").returns(promise);
 
       Issues.show(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
   });
-  describe('#new_issue()', () => {
-    it('should require a login', (done) => {
+  describe("#new_issue()", () => {
+    it("should require a login", done => {
       Issues.new_issue(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
-    it('should render a form for a new submission', (done) => {
+    it("should render a form for a new submission", done => {
       req.signedCookies.id_token = 1;
 
       Issues.new_issue(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('issues/new');
+        action.should.equal("render");
+        page.should.equal("issues/new");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#create()', () => {
-    it('should require a login', (done) => {
+  describe("#create()", () => {
+    it("should require a login", done => {
       Issues.create(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
-    it('should redirect on success', (done) => {
+    it("should redirect on success", done => {
       const putPromise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -186,20 +185,20 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'put').returns(putPromise);
+      sinon.stub(db, "put").returns(putPromise);
 
-      req.file.location = '/dev/null/';
+      req.file.location = "/dev/null/";
       req.signedCookies.id_token = 1;
 
       Issues.create(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/issues');
+        action.should.equal("redirect");
+        page.should.equal("/issues");
         should.not.exist(obj);
         done();
       });
     });
-    it('should render an error when an error occurs', (done) => {
-      const error = new Error('some failure');
+    it("should render an error when an error occurs", done => {
+      const error = new Error("some failure");
       const putPromise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -207,28 +206,28 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'put').returns(putPromise);
+      sinon.stub(db, "put").returns(putPromise);
 
-      req.file.location = '/dev/null/';
+      req.file.location = "/dev/null/";
       req.signedCookies.id_token = 1;
 
       Issues.create(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
   });
-  describe('#edit()', () => {
-    it('should render the edit form', (done) => {
+  describe("#edit()", () => {
+    it("should render the edit form", done => {
       req.signedCookies.id_token = 1;
 
       const result = {
         TableName: process.env.ISSUE_TABLE,
         Item: {
-          issueId: 'test-id',
-          link: '/dev/null'
+          issueId: "test-id",
+          link: "/dev/null"
         }
       };
       const promise = {
@@ -238,19 +237,19 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'get').returns(promise);
+      sinon.stub(db, "get").returns(promise);
 
       Issues.edit(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('issues/edit');
+        action.should.equal("render");
+        page.should.equal("issues/edit");
         obj.issue.should.equal(result.Item);
         done();
       });
     });
-    it('should render an error', (done) => {
+    it("should render an error", done => {
       req.signedCookies.id_token = 1;
 
-      const error = new Error('Some error');
+      const error = new Error("Some error");
       const promise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -258,29 +257,29 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'get').returns(promise);
+      sinon.stub(db, "get").returns(promise);
 
       Issues.edit(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
-    it('should require a login', (done) => {
+    it("should require a login", done => {
       Issues.edit(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#update()', () => {
-    it('should update the issue', (done) => {
+  describe("#update()", () => {
+    it("should update the issue", done => {
       req.signedCookies.id_token = 1;
-      req.body.issueId = 'fake-id';
-      req.file.location = '/dev/null/';
+      req.body.issueId = "fake-id";
+      req.file.location = "/dev/null/";
 
       const promise = {
         promise: function() {
@@ -289,31 +288,31 @@ describe('Issues', () => {
           });
         }
       };
-      let spy = sinon.stub(db, 'update').returns(promise);
+      let spy = sinon.stub(db, "update").returns(promise);
 
       const expectedUpdate = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.body.issueId,
+          issueId: req.body.issueId
         },
-        UpdateExpression: 'SET link = :link',
+        UpdateExpression: "SET link = :link",
         ExpressionAttributeValues: {
-          ':link': req.file.location,
+          ":link": req.file.location
         }
       };
 
       Issues.update(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/issues');
+        action.should.equal("redirect");
+        page.should.equal("/issues");
         should.not.exist(obj);
         spy.calledOnceWithExactly(sinon.match(expectedUpdate)).should.be.true;
         done();
       });
     });
-    it('should render an error', (done) => {
+    it("should render an error", done => {
       req.signedCookies.id_token = 1;
 
-      const error = new Error('Some error');
+      const error = new Error("Some error");
       const promise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -321,34 +320,34 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'update').returns(promise);
+      sinon.stub(db, "update").returns(promise);
 
       Issues.update(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
-    it('should require a login', (done) => {
+    it("should require a login", done => {
       Issues.update(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#destroy()', () => {
-    it('should require a login', (done) => {
+  describe("#destroy()", () => {
+    it("should require a login", done => {
       Issues.destroy(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
-    it('should redirect on success', (done) => {
+    it("should redirect on success", done => {
       req.signedCookies.id_token = 1;
 
       const promise = {
@@ -358,19 +357,19 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'delete').returns(promise);
+      sinon.stub(db, "delete").returns(promise);
 
       Issues.destroy(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/issues');
+        action.should.equal("redirect");
+        page.should.equal("/issues");
         should.not.exist(obj);
         done();
       });
     });
-    it('should render an error', (done) => {
+    it("should render an error", done => {
       req.signedCookies.id_token = 1;
 
-      const error = new Error('Some error');
+      const error = new Error("Some error");
       const promise = {
         promise: function() {
           return new Promise((resolve, reject) => {
@@ -378,11 +377,11 @@ describe('Issues', () => {
           });
         }
       };
-      sinon.stub(db, 'delete').returns(promise);
+      sinon.stub(db, "delete").returns(promise);
 
       Issues.destroy(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });

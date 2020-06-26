@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const dotenv = require('dotenv');
-const faker = require('faker');
-const AWS = require('aws-sdk');
+const dotenv = require("dotenv");
+const faker = require("faker");
+const AWS = require("aws-sdk");
 
-const result = dotenv.config(
-  { path: process.cwd() + '/test/.env' });
+const result = dotenv.config({ path: process.cwd() + "/test/.env" });
 if (result.error) {
   throw result.error;
 }
 
 const db = new AWS.DynamoDB.DocumentClient({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000'
+  region: "localhost",
+  endpoint: "http://localhost:8000"
 });
 
 const title = faker.lorem.sentence();
-const videoId = title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-');
+const videoId = title
+  .toLocaleLowerCase()
+  .substr(0, 20)
+  .replace(/\s/g, "-");
 const link = faker.internet.url();
 
 class VideosDB {
-
   static get videoId() {
     return videoId;
   }

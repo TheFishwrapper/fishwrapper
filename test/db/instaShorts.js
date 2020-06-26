@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const dotenv = require('dotenv');
-const faker = require('faker');
-const AWS = require('aws-sdk');
+const dotenv = require("dotenv");
+const faker = require("faker");
+const AWS = require("aws-sdk");
 
 const result = dotenv.config();
 if (result.error) {
@@ -23,15 +23,14 @@ if (result.error) {
 }
 
 const db = new AWS.DynamoDB.DocumentClient({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000'
+  region: "localhost",
+  endpoint: "http://localhost:8000"
 });
 
 const instaId = faker.internet.userName();
 const content = faker.lorem.sentence();
 
 class InstaShortsDB {
-
   static get instaId() {
     return instaId;
   }

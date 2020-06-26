@@ -1,15 +1,15 @@
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const instaDb = require('../db/instaShorts');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const instaDb = require("../db/instaShorts");
 
 let driver;
 
-describe('insta shorts', function() {
+describe("insta shorts", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -22,15 +22,17 @@ describe('insta shorts', function() {
       throw error;
     }
   });
-  it('should display the insta short', async function() {
+  it("should display the insta short", async function() {
     this.timeout(0);
     try {
       await instaDb.putExample();
-      await driver.get('http://localhost:3000');
-      let frame = await driver.findElement(By.xpath("//*[@id=\"carousel-2\"]"));
+      await driver.get("http://localhost:3000");
+      let frame = await driver.findElement(By.xpath('//*[@id="carousel-2"]'));
       frame.isDisplayed();
 
-      let short = await driver.findElement(By.xpath("//*[@id=\"carousel-2\"]/div/div/a/p")).getText();
+      let short = await driver
+        .findElement(By.xpath('//*[@id="carousel-2"]/div/div/a/p'))
+        .getText();
       short.should.equal(instaDb.content);
 
       await instaDb.deleteExample();
@@ -39,5 +41,4 @@ describe('insta shorts', function() {
       throw error;
     }
   });
-
 });

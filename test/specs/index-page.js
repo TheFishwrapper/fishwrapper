@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
 
 let driver;
 
-describe('IndexPage', function() {
+describe("IndexPage", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -36,11 +36,11 @@ describe('IndexPage', function() {
       throw error;
     }
   });
-  it('should have a correct subtitle', async function() {
+  it("should have a correct subtitle", async function() {
     this.timeout(0);
     try {
-      await driver.get('http://localhost:3000');
-      const subtitle = await driver.findElement(By.id('subtitle')).getText();
+      await driver.get("http://localhost:3000");
+      const subtitle = await driver.findElement(By.id("subtitle")).getText();
 
       subtitle.should.equal("It's all irrelevant.");
     } catch (error) {
@@ -48,13 +48,13 @@ describe('IndexPage', function() {
       throw error;
     }
   });
-  it('should have a correct contact', async function() {
+  it("should have a correct contact", async function() {
     this.timeout(0);
     try {
-      await driver.get('http://localhost:3000');
-      const contact = await driver.findElement(By.css('footer p')).getText();
+      await driver.get("http://localhost:3000");
+      const contact = await driver.findElement(By.css("footer p")).getText();
 
-      contact.should.equal('Contact us: editorial@thefishwrapper.news');
+      contact.should.equal("Contact us: editorial@thefishwrapper.news");
     } catch (error) {
       console.error(error);
       throw error;

@@ -1,22 +1,21 @@
-const Login = require('./login');
-const markdown = require('markdown').markdown;
+const Login = require("./login");
+const markdown = require("markdown").markdown;
 
 /*
  * Controller class for crossword objects.
  */
 class Crosswords {
-
   /*
    * Renders an index page with all the crossword objects.
    */
   static index(req, dynamoDb, callback) {
-    const params = {TableName: process.env.CROSS_TABLE};
+    const params = { TableName: process.env.CROSS_TABLE };
     dynamoDb.scan(params, (error, result) => {
       if (error) {
         console.error(error);
-        callback('render', 'error', {error: error});
+        callback("render", "error", { error: error });
       } else {
-        callback('render', 'crosswords/index', {crosswords: result.Items});
+        callback("render", "crosswords/index", { crosswords: result.Items });
       }
     });
   }
@@ -34,10 +33,10 @@ class Crosswords {
     dynamoDb.get(params, (error, result) => {
       if (error) {
         console.error(error);
-        callback('render', 'error', {error: error});
+        callback("render", "error", { error: error });
       } else {
         result.Item.solution = markdown.toHTML(result.Item.solution);
-        callback('render', 'crosswords/show', {crossword: result.Item});
+        callback("render", "crosswords/show", { crossword: result.Item });
       }
     });
   }
@@ -49,9 +48,9 @@ class Crosswords {
    */
   static new_cross(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      callback('render', 'crosswords/new');
+      callback("render", "crosswords/new");
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -63,27 +62,30 @@ class Crosswords {
   static create(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
       if (!req.body.title) {
-        callback('render', 'error', {error: 'Title is missing'});
+        callback("render", "error", { error: "Title is missing" });
       } else {
         const params = {
           TableName: process.env.CROSS_TABLE,
           Item: {
-            crossId: req.body.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
+            crossId: req.body.title
+              .toLocaleLowerCase()
+              .substr(0, 20)
+              .replace(/\s/g, "-"),
             title: req.body.title,
             solution: req.body.solution
           }
         };
-        dynamoDb.put(params, (error) => {
+        dynamoDb.put(params, error => {
           if (error) {
             console.error(error);
-            callback('render', 'error', {error: error});
+            callback("render", "error", { error: error });
           } else {
-            callback('redirect', '/crosswords');
+            callback("redirect", "/crosswords");
           }
         });
       }
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -102,13 +104,13 @@ class Crosswords {
       };
       dynamoDb.get(params, (error, result) => {
         if (error) {
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('render', 'crosswords/edit', {crossword: result.Item});
+          callback("render", "crosswords/edit", { crossword: result.Item });
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -124,22 +126,22 @@ class Crosswords {
         Key: {
           crossId: req.body.crossId
         },
-        UpdateExpression: 'SET solution = :solution, title = :title',
+        UpdateExpression: "SET solution = :solution, title = :title",
         ExpressionAttributeValues: {
-          ':solution': req.body.solution,
-          ':title': req.body.title
+          ":solution": req.body.solution,
+          ":title": req.body.title
         }
       };
-      dynamoDb.update(params, (error) => {
+      dynamoDb.update(params, error => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('redirect', '/crosswords');
+          callback("redirect", "/crosswords");
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 
@@ -156,16 +158,16 @@ class Crosswords {
           crossId: req.params.crossId
         }
       };
-      dynamoDb.delete(params, (error) => {
+      dynamoDb.delete(params, error => {
         if (error) {
           console.error(error);
-          callback('render', 'error', {error: error});
+          callback("render", "error", { error: error });
         } else {
-          callback('redirect', '/crosswords');
+          callback("redirect", "/crosswords");
         }
       });
     } else {
-      callback('redirect', '/login');
+      callback("redirect", "/login");
     }
   }
 }
