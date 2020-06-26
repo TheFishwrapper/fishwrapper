@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const db = require('../db/login.js');
+const firefox = require("selenium-webdriver/firefox");
+const db = require("../db/login.js");
 
 const options = new firefox.Options();
 options.addArguments("-headless");
 
 class LoginHelper {
-
   static async login(driver) {
     await db.putExample();
-    await driver.get('http://localhost:3000/login');
-    await driver.findElement(By.name('username')).sendKeys(db.username);
-    await driver.findElement(By.name('password')).sendKeys(db.password);
-    await driver.findElement(By.id('submit-form')).click();
-    await driver.wait(until.urlIs('http://localhost:3000/'));
+    await driver.get("http://localhost:3000/login");
+    await driver.findElement(By.name("username")).sendKeys(db.username);
+    await driver.findElement(By.name("password")).sendKeys(db.password);
+    await driver.findElement(By.id("submit-form")).click();
+    await driver.wait(until.urlIs("http://localhost:3000/"));
   }
 
   static async logout(driver) {
-    await driver.get('http://localhost:3000/logout');
+    await driver.get("http://localhost:3000/logout");
   }
 }
 

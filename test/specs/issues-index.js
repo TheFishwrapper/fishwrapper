@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/issues.js');
-const faker = require('faker');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/issues.js");
+const faker = require("faker");
 
 let driver;
 
-describe('IssuesIndex', function() {
+describe("IssuesIndex", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -37,36 +37,38 @@ describe('IssuesIndex', function() {
       throw error;
     }
   });
-  it('should have a correct title', async function() {
+  it("should have a correct title", async function() {
     this.timeout(0);
     try {
-      driver.get('http://localhost:3000/issues');
-      let title = await driver.findElement(By.xpath('/html/body/main/h1'))
+      driver.get("http://localhost:3000/issues");
+      let title = await driver
+        .findElement(By.xpath("/html/body/main/h1"))
         .getText();
 
-      title.should.equal('Issues');
-    } catch(error) {
-      console.error('Error: ' + error);
+      title.should.equal("Issues");
+    } catch (error) {
+      console.error("Error: " + error);
       should.fail();
     }
   });
-  it('should display an issue', async function() {
+  it("should display an issue", async function() {
     this.timeout(0);
     try {
       const fakeLink = faker.internet.url();
       await db.put(1, fakeLink);
-      driver.get('http://localhost:3000/issues');
+      driver.get("http://localhost:3000/issues");
 
-      let storyCount = await driver.findElements(By.className('issue'));
-      let title = await driver.findElement(
-        By.xpath('/html/body/main/div/div[1]/h3/a')).getText();
+      let storyCount = await driver.findElements(By.className("issue"));
+      let title = await driver
+        .findElement(By.xpath("/html/body/main/div/div[1]/h3/a"))
+        .getText();
 
-      title.should.equal('Issue #1');
+      title.should.equal("Issue #1");
       storyCount.length.should.equal(1);
 
       await db.delete(1);
-    } catch(error) {
-      console.error('Error: ' + error);
+    } catch (error) {
+      console.error("Error: " + error);
       throw error;
     }
   });

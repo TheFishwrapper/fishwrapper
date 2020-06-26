@@ -13,53 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/videos.js');
-const Login = require('../lib/login.js');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/videos.js");
+const Login = require("../lib/login.js");
 
 let driver;
 
-describe('VideoNew', function() {
+describe("VideoNew", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
   afterEach(async function() {
     this.timeout(0);
-    try {
-      await driver.quit();
-    } catch (error) {
-      throw error;
-    }
+    await driver.quit();
   });
-  it('should require login', async function() {
+  it("should require login", async function() {
     this.timeout(0);
     try {
-      await driver.get('http://localhost:3000/videos/new');
-      await driver.wait(until.urlContains('/login'));
+      await driver.get("http://localhost:3000/videos/new");
+      await driver.wait(until.urlContains("/login"));
 
       const url = await driver.getCurrentUrl();
-      url.should.equal('http://localhost:3000/login');
+      url.should.equal("http://localhost:3000/login");
     } catch (error) {
       console.error(error);
       should.fail();
     }
   });
-  it('should create a video', async function() {
+  it("should create a video", async function() {
     this.timeout(0);
     try {
       await Login.login(driver);
-      await driver.get('http://localhost:3000/videos/new');
+      await driver.get("http://localhost:3000/videos/new");
 
-      await driver.findElement(By.name('title')).sendKeys(db.title);
-      await driver.findElement(By.name('link')).sendKeys(db.link);
-      await driver.findElement(By.id('form-submit')).click();
+      await driver.findElement(By.name("title")).sendKeys(db.title);
+      await driver.findElement(By.name("link")).sendKeys(db.link);
+      await driver.findElement(By.id("form-submit")).click();
 
       // Ensure that a db Item was created with the matching data
       const item = await db.getExample();

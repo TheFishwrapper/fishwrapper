@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/infinite.js');
-const faker = require('faker');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/infinite.js");
+const faker = require("faker");
 
 let driver;
 
-describe('InfiniteTimelineIndex', function() {
+describe("InfiniteTimelineIndex", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -37,37 +37,40 @@ describe('InfiniteTimelineIndex', function() {
       throw error;
     }
   });
-  it('should have a correct title', async function() {
+  it("should have a correct title", async function() {
     this.timeout(0);
     try {
-      driver.get('http://localhost:3000/infinite_timeline');
-      let title = await driver.findElement(By.css('main h1')).getText();
-      let subhead = await driver.findElement(By.css('main h6')).getText();
+      driver.get("http://localhost:3000/infinite_timeline");
+      let title = await driver.findElement(By.css("main h1")).getText();
+      let subhead = await driver.findElement(By.css("main h6")).getText();
 
-      title.should.equal('Infinite Timeline');
-      subhead.should.equal('A collaborative story produced by readers like'
-        + ' you.');
-    } catch(error) {
-      console.error('Error: ' + error);
+      title.should.equal("Infinite Timeline");
+      subhead.should.equal(
+        "A collaborative story produced by readers like" + " you."
+      );
+    } catch (error) {
+      console.error("Error: " + error);
       should.fail();
     }
   });
-  it('should display the timeline', async function() {
+  it("should display the timeline", async function() {
     this.timeout(0);
     try {
       const word1 = faker.lorem.word();
       const word2 = faker.lorem.word();
       const word3 = faker.lorem.word();
-      await db.put(1, word1, 1, 'x');
+      await db.put(1, word1, 1, "x");
       await db.put(2, word2, 1);
-      await db.put(3, word3, 2, 'x');
-      driver.get('http://localhost:3000/infinite_timeline');
+      await db.put(3, word3, 2, "x");
+      driver.get("http://localhost:3000/infinite_timeline");
 
-      let storyCount = await driver.findElements(By.css('#stories p'));
-      let text1 = await driver.findElement(By.xpath(
-        '//main/div/p[1]')).getText();
-      let text2 = await driver.findElement(By.xpath(
-        '//main/div/p[2]')).getText();
+      let storyCount = await driver.findElements(By.css("#stories p"));
+      let text1 = await driver
+        .findElement(By.xpath("//main/div/p[1]"))
+        .getText();
+      let text2 = await driver
+        .findElement(By.xpath("//main/div/p[2]"))
+        .getText();
 
       text1.should.equal(word1);
       text2.should.equal(word3);
@@ -76,8 +79,8 @@ describe('InfiniteTimelineIndex', function() {
       await db.delete(1);
       await db.delete(2);
       await db.delete(3);
-    } catch(error) {
-      console.error('Error: ' + error);
+    } catch (error) {
+      console.error("Error: " + error);
       throw error;
     }
   });

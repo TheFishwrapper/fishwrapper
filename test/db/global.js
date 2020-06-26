@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const dotenv = require('dotenv');
-const faker = require('faker');
-const AWS = require('aws-sdk');
+const dotenv = require("dotenv");
+const faker = require("faker");
+const AWS = require("aws-sdk");
 
-const result = dotenv.config(
-  { path: process.cwd() + '/test/.env' });
+const result = dotenv.config({ path: process.cwd() + "/test/.env" });
 if (result.error) {
   throw result.error;
 }
 
 const db = new AWS.DynamoDB.DocumentClient({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000'
+  region: "localhost",
+  endpoint: "http://localhost:8000"
 });
 
-const key = 'TimelineWeek';
+const key = "TimelineWeek";
 const week = 1;
 
 class GlobalDB {
-
   static get key() {
     return key;
   }
@@ -46,7 +44,7 @@ class GlobalDB {
       TableName: process.env.GLOBAL_TABLE,
       Item: {
         key: key,
-        value: week,
+        value: week
       }
     };
     return db.put(params).promise();

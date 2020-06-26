@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const should = require('chai').should();
-const faker = require('faker');
-const sinon = require('sinon');
-const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs');
-const Login = require('../login');
+const should = require("chai").should();
+const faker = require("faker");
+const sinon = require("sinon");
+const dotenv = require("dotenv");
+const bcrypt = require("bcryptjs");
+const Login = require("../login");
 
-const result = dotenv.config(
-  { path: process.cwd() + '/test/.env' });
+const result = dotenv.config({ path: process.cwd() + "/test/.env" });
 if (result.error) {
   throw result.error;
 }
@@ -32,11 +31,11 @@ let req = {
 
 let db = {
   get: function(params, callback) {
-    throw new Error('Use stub instead');
+    throw new Error("Use stub instead");
   }
 };
 
-describe('Login', () => {
+describe("Login", () => {
   beforeEach(() => {
     req.signedCookies = [];
     req.params = [];
@@ -46,18 +45,18 @@ describe('Login', () => {
     // Restore the default sandbox here
     sinon.restore();
   });
-  describe('#show()', () => {
-    it('should display the login page', (done) => {
+  describe("#show()", () => {
+    it("should display the login page", done => {
       Login.show(req, null, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('login');
+        action.should.equal("render");
+        page.should.equal("login");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#attempt()', () => {
-    it('should redirect and set a cookie on success', (done) => {
+  describe("#attempt()", () => {
+    it("should redirect and set a cookie on success", done => {
       req.body = {
         username: faker.internet.userName(),
         password: faker.internet.password()
@@ -70,20 +69,20 @@ describe('Login', () => {
           password: bcrypt.hashSync(req.body.password)
         }
       };
-      sinon.stub(db, 'get').yields(null, result);
+      sinon.stub(db, "get").yields(null, result);
 
       Login.attempt(req, db, (action, page, obj) => {
-        action.should.equal('cookie');
-        page.should.equal('/');
-        obj.cookie.should.equal('id_token');
-        obj.should.have.property('value');
+        action.should.equal("cookie");
+        page.should.equal("/");
+        obj.cookie.should.equal("id_token");
+        obj.should.have.property("value");
         obj.options.signed.should.equal(true);
         obj.options.httpOnly.should.equal(true);
-        obj.options.sameSite.should.equal('strict');
+        obj.options.sameSite.should.equal("strict");
         done();
       });
     });
-    it('should render an error on invalid password', (done) => {
+    it("should render an error on invalid password", done => {
       req.body = {
         username: faker.internet.userName(),
         password: faker.internet.password()
@@ -96,54 +95,54 @@ describe('Login', () => {
           password: bcrypt.hashSync(faker.internet.password())
         }
       };
-      sinon.stub(db, 'get').yields(null, result);
+      sinon.stub(db, "get").yields(null, result);
 
       Login.attempt(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.error.should.equal('Incorrect password or username');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.error.should.equal("Incorrect password or username");
         done();
       });
     });
-    it('should render an error on invalid username', (done) => {
+    it("should render an error on invalid username", done => {
       req.body = {
         username: faker.internet.userName(),
         password: faker.internet.password()
       };
 
-      sinon.stub(db, 'get').yields(null, {});
+      sinon.stub(db, "get").yields(null, {});
 
       Login.attempt(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.error.should.equal('User not found');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.error.should.equal("User not found");
         done();
       });
     });
-    it('should render an error on invalid params', (done) => {
+    it("should render an error on invalid params", done => {
       req.body = {
         username: faker.random.number(),
         password: faker.internet.password()
       };
 
-      sinon.stub(db, 'get').yields(new Error(), null);
+      sinon.stub(db, "get").yields(new Error(), null);
 
       Login.attempt(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.should.have.property('error');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.should.have.property("error");
         done();
       });
     });
   });
-  describe('#logout()', () => {
-    it('should clear id_token and redirect to index', (done) => {
+  describe("#logout()", () => {
+    it("should clear id_token and redirect to index", done => {
       Login.logout(req, null, (action, page, obj) => {
-        action.should.equal('cookie');
-        page.should.equal('/');
-        obj.cookie.should.equal('id_token');
-        obj.value.should.equal('');
-        obj.options.should.have.property('expires');
+        action.should.equal("cookie");
+        page.should.equal("/");
+        obj.cookie.should.equal("id_token");
+        obj.value.should.equal("");
+        obj.options.should.have.property("expires");
         done();
       });
     });

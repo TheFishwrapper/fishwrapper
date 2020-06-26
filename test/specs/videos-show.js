@@ -13,40 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/videos.js');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/videos.js");
 
 let driver;
 
-describe('VideoShow', function() {
+describe("VideoShow", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
   afterEach(async function() {
     this.timeout(0);
-    try {
-      await driver.quit();
-    } catch (error) {
-      throw error;
-    }
+    await driver.quit();
   });
-  it('should display a video', async function() {
+  it("should display a video", async function() {
     this.timeout(0);
     try {
       await db.putExample();
-      await driver.get('http://localhost:3000/videos/' + db.videoId);
+      await driver.get("http://localhost:3000/videos/" + db.videoId);
 
-      const title = await driver.findElement(By.xpath('//main/div/div[1]/h1'))
+      const title = await driver
+        .findElement(By.xpath("//main/div/div[1]/h1"))
         .getText();
-      const link = await driver.findElement(By.xpath(
-        '//main/div[@class="row"]/div[2]')).getText();
+      const link = await driver
+        .findElement(By.xpath('//main/div[@class="row"]/div[2]'))
+        .getText();
 
       title.should.equal(db.title);
       link.should.equal(db.link);

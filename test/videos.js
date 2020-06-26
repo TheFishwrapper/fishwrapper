@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const should = require('chai').should();
-const sinon = require('sinon');
-const dotenv = require('dotenv');
-const faker = require('faker');
-const Videos = require('../videos');
+const should = require("chai").should();
+const sinon = require("sinon");
+const dotenv = require("dotenv");
+const faker = require("faker");
+const Videos = require("../videos");
 
-const result = dotenv.config(
-  { path: process.cwd() + '/test/.env' });
+const result = dotenv.config({ path: process.cwd() + "/test/.env" });
 if (result.error) {
   throw result.error;
 }
@@ -31,11 +30,11 @@ let req = {
 };
 
 let db = {
-  scan: function(params, callback) {
-    throw new Error('Use stub instead');
+  scan: function() {
+    throw new Error("Use stub instead");
   },
-  get: function(params, callback) {
-    throw new Error('Use stub instead');
+  get: function() {
+    throw new Error("Use stub instead");
   },
   put: function(params, callback) {
     callback(null); // no error
@@ -48,8 +47,7 @@ let db = {
   }
 };
 
-
-describe('Videos', () => {
+describe("Videos", () => {
   beforeEach(() => {
     req.signedCookies = [];
     req.params = [];
@@ -59,151 +57,153 @@ describe('Videos', () => {
     // Restore the default sandbox here
     sinon.restore();
   });
-  describe('#index()', () => {
-    it('should display the index page of all videos', (done) => {
+  describe("#index()", () => {
+    it("should display the index page of all videos", done => {
       const result = {
         TableName: process.env.VIDEOS_TABLE,
         Items: []
       };
-      sinon.stub(db, 'scan').yields(null, result);
+      sinon.stub(db, "scan").yields(null, result);
 
       Videos.index(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('videos/index');
-        obj.should.have.property('videos');
+        action.should.equal("render");
+        page.should.equal("videos/index");
+        obj.should.have.property("videos");
         done();
       });
     });
-    it('should render an error on dynamodb failure', (done) => {
-      const error = new Error('failure of some sort');
-      sinon.stub(db, 'scan').yields(error, null);
+    it("should render an error on dynamodb failure", done => {
+      const error = new Error("failure of some sort");
+      sinon.stub(db, "scan").yields(error, null);
 
       Videos.index(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
   });
-  describe('#show()', () => {
-    it('should display a specific video', (done) => {
+  describe("#show()", () => {
+    it("should display a specific video", done => {
       const result = {
         TableName: process.env.VIDEO_TABLE,
         Item: {
-          videoId: 'test-id',
-          title: 'Test Video',
-          link: 'blank'
+          videoId: "test-id",
+          title: "Test Video",
+          link: "blank"
         }
       };
       req.params.videoId = result.Item.videoId;
-      sinon.stub(db, 'get').yields(null, result);
+      sinon.stub(db, "get").yields(null, result);
 
       Videos.show(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('videos/show');
-        obj.should.have.property('video');
+        action.should.equal("render");
+        page.should.equal("videos/show");
+        obj.should.have.property("video");
         obj.video.title.should.equal(result.Item.title);
         obj.video.link.should.equal(result.Item.link);
         done();
       });
     });
-    it('should render an error on invalid id', (done) => {
-      sinon.stub(db, 'get').yields(new Error(), null);
+    it("should render an error on invalid id", done => {
+      sinon.stub(db, "get").yields(new Error(), null);
 
       Videos.show(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.should.have.property('error');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.should.have.property("error");
         done();
       });
     });
   });
-  describe('#new_video()', () => {
-    it('should render the new video form', (done) => {
+  describe("#new_video()", () => {
+    it("should render the new video form", done => {
       req.signedCookies.id_token = 1;
 
       Videos.new_video(req, null, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('videos/new');
+        action.should.equal("render");
+        page.should.equal("videos/new");
         should.not.exist(obj);
         done();
       });
     });
-    it('should redirect to login', (done) => {
+    it("should redirect to login", done => {
       Videos.new_video(req, null, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#create()', () => {
-    it('should redirect after successfully creating a new video',
-      (done) => {
+  describe("#create()", () => {
+    it("should redirect after successfully creating a new video", done => {
       req.signedCookies.id_token = 1;
       req.body = {
         title: faker.lorem.word(),
         link: faker.lorem.word()
       };
-      let spy = sinon.spy(db, 'put');
+      let spy = sinon.spy(db, "put");
       // Object expected to be sent to the database
       const expected = {
         TableName: process.env.VIDEO_TABLE,
         Item: {
-          videoId: req.body.title.toLocaleLowerCase().substr(0, 20).replace(/\s/g, '-'),
+          videoId: req.body.title
+            .toLocaleLowerCase()
+            .substr(0, 20)
+            .replace(/\s/g, "-"),
           title: req.body.title,
           link: req.body.link
         }
       };
 
       Videos.create(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/videos');
+        action.should.equal("redirect");
+        page.should.equal("/videos");
         should.not.exist(obj);
         // Check if the database was given the correct object
         spy.calledWith(expected).should.be.true;
         done();
       });
     });
-    it('should render an error on invalid input', (done) => {
+    it("should render an error on invalid input", done => {
       req.signedCookies.id_token = 1;
 
       Videos.create(req, null, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.error.should.equal('Missing title or link');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.error.should.equal("Missing title or link");
         done();
       });
     });
-    it('should require a login', (done) => {
+    it("should require a login", done => {
       Videos.create(req, null, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
-    it('should render an error on dynamodb failure', (done) => {
+    it("should render an error on dynamodb failure", done => {
       req.signedCookies.id_token = 1;
       req.body = {
         title: faker.lorem.word(),
         link: faker.lorem.word()
       };
-      const error = new Error('failure of some sort');
-      sinon.stub(db, 'put').yields(error, null);
+      const error = new Error("failure of some sort");
+      sinon.stub(db, "put").yields(error, null);
 
       Videos.create(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
+        action.should.equal("render");
+        page.should.equal("error");
         obj.error.should.equal(error);
         done();
       });
     });
   });
-  describe('#edit()', () => {
-    it('should render the edit form', (done) => {
+  describe("#edit()", () => {
+    it("should render the edit form", done => {
       req.signedCookies.id_token = 1;
       let title = faker.lorem.word();
       req.params.videoId = title.toLocaleLowerCase().substr(0, 20);
@@ -214,38 +214,38 @@ describe('Videos', () => {
           title: title
         }
       };
-      sinon.stub(db, 'get').yields(null, item);
+      sinon.stub(db, "get").yields(null, item);
 
       Videos.edit(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('videos/edit');
+        action.should.equal("render");
+        page.should.equal("videos/edit");
         obj.video.title.should.equal(title);
         done();
       });
     });
-    it('should render an error when video doesn\'t exist', (done) => {
+    it("should render an error when video doesn't exist", done => {
       req.signedCookies.id_token = 1;
       // No videoId provided so the db.get will fail
-      sinon.stub(db, 'get').yields(new Error("Does not exist"), null);
+      sinon.stub(db, "get").yields(new Error("Does not exist"), null);
 
       Videos.edit(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.should.have.property('error');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.should.have.property("error");
         done();
       });
     });
-    it('should require a login', (done) => {
+    it("should require a login", done => {
       Videos.edit(req, null, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#update()', () => {
-    it('should update a video', (done) => {
+  describe("#update()", () => {
+    it("should update a video", done => {
       req.signedCookies.id_token = 1;
       let title = faker.lorem.word();
       req.body = {
@@ -258,78 +258,78 @@ describe('Videos', () => {
         Key: {
           videoId: req.body.videoId
         },
-        UpdateExpression: 'SET link = :link, title = :title',
+        UpdateExpression: "SET link = :link, title = :title",
         ExpressionAttributeValues: {
-          ':link': req.body.link,
-          ':title': req.body.title
+          ":link": req.body.link,
+          ":title": req.body.title
         }
       };
-      let spy = sinon.spy(db, 'update');
+      let spy = sinon.spy(db, "update");
 
       Videos.update(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/videos');
+        action.should.equal("redirect");
+        page.should.equal("/videos");
         should.not.exist(obj);
         spy.calledWith(expected).should.be.true;
         done();
       });
     });
-    it('should render an error on invalid video', (done) => {
+    it("should render an error on invalid video", done => {
       req.signedCookies.id_token = 1;
-      sinon.stub(db, 'update').yields(new Error('invalid videoid'), null);
+      sinon.stub(db, "update").yields(new Error("invalid videoid"), null);
 
       Videos.update(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.should.have.property('error');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.should.have.property("error");
         done();
       });
     });
-    it('should require a login', (done) => {
+    it("should require a login", done => {
       Videos.update(req, null, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe('#destroy()', () => {
-    it('should delete a video', (done) => {
+  describe("#destroy()", () => {
+    it("should delete a video", done => {
       req.signedCookies.id_token = 1;
       let title = faker.lorem.word();
-      req.params.videoId = title.toLocaleLowerCase().substr(0, 20)
+      req.params.videoId = title.toLocaleLowerCase().substr(0, 20);
       const expected = {
         TableName: process.env.VIDEO_TABLE,
         Key: {
           videoId: req.params.videoId
         }
-      }
-      let spy = sinon.spy(db, 'delete');
+      };
+      let spy = sinon.spy(db, "delete");
 
       Videos.destroy(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/videos');
+        action.should.equal("redirect");
+        page.should.equal("/videos");
         should.not.exist(obj);
         spy.calledWith(expected).should.be.true;
         done();
       });
     });
-    it('should render an error on invalid video', (done) => {
+    it("should render an error on invalid video", done => {
       req.signedCookies.id_token = 1;
-      sinon.stub(db, 'delete').yields(new Error('invalid videoid'), null);
+      sinon.stub(db, "delete").yields(new Error("invalid videoid"), null);
 
       Videos.destroy(req, db, (action, page, obj) => {
-        action.should.equal('render');
-        page.should.equal('error');
-        obj.should.have.property('error');
+        action.should.equal("render");
+        page.should.equal("error");
+        obj.should.have.property("error");
         done();
       });
     });
-    it('should require a login', (done) => {
+    it("should require a login", done => {
       Videos.destroy(req, db, (action, page, obj) => {
-        action.should.equal('redirect');
-        page.should.equal('/login');
+        action.should.equal("redirect");
+        page.should.equal("/login");
         should.not.exist(obj);
         done();
       });

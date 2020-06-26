@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const webdriver = require('selenium-webdriver'),
+const webdriver = require("selenium-webdriver"),
   until = webdriver.until,
   By = webdriver.By;
-const firefox = require('selenium-webdriver/firefox');
-const should = require('chai').should();
-const db = require('../db/infinite.js');
-const weekDB = require('../db/global.js');
-const faker = require('faker');
+const firefox = require("selenium-webdriver/firefox");
+const should = require("chai").should();
+const db = require("../db/infinite.js");
+const weekDB = require("../db/global.js");
+const faker = require("faker");
 
 let driver;
 
-describe('InfiniteTimelineNew', function() {
+describe("InfiniteTimelineNew", function() {
   beforeEach(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser("firefox")
       .setFirefoxOptions(new firefox.Options().headless())
       .build();
   });
@@ -39,17 +39,17 @@ describe('InfiniteTimelineNew', function() {
       throw error;
     }
   });
-  it('should create a new story', async function() {
+  it("should create a new story", async function() {
     this.timeout(0);
     try {
       await weekDB.put();
       const word = faker.lorem.word();
-      await driver.get('http://localhost:3000/infinite_timeline/new');
+      await driver.get("http://localhost:3000/infinite_timeline/new");
 
-      await driver.findElement(By.name('content')).sendKeys(word);
-      await driver.findElement(By.id('form-submit')).click();
+      await driver.findElement(By.name("content")).sendKeys(word);
+      await driver.findElement(By.id("form-submit")).click();
 
-      await driver.wait(until.urlIs('http://localhost:3000/infinite_timeline'));
+      await driver.wait(until.urlIs("http://localhost:3000/infinite_timeline"));
 
       const items = await db.scan();
       const story = items.Items[0];
@@ -58,8 +58,8 @@ describe('InfiniteTimelineNew', function() {
 
       await db.delete(story.id);
       await weekDB.delete();
-    } catch(error) {
-      console.error('Error: ' + error);
+    } catch (error) {
+      console.error("Error: " + error);
       throw error;
     }
   });

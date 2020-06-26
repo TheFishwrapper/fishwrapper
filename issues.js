@@ -85,7 +85,7 @@ class Issues {
         TableName: process.env.ISSUE_TABLE,
         Item: {
           issueId: Number(req.body.issueId),
-          link: req.file.location,
+          link: req.file.location
         }
       };
       dynamoDb
