@@ -189,7 +189,7 @@ class Features {
           index: parseInt(req.params.index, 10)
         }
       };
-      dynamoDb.delete(params, (err, data) => {
+      dynamoDb.delete(params, (err, _data) => {
         if (err) {
           console.error(err);
           callback("render", "error", {

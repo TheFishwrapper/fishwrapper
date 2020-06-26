@@ -16,7 +16,6 @@
 const should = require("chai").should();
 const sinon = require("sinon");
 const dotenv = require("dotenv");
-const faker = require("faker");
 const Issues = require("../issues");
 
 const result = dotenv.config({ path: process.cwd() + "/test/.env" });
@@ -31,10 +30,10 @@ let req = {
 };
 
 let db = {
-  scan: function(params, callback) {
+  scan: function() {
     throw new Error("Use stub instead");
   },
-  get: function(params, callback) {
+  get: function() {
     throw new Error("Use stub instead");
   },
   put: function(params, callback) {
@@ -67,7 +66,7 @@ describe("Issues", () => {
       };
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -85,7 +84,7 @@ describe("Issues", () => {
       const error = new Error("some failure");
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -111,7 +110,7 @@ describe("Issues", () => {
       };
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -132,7 +131,7 @@ describe("Issues", () => {
       const error = new Error("some error");
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -180,7 +179,7 @@ describe("Issues", () => {
     it("should redirect on success", done => {
       const putPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve();
           });
         }
@@ -201,7 +200,7 @@ describe("Issues", () => {
       const error = new Error("some failure");
       const putPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -232,7 +231,7 @@ describe("Issues", () => {
       };
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -252,7 +251,7 @@ describe("Issues", () => {
       const error = new Error("Some error");
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -283,7 +282,7 @@ describe("Issues", () => {
 
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve();
           });
         }
@@ -352,7 +351,7 @@ describe("Issues", () => {
 
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve();
           });
         }
@@ -372,7 +371,7 @@ describe("Issues", () => {
       const error = new Error("Some error");
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }

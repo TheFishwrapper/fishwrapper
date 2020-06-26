@@ -32,7 +32,7 @@ class Quizzes {
     });
   }
 
-  static new(req, res, dynamoDb) {
+  static new(req, res) {
     Lib.render(res, req, "quizzes/new");
   }
 
@@ -54,7 +54,7 @@ class Quizzes {
           results: Quizzes.parseResults(req.body)
         }
       };
-      dynamoDb.put(params, function(err, data) {
+      dynamoDb.put(params, function(err, _data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
@@ -125,7 +125,7 @@ class Quizzes {
         params.UpdateExpression += ", thumbnail = :thumbnail";
         params.ExpressionAttributeValues[":thumbnail"] = req.file.location;
       }
-      dynamoDb.update(params, function(err, data) {
+      dynamoDb.update(params, function(err, _data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);
@@ -144,7 +144,7 @@ class Quizzes {
           quizId: req.params.quizId
         }
       };
-      dynamoDb.delete(params, function(err, data) {
+      dynamoDb.delete(params, function(err, _data) {
         if (err) {
           console.log(err);
           Lib.error(res, req, err);

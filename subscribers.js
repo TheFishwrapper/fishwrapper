@@ -69,7 +69,7 @@ class Subscribers {
         email: req.body.email
       }
     };
-    dynamoDb.delete(params, function(err, data) {
+    dynamoDb.delete(params, function(err, _data) {
       if (err) {
         console.error(err);
         callback("render", "error", {

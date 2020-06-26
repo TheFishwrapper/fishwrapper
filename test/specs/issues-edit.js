@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 const webdriver = require("selenium-webdriver"),
-  until = webdriver.until,
-  By = webdriver.By;
+  until = webdriver.until;
 const firefox = require("selenium-webdriver/firefox");
 const should = require("chai").should();
 const db = require("../db/issues.js");
-const Login = require("../lib/login.js");
 const faker = require("faker");
 
 let driver;
@@ -33,11 +31,7 @@ describe("IssuesEdit", function() {
   });
   afterEach(async function() {
     this.timeout(0);
-    try {
-      await driver.quit();
-    } catch (error) {
-      throw error;
-    }
+    await driver.quit();
   });
   it("should require login", async function() {
     this.timeout(0);

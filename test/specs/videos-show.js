@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 const webdriver = require("selenium-webdriver"),
-  until = webdriver.until,
   By = webdriver.By;
 const firefox = require("selenium-webdriver/firefox");
 const should = require("chai").should();

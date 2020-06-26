@@ -16,7 +16,6 @@
 const should = require("chai").should();
 const sinon = require("sinon");
 const dotenv = require("dotenv");
-const faker = require("faker");
 const InfiniteTimeline = require("../infinite_timeline");
 
 const result = dotenv.config({ path: process.cwd() + "/test/.env" });
@@ -30,13 +29,13 @@ let req = {
 };
 
 let db = {
-  query: function(params, callback) {
+  query: function() {
     throw new Error("Use stub instead");
   },
-  scan: function(params, callback) {
+  scan: function() {
     throw new Error("Use stub instead");
   },
-  get: function(params, callback) {
+  get: function() {
     throw new Error("Use stub instead");
   },
   put: function(params, callback) {
@@ -52,10 +51,10 @@ let db = {
 
 const week = 5;
 
-function stubSelectStory(params) {
+function stubSelectStory() {
   const updatePromise = {
     promise: function() {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, _reject) => {
         resolve();
       });
     }
@@ -120,7 +119,7 @@ describe("InfiniteTimeline", () => {
       };
       const getPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(weekRes);
           });
         }
@@ -130,7 +129,7 @@ describe("InfiniteTimeline", () => {
     it("should redirect on success", done => {
       const putPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve();
           });
         }
@@ -148,7 +147,7 @@ describe("InfiniteTimeline", () => {
       const error = new Error("some failure");
       const putPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -172,7 +171,7 @@ describe("InfiniteTimeline", () => {
       };
       const getPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(weekRes);
           });
         }
@@ -188,7 +187,7 @@ describe("InfiniteTimeline", () => {
       };
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -216,7 +215,7 @@ describe("InfiniteTimeline", () => {
       };
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -239,7 +238,7 @@ describe("InfiniteTimeline", () => {
       const error = new Error("Some error");
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -281,7 +280,7 @@ describe("InfiniteTimeline", () => {
       };
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -325,7 +324,7 @@ describe("InfiniteTimeline", () => {
       const error = new Error("Some error");
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -358,7 +357,7 @@ describe("InfiniteTimeline", () => {
       };
       const getPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(weekRes);
           });
         }
@@ -378,7 +377,7 @@ describe("InfiniteTimeline", () => {
       const error = new Error("Some error");
       const getPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -440,7 +439,7 @@ describe("InfiniteTimeline", () => {
     beforeEach(() => {
       const deletePromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve();
           });
         }
@@ -460,7 +459,7 @@ describe("InfiniteTimeline", () => {
       };
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -480,7 +479,7 @@ describe("InfiniteTimeline", () => {
       const error = new Error("Some error");
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }

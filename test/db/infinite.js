@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 const dotenv = require("dotenv");
-const faker = require("faker");
 const AWS = require("aws-sdk");
 
 const result = dotenv.config({ path: process.cwd() + "/test/.env" });
