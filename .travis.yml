@@ -34,6 +34,7 @@ before_script:
  - sleep 5s # Give time to startup
 
 script:
+ - npm run lint
  - npm run test-ci
  - npm run integration
 
@@ -45,5 +46,5 @@ deploy:
   # Deploy to dev.thefishwrapper.news
   provider: script
   script: sls deploy
-  on:
-    branch: master
+  #on:
+  #  branch: master
