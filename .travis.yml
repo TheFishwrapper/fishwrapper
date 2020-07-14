@@ -42,9 +42,10 @@ after_script:
  - 'kill $(pgrep -f sls)' # Teardown the webserver
  - cat slslog.txt # Display sls log
 
-deploy:
-  # Deploy to dev.thefishwrapper.news
-  provider: script
-  script: sls deploy
-  #on:
-  #  branch: master
+# deploy:
+#   # Deploy to dev.thefishwrapper.news
+#   provider: script
+#   script: sls deploy
+#   on:
+#     branch:
+#       - master
