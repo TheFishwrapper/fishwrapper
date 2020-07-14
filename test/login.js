@@ -30,7 +30,7 @@ let req = {
 };
 
 let db = {
-  get: function(params, callback) {
+  get: function() {
     throw new Error("Use stub instead");
   }
 };

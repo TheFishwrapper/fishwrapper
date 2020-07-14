@@ -87,16 +87,16 @@ describe("Features", () => {
           index: params.Item.index
         }
       };
-      db.put(params, err => {
+      db.put(params, _ => {
         params.Item.index += 10;
-        db.put(params, er => {
+        db.put(params, _ => {
           Features.index(req, db, (action, page, obj) => {
             action.should.equal("render");
             page.should.equal("features/index");
             should.exist(obj);
             obj.should.have.property("feats").that.is.a("array");
             obj.feats[1].index.should.be.above(obj.feats[0].index);
-            db.delete(pars, e => {
+            db.delete(pars, _ => {
               pars.Key.index += 10;
               db.delete(pars, () => {
                 done();
@@ -168,7 +168,7 @@ describe("Features", () => {
       req.body = {
         post: faker.internet.url()
       };
-      Features.create(req, db, (action, page, obj) => {
+      Features.create(req, db, (action, page, _) => {
         action.should.equal("render");
         page.should.equal("error");
         done();

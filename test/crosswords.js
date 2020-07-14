@@ -30,10 +30,10 @@ let req = {
 };
 
 let db = {
-  scan: function(params, callback) {
+  scan: function() {
     throw new Error("Use stub instead");
   },
-  get: function(params, callback) {
+  get: function() {
     throw new Error("Use stub instead");
   },
   put: function(params, callback) {
@@ -143,10 +143,6 @@ describe("Crosswords", () => {
         title: faker.lorem.word(),
         solution: faker.lorem.word()
       };
-      let id = req.body.title
-        .toLocaleLowerCase()
-        .substr(0, 20)
-        .replace(/\s/g, "-");
       const expected = {
         TableName: process.env.CROSS_TABLE,
         Item: {

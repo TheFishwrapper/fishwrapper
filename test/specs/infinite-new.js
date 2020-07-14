@@ -33,11 +33,7 @@ describe("InfiniteTimelineNew", function() {
   });
   afterEach(async function() {
     this.timeout(0);
-    try {
-      await driver.quit();
-    } catch (error) {
-      throw error;
-    }
+    await driver.quit();
   });
   it("should create a new story", async function() {
     this.timeout(0);

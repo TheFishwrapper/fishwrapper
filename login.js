@@ -79,20 +79,6 @@ class Login {
 
   /*
    * Verifies that the user is logged in.
-   *
-   * DEPRECATED: use authenticate(req)
-   */
-  static authenticate(req, res) {
-    if (!req.signedCookies["id_token"]) {
-      res.redirect("/login");
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  /*
-   * Verifies that the user is logged in.
    */
   static authenticate(req) {
     if (!req.signedCookies["id_token"]) {

@@ -146,7 +146,7 @@ class InfiniteTimeline {
           });
           return Promise.all(prom);
         })
-        .then(x => {
+        .then(_ => {
           callback("redirect", "/infinite_timeline");
         })
         .catch(error => {
@@ -199,7 +199,7 @@ class InfiniteTimeline {
           ":val": parseInt(req.body.week, 10)
         }
       };
-      dynamoDb.update(params, function(error, data) {
+      dynamoDb.update(params, function(error, _data) {
         if (error) {
           console.error(error);
           callback("render", "error", { error: error });

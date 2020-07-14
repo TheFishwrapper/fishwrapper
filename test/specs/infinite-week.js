@@ -18,10 +18,8 @@ const webdriver = require("selenium-webdriver"),
   By = webdriver.By;
 const firefox = require("selenium-webdriver/firefox");
 const should = require("chai").should();
-const db = require("../db/infinite.js");
 const weekDB = require("../db/global.js");
 const Login = require("../lib/login.js");
-const faker = require("faker");
 
 let driver;
 
@@ -34,11 +32,7 @@ describe("InfiniteTimelineWeek", function() {
   });
   afterEach(async function() {
     this.timeout(0);
-    try {
-      await driver.quit();
-    } catch (error) {
-      throw error;
-    }
+    await driver.quit();
   });
   it("should give the current week", async function() {
     this.timeout(0);

@@ -15,13 +15,13 @@ let req = {
 };
 
 let db = {
-  query: function(params, callback) {
+  query: function() {
     throw new Error("Use stub instead");
   },
-  scan: function(params, callback) {
+  scan: function() {
     throw new Error("Use stub instead");
   },
-  get: function(params, callback) {
+  get: function() {
     throw new Error("Use stub instead");
   },
   put: function(params, callback) {
@@ -34,17 +34,6 @@ let db = {
     callback(null); // no error
   }
 };
-
-function stubSelectContent(params) {
-  const updatePromise = {
-    promise: function() {
-      return new Promise((resolve, reject) => {
-        resolve();
-      });
-    }
-  };
-  return updatePromise;
-}
 
 describe("InstaShorts", () => {
   beforeEach(() => {
@@ -74,12 +63,12 @@ describe("InstaShorts", () => {
       };
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
       };
-      let spy = sinon.stub(db, "scan").returns(promise);
+      sinon.stub(db, "scan").returns(promise);
 
       InstaShorts.index(req, db, (action, page, obj) => {
         action.should.equal("render");
@@ -93,7 +82,7 @@ describe("InstaShorts", () => {
       const error = new Error("some failure");
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -135,7 +124,7 @@ describe("InstaShorts", () => {
       };
       const getPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(short);
           });
         }
@@ -157,7 +146,7 @@ describe("InstaShorts", () => {
 
       const putPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve();
           });
         }
@@ -178,7 +167,7 @@ describe("InstaShorts", () => {
       const error = new Error("some failure");
       const putPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -214,7 +203,7 @@ describe("InstaShorts", () => {
       };
       const getPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(short);
           });
         }
@@ -235,7 +224,7 @@ describe("InstaShorts", () => {
       const error = new Error("Some error");
       const promise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -271,7 +260,7 @@ describe("InstaShorts", () => {
       };
       const updatePromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -303,7 +292,7 @@ describe("InstaShorts", () => {
       const error = new Error("Some error");
       const updatePromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
@@ -337,7 +326,7 @@ describe("InstaShorts", () => {
       };
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve, _reject) => {
             resolve(result);
           });
         }
@@ -357,7 +346,7 @@ describe("InstaShorts", () => {
       const error = new Error("Some error");
       const scanPromise = {
         promise: function() {
-          return new Promise((resolve, reject) => {
+          return new Promise((_resolve, reject) => {
             reject(error);
           });
         }
