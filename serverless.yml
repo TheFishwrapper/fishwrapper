@@ -83,6 +83,8 @@ provider:
     SOLR_SITE: ${ssm:solrSite}
     SOLR_PORT: ${ssm:solrPort}
     SOLR_CORE: '${ssm:solrCore}-${self:provider.stage}'
+    S3BUCKET_ACCESS: ${ssm:s3BucketAccessKey~true}
+    S3BUCKET_SECRET: ${ssm:s3BucketSecret~true}
 
 functions:
   app:

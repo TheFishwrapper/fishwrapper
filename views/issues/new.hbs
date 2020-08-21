@@ -1,5 +1,97 @@
 {{> header}}
 <h1>New</h1>
-{{> issue_form method='POST'}}
+<form id="app"
+      @submit="checkForm"
+      action="/issues"
+      enctype="multipart/form-data"
+      method="POST">
+  <p v-if="errors.length">
+    Please correct the following error(s):
+    <ul>
+      <li v-for="error in errors">\{{ error }}</li>
+    </ul>
+  </p>
+
+  <p>
+    <label for="issueId">Issue</label>
+    <input id="issueId"
+           v-model="issueId"
+           type="text"
+           name="issueId" />
+  </p>
+
+  <p>
+    <label for="link">Issue File</label>
+    <input id="link"
+           v-model="link"
+           @change="fileChange"
+           type="file"
+           name="link" />
+  </p>
+
+  <input type="hidden"
+         name="_method"
+         value="{{method}}" />
+
+  <p>
+    <input type="submit"
+           value="Submit" />
+  </p>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://fishwrapper-assets-dev.s3.amazonaws.com/aws-sdk-2.736.0.min.js"></script>
+<script>
+  AWS.config.update({
+      // TODO remove these for a AWS.credentials object
+      accessKeyId: "{{{accessKey}}}",
+      secretAccessKey: "{{{secretKey}}}",
+    region: 'us-east-1',
+  });
+  var app = new Vue({
+      el: '#app',
+      data: {
+        errors: [],
+        issueId: null,
+        link: null,
+      },
+      methods:{
+        checkForm: function (e) {
+          if (this.issueId && this.link) {
+            return true;
+          }
+
+          this.errors = [];
+
+          if (!this.issueId) {
+            this.errors.push('Issue number required.');
+          }
+          if (!this.link) {
+            this.errors.push('Issue file required.');
+          }
+
+          e.preventDefault();
+        },
+        fileChange: function(event) {
+            const file = event.target.files[0];
+            console.log('File ' + JSON.stringify(file));
+            const upload = new AWS.S3.ManagedUpload({
+                params: {
+                    Bucket: "{{{s3bucket}}}",
+                    Key: `${Date.now()}-issue.pdf`,
+                    Body: file,
+                    ACL: 'public-read',
+                }
+            }).promise();
+            upload.then(data => {
+                console.log('Uploaded file ' + data.Location);
+                this.link = data.Location;
+            }).catch(error => {
+              console.error(error);
+              this.errors.push('File failed to upload');
+            });
+        },
+      }
+  })
+</script>
 <a href="/issues">Back</a>
 {{> footer}}

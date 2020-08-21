@@ -67,7 +67,11 @@ class Issues {
    */
   static new_issue(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
-      callback("render", "issues/new");
+      callback("render", "issues/new", {
+        accessKey: process.env.S3BUCKET_ACCESS,
+        secretKey: process.env.S3BUCKET_SECRET,
+        s3bucket: "fishwrapper-storage"
+      });
     } else {
       callback("redirect", "/login");
     }
