@@ -191,6 +191,14 @@ app.post("/login", function(req, res) {
   );
 });
 
+app.get("/catch-code", function(req, res) {
+  Login.handle_code(
+    req,
+    dynamoDb,
+    handlerObj.callback.bind({ req: req, res: res })
+  );
+});
+
 app.get("/logout", function(req, res) {
   Login.logout(req, dynamoDb, handlerObj.callback.bind({ req: req, res: res }));
 });

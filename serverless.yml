@@ -85,6 +85,10 @@ provider:
     SOLR_CORE: '${ssm:solrCore}-${self:provider.stage}'
     S3BUCKET_ACCESS: ${ssm:s3BucketAccessKey~true}
     S3BUCKET_SECRET: ${ssm:s3BucketSecret~true}
+    CLIENT_ID: ${ssm:clientId}
+    CLIENT_SECRET: ${ssm:clientSecret~true}
+    TOKEN_URL: ${ssm:tokenURL}
+    TOKEN_REDIRECT: ${ssm:tokenRedirect}
 
 functions:
   app:

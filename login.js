@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 const bcrypt = require("bcryptjs");
+const axios = require("axios");
+const querystring = require("querystring");
 
 /*
  * Controller class for logging in to the website.
@@ -24,6 +26,43 @@ class Login {
    */
   static show(req, dynamoDb, callback) {
     callback("render", "login");
+  }
+
+  static handle_code(req, _dynamoDb, callback) {
+    if (req.query.code) {
+      const authStr = Buffer.from(
+        process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET,
+        "utf-8"
+      );
+      const postData = querystring.stringify({
+        grant_type: "authorization_code",
+        client_id: process.env.CLIENT_ID,
+        code: req.query.code,
+        redirect_uri: process.env.TOKEN_REDIRECT
+      });
+      axios
+        .post(process.env.TOKEN_URL, postData, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: "Basic " + authStr.toString("base64")
+          }
+        })
+        .then(res => {
+          // const id_token = res.data.id_token;
+          const access_token = res.data.access_token;
+          callback("cookie", "/", {
+            cookie: "access_token",
+            value: access_token,
+            options: { signed: true, httpOnly: true, sameSite: "strict" }
+          });
+        })
+        .catch(error => {
+          console.log("Caught error " + error);
+          callback("render", "error", { error: error });
+        });
+    } else {
+      callback("render", "error", { error: "No code provided" });
+    }
   }
 
   /*
