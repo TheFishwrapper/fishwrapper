@@ -39,14 +39,17 @@
   </p>
 </form>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-<script src="https://fishwrapper-assets-dev.s3.amazonaws.com/aws-sdk-2.736.0.min.js"></script>
+<!-- <script src="https://fishwrapper-assets-dev.s3.amazonaws.com/aws-sdk-2.736.0.min.js"></script> -->
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.739.0.min.js"></script>
 <script>
-  AWS.config.update({
-      // TODO remove these for a AWS.credentials object
-      accessKeyId: "{{{accessKey}}}",
-      secretAccessKey: "{{{secretKey}}}",
-    region: 'us-east-1',
+  AWS.config.region = "us-east-1";
+  AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: "us-east-1:74c8070f-75d3-4aa4-aa4d-d5120f8a836f",
+    Logins: {
+      "cognito-idp.us-east-1.amazonaws.com/us-east-1_wOU0VO1um": "{{{authToken}}}"
+    }
   });
+
   var app = new Vue({
       el: '#app',
       data: {
@@ -72,23 +75,22 @@
           e.preventDefault();
         },
         fileChange: function(event) {
-            const file = event.target.files[0];
-            console.log('File ' + JSON.stringify(file));
-            const upload = new AWS.S3.ManagedUpload({
-                params: {
-                    Bucket: "{{{s3bucket}}}",
-                    Key: `${Date.now()}-issue.pdf`,
-                    Body: file,
-                    ACL: 'public-read',
-                }
-            }).promise();
-            upload.then(data => {
-                console.log('Uploaded file ' + data.Location);
-                this.link = data.Location;
-            }).catch(error => {
-              console.error(error);
-              this.errors.push('File failed to upload');
-            });
+          const file = event.target.files[0];
+          const upload = new AWS.S3.ManagedUpload({
+            params: {
+              Bucket: "{{{s3bucket}}}",
+              Key: `${Date.now()}-issue.pdf`,
+              Body: file,
+              ACL: 'public-read',
+            }
+          }).promise();
+          upload.then(data => {
+              console.log('Uploaded file ' + data.Location);
+              this.link = data.Location;
+          }).catch(error => {
+            console.error(error);
+            this.errors.push('File failed to upload');
+          });
         },
       }
   })

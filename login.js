@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const bcrypt = require("bcryptjs");
 const axios = require("axios");
 const querystring = require("querystring");
 
@@ -25,7 +24,10 @@ class Login {
    * Renders the login page.
    */
   static show(req, dynamoDb, callback) {
-    callback("render", "login");
+    callback(
+      "redirect",
+      "https://thefishwrapper.auth.us-east-1.amazoncognito.com/login?client_id=2n90dgo71u6b71aj09p5f8i43u&response_type=code&scope=openid&redirect_uri=https://dev.thefishwrapper.news/catch-code"
+    );
   }
 
   static handle_code(req, _dynamoDb, callback) {
@@ -48,11 +50,10 @@ class Login {
           }
         })
         .then(res => {
-          // const id_token = res.data.id_token;
-          const access_token = res.data.access_token;
+          const id_token = res.data.id_token;
           callback("cookie", "/", {
-            cookie: "access_token",
-            value: access_token,
+            cookie: "id_token",
+            value: id_token,
             options: { signed: true, httpOnly: true, sameSite: "strict" }
           });
         })
@@ -63,45 +64,6 @@ class Login {
     } else {
       callback("render", "error", { error: "No code provided" });
     }
-  }
-
-  /*
-   * Attempts to login the user with the given username and password. The user
-   * is redirected to the index page on success.
-   */
-  static attempt(req, dynamoDb, callback) {
-    const params = {
-      TableName: process.env.USERS_TABLE,
-      Key: {
-        user: req.body.username
-      }
-    };
-    dynamoDb.get(params, function(error, result) {
-      if (error) {
-        console.error(error);
-        callback("render", "error", { error: error });
-      } else if (result.Item) {
-        const hash = result.Item.password;
-        bcrypt.compare(req.body.password, hash, function(err, correct) {
-          if (err) {
-            console.error(err);
-            callback("render", "error", { error: err });
-          } else if (correct) {
-            callback("cookie", "/", {
-              cookie: "id_token",
-              value: result.Item.user,
-              options: { signed: true, httpOnly: true, sameSite: "strict" }
-            });
-          } else {
-            callback("render", "error", {
-              error: "Incorrect password or username"
-            });
-          }
-        });
-      } else {
-        callback("render", "error", { error: "User not found" });
-      }
-    });
   }
 
   /*

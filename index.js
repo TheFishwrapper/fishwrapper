@@ -183,14 +183,6 @@ app.get("/login", function(req, res) {
   Login.show(req, dynamoDb, handlerObj.callback.bind({ req: req, res: res }));
 });
 
-app.post("/login", function(req, res) {
-  Login.attempt(
-    req,
-    dynamoDb,
-    handlerObj.callback.bind({ req: req, res: res })
-  );
-});
-
 app.get("/catch-code", function(req, res) {
   Login.handle_code(
     req,
