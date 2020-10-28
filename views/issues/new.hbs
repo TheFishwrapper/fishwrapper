@@ -1,10 +1,7 @@
 {{> header}}
 <h1>New</h1>
 <form id="app"
-      @submit="checkForm"
-      action="/issues"
-      enctype="multipart/form-data"
-      method="POST">
+      @submit.prevent="checkForm">
   <p v-if="errors.length">
     Please correct the following error(s):
     <ul>
@@ -29,24 +26,19 @@
            name="link" />
   </p>
 
-  <input type="hidden"
-         name="_method"
-         value="{{method}}" />
-
   <p>
     <input type="submit"
            value="Submit" />
   </p>
 </form>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-<!-- <script src="https://fishwrapper-assets-dev.s3.amazonaws.com/aws-sdk-2.736.0.min.js"></script> -->
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.739.0.min.js"></script>
 <script>
   AWS.config.region = "us-east-1";
   AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: "us-east-1:74c8070f-75d3-4aa4-aa4d-d5120f8a836f",
+    IdentityPoolId: "{{{identityPool}}}",
     Logins: {
-      "cognito-idp.us-east-1.amazonaws.com/us-east-1_wOU0VO1um": "{{{authToken}}}"
+      "{{{issuerURL}}}": "{{{authToken}}}"
     }
   });
 
@@ -56,15 +48,40 @@
         errors: [],
         issueId: null,
         link: null,
+        token: "{{{authToken}}}",
       },
       methods:{
         checkForm: function (e) {
           if (this.issueId && this.link) {
-            return true;
+              const body = JSON.stringify({
+                  issueId: this.issueId,
+                  link: this.link,
+              });
+
+              const headers = new Headers();
+              headers.append("Authorization", "Bearer " + this.token);
+              headers.append("Content-Type", "application/json");
+              fetch("/issues", {
+                method: "POST",
+                headers,
+                body,
+              }).then(response => {
+                  return response.json();
+              }).then(result => {
+                  if (result.redirect) {
+                    // Redirect to local url
+                    window.location.pathname = result.url;
+                  } else {
+                    console.error(result.error);
+                    throw result.error.message;
+                  }
+              }).catch(error => {
+                this.errors = [];
+                this.errors.push(error);
+              });
           }
 
           this.errors = [];
-
           if (!this.issueId) {
             this.errors.push('Issue number required.');
           }
@@ -85,8 +102,7 @@
             }
           }).promise();
           upload.then(data => {
-              console.log('Uploaded file ' + data.Location);
-              this.link = data.Location;
+            this.link = data.Location;
           }).catch(error => {
             console.error(error);
             this.errors.push('File failed to upload');

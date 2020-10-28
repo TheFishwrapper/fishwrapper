@@ -67,9 +67,14 @@ class Issues {
    */
   static new_issue(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
+      const issuerURL = process.env.ISSUER_URL;
+      // Remove https:// or http:// from the URL
+      const issuerNoProtocol = issuerURL.split("//")[1];
       callback("render", "issues/new", {
         authToken: req.signedCookies["id_token"],
-        s3bucket: "fishwrapper-storage"
+        s3bucket: "fishwrapper-storage",
+        issuerURL: issuerNoProtocol,
+        identityPool: process.env.IDENTITY_POOL
       });
     } else {
       callback("redirect", "/login");
@@ -88,21 +93,22 @@ class Issues {
         TableName: process.env.ISSUE_TABLE,
         Item: {
           issueId: Number(req.body.issueId),
-          link: req.file.location
+          link: req.body.link
         }
       };
+      console.log("Params: " + JSON.stringify(params));
       dynamoDb
         .put(params)
         .promise()
         .then(() => {
-          callback("redirect", "/issues");
+          callback("json", "/issues", { redirect: true });
         })
         .catch(error => {
           console.error(error);
-          callback("render", "error", { error: error });
+          callback("json", "error", { error: error });
         });
     } else {
-      callback("redirect", "/login");
+      callback("json", "/login", { redirect: true });
     }
   }
 
@@ -116,7 +122,7 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.params.issueId
+          issueId: Number(req.params.issueId)
         }
       };
       dynamoDb
@@ -145,7 +151,7 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.body.issueId
+          issueId: Number(req.body.issueId)
         },
         UpdateExpression: "SET link = :link",
         ExpressionAttributeValues: {
@@ -178,7 +184,7 @@ class Issues {
       const params = {
         TableName: process.env.ISSUE_TABLE,
         Key: {
-          issueId: req.params.issueId
+          issueId: Number(req.params.issueId)
         }
       };
       dynamoDb

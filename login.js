@@ -15,6 +15,7 @@
  */
 const axios = require("axios");
 const querystring = require("querystring");
+const { JWT, JWKS } = require("jose");
 
 /*
  * Controller class for logging in to the website.
@@ -24,12 +25,13 @@ class Login {
    * Renders the login page.
    */
   static show(req, dynamoDb, callback) {
-    callback(
-      "redirect",
-      "https://thefishwrapper.auth.us-east-1.amazoncognito.com/login?client_id=2n90dgo71u6b71aj09p5f8i43u&response_type=code&scope=openid&redirect_uri=https://dev.thefishwrapper.news/catch-code"
-    );
+    callback("redirect", process.env.LOGIN_URL);
   }
 
+  /*
+   * Handle the authorization code as part of OAuth and use it to get a token.
+   * This token will then be used as the signed cookie id_token.
+   */
   static handle_code(req, _dynamoDb, callback) {
     if (req.query.code) {
       const authStr = Buffer.from(
@@ -82,11 +84,36 @@ class Login {
    * Verifies that the user is logged in.
    */
   static authenticate(req) {
-    if (!req.signedCookies["id_token"]) {
-      return false;
-    } else {
+    if (req.get("Authorization")) {
+      const token = req.get("Authorization").substring(7);
+      const keyStore = Login.loadKeyStore();
+      console.log(keyStore);
+      console.log(token);
+      let threwError = false;
+      try {
+        const result = JWT.verify(token, keyStore, {
+          audience: process.env.CLIENT_ID,
+          issuer: process.env.ISSUER_URL
+        });
+        console.log(result);
+      } catch (e) {
+        threwError = true;
+        console.error(e);
+      }
+      return !threwError;
+    } else if (req.signedCookies["id_token"]) {
       return true;
+    } else {
+      return false;
     }
+  }
+
+  /*
+   * Loads the JSON Web Key Store from the JSON for verifying JWTs.
+   */
+  static loadKeyStore() {
+    const keys = JSON.parse(process.env.KEYS_JSON);
+    return JWKS.asKeyStore(keys);
   }
 }
 module.exports = Login;

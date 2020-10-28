@@ -89,6 +89,10 @@ provider:
     CLIENT_SECRET: ${ssm:clientSecret~true}
     TOKEN_URL: ${ssm:tokenURL}
     TOKEN_REDIRECT: ${ssm:tokenRedirect}
+    KEYS_JSON: ${ssm:keysJSON}
+    LOGIN_URL: ${ssm:loginURL}
+    ISSUER_URL: ${ssm:issuerURL}
+    IDENTITY_POOL: ${ssm:identityPool}
 
 functions:
   app:

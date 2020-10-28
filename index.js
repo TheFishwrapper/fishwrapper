@@ -169,6 +169,16 @@ let handlerObj = {
       case "redirect":
         this.res.redirect(page);
         break;
+      case "json":
+        this.res.send(
+          Object.assign(
+            {
+              url: page
+            },
+            obj
+          )
+        );
+        break;
       default:
         console.log("Unknown action");
     }
@@ -503,13 +513,14 @@ app.get("/issues", function(req, res) {
   Issues.index(req, dynamoDb, cb);
 });
 
-app.post("/issues", upload.single("link"), function(req, res) {
+app.post("/issues", function(req, res) {
   const cb = handlerObj.callback.bind({ req: req, res: res });
-  if (req.body._method === "POST") {
-    Issues.create(req, dynamoDb, cb);
-  } else if (req.body._method === "PUT") {
-    Issues.update(req, dynamoDb, cb);
-  }
+  Issues.create(req, dynamoDb, cb);
+});
+
+app.put("/issues", function(req, res) {
+  const cb = handlerObj.callback.bind({ req: req, res: res });
+  Issues.update(req, dynamoDb, cb);
 });
 
 app.get("/issues/new", function(req, res) {
