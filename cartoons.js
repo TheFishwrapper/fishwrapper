@@ -62,7 +62,7 @@ class Cartoons {
    * NOTE:
    *   User must be logged in.
    */
-  static new_issue(req, dynamoDb, callback) {
+  static new_cartoon(req, dynamoDb, callback) {
     if (Login.authenticate(req)) {
       callback('render', 'cartoons/new');
     } else {
