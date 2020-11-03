@@ -71,7 +71,7 @@ class Cartoons {
   }
 
   /*
-   * Creates a new issue link in the database. Redirects to the issue index on
+   * Creates a new cartoon link in the database. Redirects to the cartoons index on
    * successful creation.
    * NOTE:
    *   User must be logged in.
@@ -182,4 +182,4 @@ class Cartoons {
     }
   }
 }
-module.exports = Issues;
+module.exports = Cartoons;
