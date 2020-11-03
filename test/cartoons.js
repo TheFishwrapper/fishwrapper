@@ -17,7 +17,7 @@ const should = require('chai').should();
 const sinon = require('sinon');
 const dotenv = require('dotenv');
 const faker = require('faker');
-const Cartoons = require('../issues');
+const Cartoons = require('../cartoons');
 
 const result = dotenv.config(
   { path: process.cwd() + '/test/.env' });
@@ -277,7 +277,7 @@ describe('Cartoons', () => {
     });
   });
   describe('#update()', () => {
-    it('should update the issue', (done) => {
+    it('should update the cartoon', (done) => {
       req.signedCookies.id_token = 1;
       req.body.issueId = 'fake-id';
       req.file.location = '/dev/null/';
