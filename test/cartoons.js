@@ -106,7 +106,7 @@ describe('Cartoons', () => {
       const result = {
         TableName: process.env.ISSUE_TABLE,
         Item: {
-          issueId: 'test-id',
+          issueId: 1,
           link: 'blank'
         }
       };
@@ -122,7 +122,7 @@ describe('Cartoons', () => {
 
       Cartoons.show(req, db, (action, page, obj) => {
         action.should.equal('render');
-        page.should.equal('Cartoons/show');
+        page.should.equal('cartoons/show');
         obj.should.have.property('issue');
         obj.issue.issueId.should.equal(result.Item.issueId);
         obj.issue.link.should.equal(result.Item.link);
