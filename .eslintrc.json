@@ -22,7 +22,7 @@
             "error",
             {
                 "argsIgnorePattern": "^_",
-                "varsIgnorePattern": "should"
+                "varsIgnorePattern": "^_"
             }
         ]
     },

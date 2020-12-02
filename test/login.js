@@ -17,7 +17,6 @@ const should = require("chai").should();
 const faker = require("faker");
 const sinon = require("sinon");
 const dotenv = require("dotenv");
-const bcrypt = require("bcryptjs");
 const Login = require("../login");
 
 const result = dotenv.config({ path: process.cwd() + "/test/.env" });
@@ -48,74 +47,43 @@ describe("Login", () => {
   describe("#show()", () => {
     it("should display the login page", done => {
       Login.show(req, null, (action, page, obj) => {
-        action.should.equal("render");
-        page.should.equal("login");
+        action.should.equal("redirect");
+        page.should.equal(process.env.LOGIN_URL);
         should.not.exist(obj);
         done();
       });
     });
   });
-  describe("#attempt()", () => {
+  describe("#handle_code()", () => {
     it("should redirect and set a cookie on success", done => {
-      req.body = {
-        username: faker.internet.userName(),
-        password: faker.internet.password()
+      req.query = {
+        code: faker.internet.userName()
       };
 
-      const result = {
-        TableName: process.env.USERS_TABLE,
-        Item: {
-          user: req.body.username,
-          password: bcrypt.hashSync(req.body.password)
+      const axios = {
+        post: function() {
+          throw new Error("Use stub instead");
         }
       };
-      sinon.stub(db, "get").yields(null, result);
+      const id_token = "fake.Auth.Token";
+      sinon.stub(axios, "post").yields(null, id_token);
 
-      Login.attempt(req, db, (action, page, obj) => {
+      Login.handle_code(req, db, (action, page, obj) => {
         action.should.equal("cookie");
         page.should.equal("/");
         obj.cookie.should.equal("id_token");
-        obj.should.have.property("value");
+        obj.value.should.equal(id_token);
         obj.options.signed.should.equal(true);
         obj.options.httpOnly.should.equal(true);
         obj.options.sameSite.should.equal("strict");
         done();
       });
     });
-    it("should render an error on invalid password", done => {
-      req.body = {
-        username: faker.internet.userName(),
-        password: faker.internet.password()
-      };
-
-      const result = {
-        TableName: process.env.USERS_TABLE,
-        Item: {
-          user: req.body.username,
-          password: bcrypt.hashSync(faker.internet.password())
-        }
-      };
-      sinon.stub(db, "get").yields(null, result);
-
-      Login.attempt(req, db, (action, page, obj) => {
+    it("should render an error on invalid code", done => {
+      Login.handle_code(req, db, (action, page, obj) => {
         action.should.equal("render");
         page.should.equal("error");
-        obj.error.should.equal("Incorrect password or username");
-        done();
-      });
-    });
-    it("should render an error on invalid username", done => {
-      req.body = {
-        username: faker.internet.userName(),
-        password: faker.internet.password()
-      };
-
-      sinon.stub(db, "get").yields(null, {});
-
-      Login.attempt(req, db, (action, page, obj) => {
-        action.should.equal("render");
-        page.should.equal("error");
-        obj.error.should.equal("User not found");
+        obj.error.should.equal("No code provided");
         done();
       });
     });

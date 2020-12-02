@@ -86,23 +86,10 @@ class Login {
   static authenticate(req) {
     if (req.get("Authorization")) {
       const token = req.get("Authorization").substring(7);
-      const keyStore = Login.loadKeyStore();
-      console.log(keyStore);
-      console.log(token);
-      let threwError = false;
-      try {
-        const result = JWT.verify(token, keyStore, {
-          audience: process.env.CLIENT_ID,
-          issuer: process.env.ISSUER_URL
-        });
-        console.log(result);
-      } catch (e) {
-        threwError = true;
-        console.error(e);
-      }
-      return !threwError;
+      return Login.checkToken(token);
     } else if (req.signedCookies["id_token"]) {
-      return true;
+      const token = req.signedCookies["id_token"];
+      return Login.checkToken(token);
     } else {
       return false;
     }
@@ -114,6 +101,24 @@ class Login {
   static loadKeyStore() {
     const keys = JSON.parse(process.env.KEYS_JSON);
     return JWKS.asKeyStore(keys);
+  }
+
+  /*
+   * Verifies the JWT and returns whether or not the JWT is valid.
+   */
+  static checkToken(token) {
+    const keyStore = Login.loadKeyStore();
+    let threwError = false;
+    try {
+      const _tokenBody = JWT.verify(token, keyStore, {
+        audience: process.env.CLIENT_ID,
+        issuer: process.env.ISSUER_URL
+      });
+    } catch (e) {
+      threwError = true;
+      console.error(e);
+    }
+    return !threwError;
   }
 }
 module.exports = Login;
