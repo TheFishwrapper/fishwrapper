@@ -107,9 +107,9 @@ class Login {
    * Verifies the JWT and returns whether or not the JWT is valid.
    */
   static checkToken(token) {
-    const keyStore = Login.loadKeyStore();
     let threwError = false;
     try {
+      const keyStore = Login.loadKeyStore();
       const _tokenBody = JWT.verify(token, keyStore, {
         audience: process.env.CLIENT_ID,
         issuer: process.env.ISSUER_URL
