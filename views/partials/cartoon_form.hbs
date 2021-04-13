@@ -1,0 +1,13 @@
+<form action="/cartoons" method="POST" enctype="multipart/form-data">
+  <label for="title">Title:</label>
+  <input type="text" name="title" /><br />
+  <label for="issueId">Id:</label>
+  <input type="text" name="issueId" value="{{issue.issueId}}" /><br />
+  <label for="artist">Artist Name:</label>
+  <input type="text" name="artist" /><br />
+  <label for="link">Image file:</label>
+  <input type="file" name="link" /><br />
+  <input type="hidden" name="_method" value="{{method}}" />
+
+  <input id="form-submit" type="submit" value="Submit" class="btn btn-outline-secondary" />
+</form>
