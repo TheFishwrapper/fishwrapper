@@ -1,0 +1,13 @@
+{{> header}}
+<h1>Visuals</h1>
+{{#if req.signedCookies.id_token}}
+  <p><a href="/cartoons/new" class="btn btn-outline-secondary">New Cartoon/Faux Ad</a><p/>
+{{/if}}
+<div class="row">
+  {{#each issues}}
+    <div class="col-12 issue">
+      <h3><a href="/cartoons/{{issue.issueId}}"><img src={{issue.link}}></a></h3>
+    </div>
+  {{/each}}
+</div>
+{{> footer}}

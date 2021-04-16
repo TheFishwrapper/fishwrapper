@@ -1,0 +1,17 @@
+{{> header}}
+<div class="row">
+  <div class="col-12">
+    <h1>{{issue.title}}</h1>
+    <h2>Created by {{issue.artist}}</h2>
+  </div>
+  <div class="col-12">
+    <img src={{issue.link}} alt={{issue.title}}>
+  </div>
+</div>
+{{#if req.signedCookies.id_token}}
+  <div class="row">
+    <a href="/cartoons/{{issue.issueId}}/edit" class="btn btn-outline-secondary mt-3">Edit</a>
+    <a href="/cartoons/{{issue.issueId}}/delete" class="btn btn-outline-secondary mt-3">Delete</a>
+  </div>
+{{/if}}
+{{> footer}}
